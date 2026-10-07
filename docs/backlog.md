@@ -5,7 +5,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 ## Phase 0: setup
 - [done] **T0** Check the pwnedle.com (or alternative) domain and Listdle for name clashes; buy the domain.
 - [done] **T1** Create the GitHub repo with the README and docs. Locally, run `sh .claude/setup-harness.sh` and install the plugins listed in CLAUDE.md.
-- [todo] **T2** Next.js + TypeScript + Tailwind skeleton, ESLint, Vitest, deploy to Vercel; fill in Commands in CLAUDE.md.
+- [done] **T2** Next.js + TypeScript + Tailwind skeleton, ESLint, Vitest, deploy to Vercel; fill in Commands in CLAUDE.md.
 
 ## Phase 1: pipeline
 - [todo] **T3** Pwned Passwords range-API client with padding header and a local cache; unit tests with known counts. (R29)
