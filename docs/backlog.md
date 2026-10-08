@@ -13,7 +13,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T5** Content filter: blocklist plus personal-data patterns; tests. (R30)
 - [done] **T6** Selector that builds puzzles meeting the mix rules and no-repeat rule. Sample candidates lazily: shuffle, look up counts only until the mix rules are met; never fetch the whole pool. (R3, R5, R31)
 - [todo] **T7** Claude API note drafter with length and content limits. (R32)
-- [todo] **T8** `pipeline:generate` fills any of the next 14 days without a file; `pipeline:replace` swaps one password. (R33, R34)
+- [todo] **T8** `pipeline:generate` fills any of the next 14 days without a file; `pipeline:replace` swaps one password. Load every existing puzzle file's passwords into the selector's used set (completes R31). (R33, R34)
 - [todo] **T9** `pipeline:validate` plus a CI job: errors fail the build; warn when any of the next 7 days is still a draft. (R35)
 - [todo] **T9a** Weekly GitHub Action: generate, validate, commit; Claude API key as an Actions secret; failure notifications on. (R36a)
 
