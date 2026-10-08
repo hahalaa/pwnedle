@@ -11,7 +11,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "pipeline:generate": "node --env-file-if-exists=.env scripts/pipeline.ts generate",
-    "pipeline:replace": "node --env-file-if-exists=.env scripts/pipeline.ts replace"
+    "pipeline:replace": "node --env-file-if-exists=.env scripts/pipeline.ts replace",
+    "pipeline:validate": "node scripts/pipeline.ts validate"
   },
   "dependencies": {
     "next": "16.4.0",

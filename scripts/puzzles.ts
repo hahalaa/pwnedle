@@ -1,9 +1,10 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { LAUNCH_DATE } from "../lib/config.ts";
-import { NoValidNoteError, draftNote } from "./notes.ts";
+import { isClean } from "./filter.ts";
+import { NoValidNoteError, draftNote, noteProblem } from "./notes.ts";
 import { pwnedCount } from "./pwned.ts";
-import { selectPuzzle, selectReplacement } from "./select.ts";
+import { meetsMix, selectPuzzle, selectReplacement } from "./select.ts";
 
 // D21: one file per date, entries in display order.
 export type Puzzle = {
@@ -91,4 +92,41 @@ export async function replace(dir: string, date: string, index: number, today: s
   const e = await selectReplacement(candidates, usedSet(puzzles), others, count);
   p.passwords[index] = { ...e, note: await note(e.password, e.count) };
   await save(dir, p);
+}
+
+// Checks every puzzle file against R3, R5, R30 and the note limits (R35).
+// Errors should fail CI; warnings flag drafts dated today to today+6 as a review reminder.
+export async function validate(dir: string, today: string): Promise<{ errors: string[]; warnings: string[] }> {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const seen = new Map<string, string>();
+  const names = (await readdir(dir).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
+  for (const name of names) {
+    const err = (msg: string) => errors.push(`${name}: ${msg}`);
+    let p: Puzzle;
+    try {
+      p = JSON.parse(await readFile(join(dir, name), "utf8"));
+    } catch {
+      err("not valid JSON");
+      continue;
+    }
+    if (`${p.date}.json` !== name) err(`date ${p.date} does not match the file name`);
+    if (p.status !== "draft" && p.status !== "approved") err(`status must be draft or approved, got ${p.status}`);
+    if (!Array.isArray(p.passwords) || p.passwords.length !== 5) {
+      err("needs exactly 5 passwords");
+      continue;
+    }
+    p.passwords.forEach((e, i) => {
+      if (typeof e.password !== "string" || !e.password) return err(`password ${i} is missing`);
+      if (!isClean(e.password)) err(`password ${i} fails the content filter`);
+      if (seen.has(e.password)) err(`password ${i} is also in ${seen.get(e.password)}`);
+      seen.set(e.password, name);
+      if (!Number.isInteger(e.count) || e.count < 0) return err(`password ${i} has a bad count`);
+      const problem = typeof e.note === "string" ? noteProblem(e.note, e.count) : "missing";
+      if (problem) err(`note ${i}: ${problem}`);
+    });
+    if (!meetsMix(p.passwords.map((e) => e.count))) err("counts break the mix rules (R3)");
+    if (p.status === "draft" && p.date >= today && p.date < addDays(today, 7)) warnings.push(`${p.date} is still a draft`);
+  }
+  return { errors, warnings };
 }

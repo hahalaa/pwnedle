@@ -18,7 +18,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T8b** Note quality: code maps each count to a band (never leaked, rare, common, extremely common) and the prompt gets the band, not the number. One sentence under 140 characters, specific to the password. Ban stock phrases ("attackers", "breach corpus", restating the count). Reject notes whose wording contradicts the band. (R32, tightens D20)
 - [done] **T8c** Variation stacking: no digit suffixes on seeds that already end in digits; at most one kind of variation per password. (R28)
 - [done] **T8d** Add the `LAUNCH_DATE` config value; `pipeline:generate` never writes a file dated before it. (D22)
-- [todo] **T9** `pipeline:validate` plus a CI job: errors fail the build; warn when any of the next 7 days is still a draft. (R35)
+- [done] **T9** `pipeline:validate` plus a CI job: errors fail the build; warn when any of the next 7 days is still a draft. (R35)
 - [todo] **T9a** GitHub Action: generate, validate, commit; manual run only until T22 turns on the weekly schedule (D22); Claude API key as an Actions secret; failure notifications on. (R36a)
 
 ## Phase 2: game

@@ -2,7 +2,7 @@ import { mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test, vi } from "vitest";
-import { addDays, generate, replace, type Puzzle } from "./puzzles";
+import { addDays, generate, replace, validate, type Puzzle } from "./puzzles";
 import { NoValidNoteError } from "./notes";
 import { meetsMix, selectReplacement } from "./select";
 
@@ -119,4 +119,45 @@ test("generate swaps a password whose note keeps failing, and fails only when th
   const apiDown = vi.fn(async () => { throw new Error("401 invalid x-api-key"); });
   await expect(generate(await tmp(), TODAY, { ...deps, note: apiDown })).rejects.toThrow("401");
   expect(apiDown).toHaveBeenCalledTimes(1);
+});
+
+test("validate passes generated drafts and warns only on drafts in the next 7 days", async () => {
+  const dir = await tmp();
+  await generate(dir, TODAY, deps);
+  const approved = await read(dir, addDays(TODAY, 2));
+  await writeFile(join(dir, `${approved.date}.json`), JSON.stringify({ ...approved, status: "approved" }));
+
+  const { errors, warnings } = await validate(dir, TODAY);
+  expect(errors).toEqual([]);
+  expect(warnings).toEqual([0, 1, 3, 4, 5, 6].map((i) => `${addDays(TODAY, i)} is still a draft`));
+  expect(await validate(await tmp(), TODAY)).toEqual({ errors: [], warnings: [] });
+});
+
+test("validate reports mix, reuse, content, note and shape errors", async () => {
+  const dir = await tmp();
+  await generate(dir, TODAY, { ...deps, launch: addDays(TODAY, 12) });
+  const [a, b] = [12, 13].map((i) => addDays(TODAY, i));
+  const p = await read(dir, a);
+  const q = await read(dir, b);
+  p.passwords.forEach((e) => (e.count = 5_000));
+  p.passwords[1] = { ...p.passwords[1], password: "fuckyou1" };
+  p.passwords[2].note = "This one appears in the RockYou dump.";
+  q.passwords[3].password = p.passwords[3].password;
+  q.passwords[4].count = -1;
+  await writeFile(join(dir, `${a}.json`), JSON.stringify(p));
+  await writeFile(join(dir, `${b}.json`), JSON.stringify(q));
+  await writeFile(join(dir, "2026-01-01.json"), JSON.stringify({ ...p, date: "2026-01-02", passwords: [] }));
+  await writeFile(join(dir, "2026-01-03.json"), "{");
+
+  const { errors } = await validate(dir, TODAY);
+  expect(errors).toEqual(expect.arrayContaining([
+    `${a}.json: counts break the mix rules (R3)`,
+    `${a}.json: password 1 fails the content filter`,
+    `${a}.json: note 2: names a breach`,
+    `${b}.json: password 3 is also in ${a}.json`,
+    `${b}.json: password 4 has a bad count`,
+    "2026-01-01.json: date 2026-01-02 does not match the file name",
+    "2026-01-01.json: needs exactly 5 passwords",
+    "2026-01-03.json: not valid JSON",
+  ]));
 });
