@@ -1,19 +1,22 @@
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 
-// Appended digits and years, and a trailing "!" (R28).
-const SUFFIXES = ["", "1", "12", "123", "1234", "!", "1!", "123!", "1990", "2000", "2010", "2020", "2024", "2025"];
+// Appended digits and years (R28).
+const DIGITS = ["1", "12", "123", "1234", "1990", "2000", "2010", "2020", "2024", "2025"];
 const SWAPS: Record<string, string> = { a: "@", o: "0", e: "3", s: "$" };
 
-// Every variation of one seed: case forms and letter swaps, each with every suffix.
+// Every variation of one seed, one kind at a time: a case form, the letter swaps,
+// appended digits, or a trailing "!" (R28). Seeds already ending in a digit get no more digits.
 export function variations(seed: string): string[] {
   const forms = [
     seed,
     seed[0].toUpperCase() + seed.slice(1),
     seed.toUpperCase(),
     seed.replace(/[aoes]/g, (c) => SWAPS[c]),
+    seed + "!",
+    ...(/\d$/.test(seed) ? [] : DIGITS.map((d) => seed + d)),
   ];
-  return [...new Set(forms.flatMap((f) => SUFFIXES.map((s) => f + s)))];
+  return [...new Set(forms)];
 }
 
 async function lines(file: string): Promise<string[]> {
