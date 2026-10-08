@@ -15,3 +15,4 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-08 [pipeline] The range cache stores whole range responses per 5-char prefix in gitignored `.cache/pwned/` -> the cache never holds a password or full hash; padding rows have count 0 so they read as misses.
 2026-10-08 [tooling] Plain `node` runs `scripts/*.ts` but warns "Reparsing as ES module" -> in T8, add `"type": "module"` to package.json or use `.mts` when wiring the pipeline commands.
 2026-10-08 [pipeline] SecLists `10k-most-common.txt` contains profanity and other junk -> candidates go through the T5 filter before selection; never feed the raw list to the selector.
+2026-10-08 [pipeline] Substring blocklists hit ordinary words ("ass" in "password", "meth" in "method", "semen" in "basement") -> mark such terms `=` in `scripts/blocklist.txt` so they only match the whole word.
