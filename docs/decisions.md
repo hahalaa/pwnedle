@@ -66,3 +66,6 @@ The pipeline drafts reveal notes with `claude-haiku-5-5` at low effort, through 
 
 ## D21. Puzzle files and the generate window
 Each `data/puzzles/YYYY-MM-DD.json` holds `date`, `status` (`draft` or `approved`) and `passwords`: 5 entries of `{password, count, note}` in display order (R4). `pipeline:generate` fills today through today+13, in UTC like R2. `pipeline:replace` only touches drafts dated today+2 or later, because the server can already serve anything up to today+1.
+
+## D22. Launch date
+`LAUNCH_DATE` is a single config value, set at T22. The puzzle number (R1) is computed from it in T10 and never stored in puzzle files. `pipeline:generate` never writes a file dated before it. Until T22, the T9a Action runs only when started by hand; T22 turns on the weekly schedule.
