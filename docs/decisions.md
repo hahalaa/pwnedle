@@ -11,6 +11,8 @@ HIBP's support documentation states the Pwned Passwords API is free, has no rate
 ## D3. Candidate sources: seed lists plus SecLists
 Both repo-maintained seed lists with variation rules, and public SecLists common-password lists. Confirm SecLists' licence in T4 and record it in the about page.
 
+Confirmed in T4: SecLists is MIT licensed (Copyright (c) 2018 Daniel Miessler). We vendor `Passwords/Common-Credentials/10k-most-common.txt` in `scripts/seeds/seclists/` with its `LICENSE` file next to it. The about page (T18) must credit SecLists.
+
 ## D4. Players never enter passwords
 Players only ever type numbers. A security game must not train people to type passwords into websites. R22 says so explicitly on the site.
 

@@ -9,7 +9,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 
 ## Phase 1: pipeline
 - [done] **T3** Pwned Passwords range-API client with padding header and a local cache; unit tests with known counts. (R29)
-- [todo] **T4** Candidate generator: seed lists in `scripts/seeds/`, variation rules, SecLists import; confirm the SecLists licence. (R28, D3)
+- [done] **T4** Candidate generator: seed lists in `scripts/seeds/`, variation rules, SecLists import; confirm the SecLists licence. (R28, D3)
 - [todo] **T5** Content filter: blocklist plus personal-data patterns; tests. (R30)
 - [todo] **T6** Selector that builds puzzles meeting the mix rules and no-repeat rule. (R3, R5, R31)
 - [todo] **T7** Claude API note drafter with length and content limits. (R32)
