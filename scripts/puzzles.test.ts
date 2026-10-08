@@ -142,6 +142,7 @@ test("validate reports mix, reuse, content, note and shape errors", async () => 
   p.passwords.forEach((e) => (e.count = 5_000));
   p.passwords[1] = { ...p.passwords[1], password: "fuckyou1" };
   p.passwords[2].note = "This one appears in the RockYou dump.";
+  q.passwords[0] = { ...q.passwords[0], count: 1_000_000, note: "A rare pick that few people choose." };
   q.passwords[3].password = p.passwords[3].password;
   q.passwords[4].count = -1;
   await writeFile(join(dir, `${a}.json`), JSON.stringify(p));
@@ -154,6 +155,7 @@ test("validate reports mix, reuse, content, note and shape errors", async () => 
     `${a}.json: counts break the mix rules (R3)`,
     `${a}.json: password 1 fails the content filter`,
     `${a}.json: note 2: names a breach`,
+    `${b}.json: note 0: contradicts band "extremely common"`,
     `${b}.json: password 3 is also in ${a}.json`,
     `${b}.json: password 4 has a bad count`,
     "2026-01-01.json: date 2026-01-02 does not match the file name",
