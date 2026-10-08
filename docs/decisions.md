@@ -70,5 +70,7 @@ Each `data/puzzles/YYYY-MM-DD.json` holds `date`, `status` (`draft` or `approved
 ## D22. Launch date
 `LAUNCH_DATE` is a single config value, set at T22. The puzzle number (R1) is computed from it in T10 and never stored in puzzle files. `pipeline:generate` never writes a file dated before it. Until T22, the T9a Action runs only when started by hand; T22 turns on the weekly schedule.
 
+`LAUNCH_DATE` is provisionally 2026-10-24 until T22 confirms it.
+
 ## D23. Note bands
 Notes are drafted from a band, never the count, so they cannot restate it: never leaked (0), rare (1 to 999), common (1,000 to 99,999), extremely common (100,000 or more). A draft is one sentence under 140 characters. It is rejected if it uses stock phrases ("attackers", "hackers", "breach corpus"), restates the count, or uses wording that contradicts its band. This tightens D20 and R32.
