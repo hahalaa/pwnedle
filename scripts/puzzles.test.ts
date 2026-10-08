@@ -12,8 +12,8 @@ const fakeCount = async (pw: string) => {
   const i = Number(pw.slice(2)) % 9;
   return i === 8 ? 0 : 10 ** i;
 };
-const deps = { candidates: pool, count: fakeCount, note: async (pw: string) => `Note for ${pw}.` };
 const TODAY = "2026-10-08";
+const deps = { candidates: pool, count: fakeCount, note: async (pw: string) => `Note for ${pw}.`, launch: TODAY };
 
 const tmp = () => mkdtemp(join(tmpdir(), "puzzles-"));
 const read = async (dir: string, date: string): Promise<Puzzle> => JSON.parse(await readFile(join(dir, `${date}.json`), "utf8"));
@@ -51,6 +51,13 @@ test("generate fills only missing days, today to today+13, with no repeats", asy
   expect(new Set(all).size).toBe(all.length);
 
   expect(await generate(dir, TODAY, deps)).toEqual([]);
+});
+
+test("generate writes nothing dated before launch", async () => {
+  const dir = await tmp();
+  const written = await generate(dir, TODAY, { ...deps, launch: addDays(TODAY, 10) });
+  expect(written).toEqual([10, 11, 12, 13].map((i) => addDays(TODAY, i)));
+  expect(await readdir(dir)).toHaveLength(4);
 });
 
 test("replace swaps one password in a draft, keeping R3 and R5", async () => {

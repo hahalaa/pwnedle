@@ -1,5 +1,6 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { LAUNCH_DATE } from "../lib/config.ts";
 import { NoValidNoteError, draftNote } from "./notes.ts";
 import { pwnedCount } from "./pwned.ts";
 import { selectPuzzle, selectReplacement } from "./select.ts";
@@ -15,6 +16,7 @@ export type Deps = {
   candidates: string[];
   count?: (password: string) => Promise<number>;
   note?: (password: string, count: number) => Promise<string>;
+  launch?: string;
 };
 
 export const DIR = "data/puzzles";
@@ -39,15 +41,16 @@ async function save(dir: string, p: Puzzle) {
   await writeFile(file(dir, p.date), JSON.stringify(p, null, 2) + "\n");
 }
 
-// Writes a draft for each day from today to today+13 that has no file yet (R33, D21). Returns the dates written.
-export async function generate(dir: string, today: string, { candidates, count = pwnedCount, note = draftNote }: Deps): Promise<string[]> {
+// Writes a draft for each day from today to today+13 that has no file yet and is not before launch (R33, D21, D22).
+// Returns the dates written.
+export async function generate(dir: string, today: string, { candidates, count = pwnedCount, note = draftNote, launch = LAUNCH_DATE }: Deps): Promise<string[]> {
   const puzzles = await loadAll(dir);
   const have = new Set(puzzles.map((p) => p.date));
   const used = usedSet(puzzles);
   const written: string[] = [];
   for (let i = 0; i < 14; i++) {
     const date = addDays(today, i);
-    if (have.has(date)) continue;
+    if (date < launch || have.has(date)) continue;
     const picked = await selectPuzzle(candidates, used, count);
     picked.forEach((e) => used.add(e.password));
     const passwords = [];

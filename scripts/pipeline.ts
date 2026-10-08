@@ -8,7 +8,7 @@ const deps = { candidates: await candidates() };
 
 if (cmd === "generate") {
   const written = await generate(DIR, utcToday(), deps);
-  console.log(written.length ? `Wrote drafts for ${written.join(", ")}` : "All 14 days already have a file");
+  console.log(written.length ? `Wrote drafts for ${written.join(", ")}` : "No days need a draft");
 } else if (cmd === "replace") {
   await replace(DIR, date, Number(index), utcToday(), deps);
   console.log(`Replaced password ${index} in ${date}`);
