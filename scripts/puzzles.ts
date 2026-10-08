@@ -49,10 +49,22 @@ export async function generate(dir: string, today: string, { candidates, count =
     const date = addDays(today, i);
     if (have.has(date)) continue;
     const picked = await selectPuzzle(candidates, used, count);
+    picked.forEach((e) => used.add(e.password));
     const passwords = [];
-    for (const e of picked) {
-      used.add(e.password);
-      passwords.push({ ...e, note: await note(e.password, e.count) });
+    for (let j = 0; j < 5; j++) {
+      // When a password gets no valid note after 3 drafts, swap it and try again (R34).
+      // selectReplacement throws once the pool runs out. API errors still stop the run.
+      for (;;) {
+        const e = picked[j];
+        try {
+          passwords.push({ ...e, note: await note(e.password, e.count) });
+          break;
+        } catch (err) {
+          if (!String(err).includes("No valid note")) throw err;
+          picked[j] = await selectReplacement(candidates, used, picked.filter((_, k) => k !== j).map((x) => x.count), count);
+          used.add(picked[j].password);
+        }
+      }
     }
     await save(dir, { date, status: "draft", passwords });
     written.push(date);

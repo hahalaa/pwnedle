@@ -90,3 +90,25 @@ test("selectReplacement skips used and unclean passwords and candidates that bre
   expect(count.mock.calls.map(([pw]) => pw)).not.toContain("fuckyou1");
   await expect(selectReplacement(["pw3"], new Set(), [1_000, 10_000, 100_000, 1_000_000], fakeCount)).rejects.toThrow("No candidate");
 });
+
+test("generate swaps a password whose note keeps failing, and fails only when the pool runs out", async () => {
+  const bad = new Set(pool.slice(0, 500));
+  const note = async (pw: string) => {
+    if (bad.has(pw)) throw new Error("No valid note for a password after 3 tries (last: empty)");
+    return `Note for ${pw}.`;
+  };
+  const dir = await tmp();
+  expect(await generate(dir, TODAY, { ...deps, note })).toHaveLength(14);
+  for (const n of await readdir(dir)) {
+    const p = await read(dir, n.slice(0, 10));
+    expect(p.passwords.some((e) => bad.has(e.password))).toBe(false);
+    expect(meetsMix(p.passwords.map((e) => e.count))).toBe(true);
+  }
+
+  const noNotes = async () => { throw new Error("No valid note for a password after 3 tries (last: empty)"); };
+  await expect(generate(await tmp(), TODAY, { ...deps, note: noNotes })).rejects.toThrow("No candidate");
+
+  const apiDown = vi.fn(async () => { throw new Error("401 invalid x-api-key"); });
+  await expect(generate(await tmp(), TODAY, { ...deps, note: apiDown })).rejects.toThrow("401");
+  expect(apiDown).toHaveBeenCalledTimes(1);
+});
