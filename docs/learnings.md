@@ -16,3 +16,4 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-08 [tooling] Plain `node` runs `scripts/*.ts` but warns "Reparsing as ES module" -> in T8, add `"type": "module"` to package.json or use `.mts` when wiring the pipeline commands.
 2026-10-08 [pipeline] SecLists `10k-most-common.txt` contains profanity and other junk -> candidates go through the T5 filter before selection; never feed the raw list to the selector.
 2026-10-08 [pipeline] Substring blocklists hit ordinary words ("ass" in "password", "meth" in "method", "semen" in "basement") -> mark such terms `=` in `scripts/blocklist.txt` so they only match the whole word.
+2026-10-08 [tooling] Plain `node` does not resolve extensionless imports between `scripts/*.ts` -> import with `.ts` (`./pwned.ts`); tsconfig has `allowImportingTsExtensions` for it.
