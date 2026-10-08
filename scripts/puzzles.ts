@@ -1,6 +1,6 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { draftNote } from "./notes.ts";
+import { NoValidNoteError, draftNote } from "./notes.ts";
 import { pwnedCount } from "./pwned.ts";
 import { selectPuzzle, selectReplacement } from "./select.ts";
 
@@ -60,7 +60,7 @@ export async function generate(dir: string, today: string, { candidates, count =
           passwords.push({ ...e, note: await note(e.password, e.count) });
           break;
         } catch (err) {
-          if (!String(err).includes("No valid note")) throw err;
+          if (!(err instanceof NoValidNoteError)) throw err;
           picked[j] = await selectReplacement(candidates, used, picked.filter((_, k) => k !== j).map((x) => x.count), count);
           used.add(picked[j].password);
         }

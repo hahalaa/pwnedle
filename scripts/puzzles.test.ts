@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test, vi } from "vitest";
 import { addDays, generate, replace, type Puzzle } from "./puzzles";
+import { NoValidNoteError } from "./notes";
 import { meetsMix, selectReplacement } from "./select";
 
 // Counts cycle through 1, 10, ..., 10,000,000 and 0, as in select.test.ts.
@@ -94,7 +95,7 @@ test("selectReplacement skips used and unclean passwords and candidates that bre
 test("generate swaps a password whose note keeps failing, and fails only when the pool runs out", async () => {
   const bad = new Set(pool.slice(0, 500));
   const note = async (pw: string) => {
-    if (bad.has(pw)) throw new Error("No valid note for a password after 3 tries (last: empty)");
+    if (bad.has(pw)) throw new NoValidNoteError("no note");
     return `Note for ${pw}.`;
   };
   const dir = await tmp();
@@ -105,7 +106,7 @@ test("generate swaps a password whose note keeps failing, and fails only when th
     expect(meetsMix(p.passwords.map((e) => e.count))).toBe(true);
   }
 
-  const noNotes = async () => { throw new Error("No valid note for a password after 3 tries (last: empty)"); };
+  const noNotes = async () => { throw new NoValidNoteError("no note"); };
   await expect(generate(await tmp(), TODAY, { ...deps, note: noNotes })).rejects.toThrow("No candidate");
 
   const apiDown = vi.fn(async () => { throw new Error("401 invalid x-api-key"); });

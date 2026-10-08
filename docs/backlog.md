@@ -15,7 +15,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T7** Claude API note drafter with length and content limits. (R32)
 - [done] **T8** `pipeline:generate` fills any of the next 14 days without a file; `pipeline:replace` swaps one password. Load every existing puzzle file's passwords into the selector's used set (completes R31). (R33, R34)
 - [done] **T8a** `pipeline:generate` keeps going when a note fails: after 3 failed drafts, swap that password for another with `selectReplacement`. Fail only when the pool runs out. (R33, R34)
-- [todo] **T8b** Note quality: code maps each count to a band (never leaked, rare, common, extremely common) and the prompt gets the band, not the number. One sentence under 140 characters, specific to the password. Ban stock phrases ("attackers", "breach corpus", restating the count). Reject notes whose wording contradicts the band. (R32, tightens D20)
+- [done] **T8b** Note quality: code maps each count to a band (never leaked, rare, common, extremely common) and the prompt gets the band, not the number. One sentence under 140 characters, specific to the password. Ban stock phrases ("attackers", "breach corpus", restating the count). Reject notes whose wording contradicts the band. (R32, tightens D20)
 - [todo] **T8c** Variation stacking: no digit suffixes on seeds that already end in digits; at most one kind of variation per password. (R28)
 - [todo] **T8d** Add the `LAUNCH_DATE` config value; `pipeline:generate` never writes a file dated before it. (D22)
 - [todo] **T9** `pipeline:validate` plus a CI job: errors fail the build; warn when any of the next 7 days is still a draft. (R35)
