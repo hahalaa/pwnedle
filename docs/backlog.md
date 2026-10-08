@@ -33,7 +33,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [todo] **T20** Mobile and accessibility pass; colourblind check of tiers. (R25)
 - [todo] **T21** Open Graph image and cookie-free analytics. (R26, R27)
 - [todo] **T22** Generate and approve the first 14 days.
-- [todo] **T23** Playtest with 5 or more people; tune K and the mix rules; log the outcome in decisions.
+- [todo] **T23** Playtest with 5 or more people; tune K and the mix rules; log the outcome in decisions. Check zero-count passwords look plausible; consider limiting stacked variations.
 - [todo] **T24** Launch: submit to Listdle, post to r/cybersecurity and r/InternetIsBeautiful, Show HN.
 
 ## Later

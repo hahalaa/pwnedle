@@ -3,7 +3,7 @@ import { candidates } from "./candidates";
 import { isClean } from "./filter";
 
 test("drops blocklist terms, including leetspeak and suffixes", () => {
-  for (const pw of ["fuckyou", "Sh1t123!", "a$$", "ass123", "p0rn", "c0caine", "weed420", "nigger1", "sexy69", "f.u.c.k"]) {
+  for (const pw of ["fuckyou", "Sh1t123!", "a$$", "ass123", "p0rn", "c0caine", "weed420", "nigger1", "sexy69", "f.u.c.k", "lesbean", "pounded"]) {
     expect(isClean(pw), pw).toBe(false);
   }
 });
