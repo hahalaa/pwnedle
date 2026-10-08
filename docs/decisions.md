@@ -60,3 +60,6 @@ Editor and agent configuration is kept local through `.git/info/exclude`, so the
 
 ## D19. One-line commits (supersedes part of D17)
 Commit messages are a single Conventional Commits subject line with no body. The commit-msg hook rejects bodies. Context that would have gone in a body goes in `docs/learnings.md` or a decision instead.
+
+## D20. Notes drafted by Claude Haiku 5.5
+The pipeline drafts reveal notes with `claude-haiku-5-5` at low effort, through the official `@anthropic-ai/sdk` (a dev dependency, used only by `scripts/`). A note is two short sentences, so the cheapest current model is enough. Every draft is checked against R32 and retried up to three times; Harry's review catches the rest.
