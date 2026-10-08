@@ -55,3 +55,18 @@ export async function selectPuzzle(
   }
   throw new Error("Not enough candidates to meet the mix rules");
 }
+
+// One unused, clean candidate whose count keeps R3 when added to `others` (R34).
+export async function selectReplacement(
+  candidates: string[],
+  used: Set<string>,
+  others: number[],
+  count: (password: string) => Promise<number> = pwnedCount,
+): Promise<Entry> {
+  for (const password of shuffle(candidates)) {
+    if (used.has(password) || !isClean(password)) continue;
+    const c = await count(password);
+    if (meetsMix([...others, c])) return { password, count: c };
+  }
+  throw new Error("No candidate keeps the mix rules");
+}

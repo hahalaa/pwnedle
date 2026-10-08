@@ -2,13 +2,16 @@
   "name": "pwnedle",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "pipeline:generate": "node --env-file-if-exists=.env scripts/pipeline.ts generate",
+    "pipeline:replace": "node --env-file-if-exists=.env scripts/pipeline.ts replace"
   },
   "dependencies": {
     "next": "16.4.0",

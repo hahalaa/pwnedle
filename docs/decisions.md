@@ -63,3 +63,6 @@ Commit messages are a single Conventional Commits subject line with no body. The
 
 ## D20. Notes drafted by Claude Haiku 5.5
 The pipeline drafts reveal notes with `claude-haiku-5-5` at low effort, through the official `@anthropic-ai/sdk` (a dev dependency, used only by `scripts/`). A note is two short sentences, so the cheapest current model is enough. Every draft is checked against R32 and retried up to three times; Harry's review catches the rest.
+
+## D21. Puzzle files and the generate window
+Each `data/puzzles/YYYY-MM-DD.json` holds `date`, `status` (`draft` or `approved`) and `passwords`: 5 entries of `{password, count, note}` in display order (R4). `pipeline:generate` fills today through today+13, in UTC like R2. `pipeline:replace` only touches drafts dated today+2 or later, because the server can already serve anything up to today+1.
