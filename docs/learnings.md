@@ -36,3 +36,4 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-09 [tooling] `npm run build` while `next dev` runs leaves the dev server serving stale CSS -> stop the dev server before building, then restart it.
 2026-10-09 [ui] A native range thumb's centre travels from half its width to 100% minus half its width -> place slider ticks at `calc(7px + (100% - 14px) * f)` for the 14px thumb, not at `f`.
 2026-10-09 [ui] A hydration warning about `caret-color: transparent` comes from Playwright hiding the caret for a screenshot taken before hydration -> ignore it, or wait for hydration before the screenshot.
+2026-10-09 [ui] Flex spacers built from `::before`/`::after` count as flex items, so the parent `gap` applies to them too -> drop the parent gap and space the real children with margins.

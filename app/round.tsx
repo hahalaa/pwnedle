@@ -25,7 +25,7 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
   }
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-1 flex-col gap-6 sm:flex-none">
       <h2 className="text-lg leading-snug">How many times has this password appeared in data breaches?</h2>
       {/* The password sits in a bracketed 1px window; its title bar carries the progress (D25). */}
       <div className="brackets relative mx-[5px] border border-line">
@@ -89,7 +89,7 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
         type="button"
         onClick={lockIn}
         disabled={invalid || busy}
-        className="self-start bg-signal px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash"
+        className="mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash"
       >
         {state === "sending" ? "Locking in…" : state === "locked" ? "Locked in" : "Lock in"}
       </button>
