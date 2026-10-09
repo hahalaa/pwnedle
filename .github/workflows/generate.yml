@@ -1,0 +1,42 @@
+name: Generate puzzles
+
+# Manual only until T22 adds the weekly schedule (D22).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate
+
+jobs:
+  generate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run pipeline:generate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      # This run's push won't trigger CI, so validate here before committing (R35).
+      - run: npm run pipeline:validate
+      # The token is only used here, so the steps above never see a write credential.
+      - name: Commit and push drafts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          last=$(git ls-files --others --exclude-standard -- data/puzzles | sort | tail -n1)
+          if [ -z "$last" ]; then echo "No new drafts"; exit 0; fi
+          git add data/puzzles
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "chore(puzzles): Add drafts to $(basename "$last" .json)"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main

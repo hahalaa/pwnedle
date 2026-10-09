@@ -24,3 +24,5 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-09 [pipeline] `draftNote` throws for both bad drafts and API errors -> it throws `NoValidNoteError` for bad drafts and `generate` only swaps on that class; anything else stops the run so a bad key cannot drain the pool.
 2026-10-09 [pipeline] At low effort Haiku 5.5 sometimes drafts, writes "Wait, ..." and corrects itself in the visible reply; medium effort does it too -> the 140-character check catches it and the retry usually comes back clean.
 2026-10-09 [pipeline] Generated puzzles are shuffled, so a test that breaks R3 by editing one entry only fails sometimes -> set every count to the same value to break the mix for certain.
+2026-10-09 [tooling] `git add data/puzzles` fails when the folder doesn't exist yet, which ends a `bash -e` Actions step -> the generate workflow lists new files with `git ls-files --others` first and only adds when there are some.
+2026-10-09 [tooling] Pushes made with the workflow's `GITHUB_TOKEN` don't trigger other workflows, so CI never sees the Action's commits -> the generate workflow runs `pipeline:validate` itself before committing.

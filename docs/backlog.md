@@ -19,7 +19,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T8c** Variation stacking: no digit suffixes on seeds that already end in digits; at most one kind of variation per password. (R28)
 - [done] **T8d** Add the `LAUNCH_DATE` config value; `pipeline:generate` never writes a file dated before it. (D22)
 - [done] **T9** `pipeline:validate` plus a CI job: errors fail the build; warn when any of the next 7 days is still a draft. (R35)
-- [todo] **T9a** GitHub Action: generate, validate, commit; manual run only until T22 turns on the weekly schedule (D22); Claude API key as an Actions secret; failure notifications on. (R36a)
+- [done] **T9a** GitHub Action: generate, validate, commit; manual run only until T22 turns on the weekly schedule (D22); Claude API key as an Actions secret; failure notifications on. (R36a)
 
 ## Phase 2: game
 - [todo] **T10** Server puzzle loader: approved or draft files, date window, `server-only` guard; puzzle number computed from `LAUNCH_DATE`. (R1, R2, R13, R36, D22)
