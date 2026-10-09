@@ -31,7 +31,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T13b** Slider scale: a tick at every power of ten from 1 to 100m, evenly spaced, with the 0 stop visually separate; keep the log mapping. (R7)
 - [done] **T13c** Layout: the game fills the viewport. Vertically centred on desktop at a sensible width; on mobile it fills the screen with Lock in within thumb reach.
 - [done] **T13d** Polish: plain background, no dot-grid texture; the outer container spans the full viewport with the content centred inside it. The 0-to-1 slider segment is half a decade wide and dotted instead of a gap.
-- [todo] **T14** Reveal UI and progress dots. (R9)
+- [done] **T14** Reveal UI and progress dots. (R9)
 - [todo] **T15** End screen with breakdown and share text. (R12, R19)
 - [todo] **T16** localStorage progress, resume, stats modal. (R15, R16, R17)
 - [todo] **T17** Archive page; archive games excluded from stats. (R18, R20)

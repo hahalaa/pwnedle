@@ -92,3 +92,9 @@ Tier colours run from blue to yellow and get lighter as the tier improves, so th
 - Pwned #5f7fc0, Weak #8fa3c4, Medium #b9b39b, Strong #dcc062, Uncrackable #fde74c
 
 Type: Archivo for prose and buttons; IBM Plex Mono for passwords, numbers and labels (lowercase, never all caps); Doto, a dot-matrix face, only for the Pwnedle wordmark.
+
+## D26. Traffic-light tier colours (supersedes the D25 tier tokens)
+Tier colours now match the R19 share squares: green and olive-lime for the top two tiers, then amber, orange and red. Pwned reuses the `signal` accent, so red means a bad result as well as the main action. Uncrackable is a saturated green with its chroma held below the phosphor green D25 rules out for text.
+
+A saturated green can't be much lighter than OKLab L 0.85, so the ramp is compressed under it: each tier is about 0.05 to 0.07 OKLab lightness lighter than the one below. Under a deuteranopia simulation (Machado 2009, full severity) the hues collapse to yellows but the steps remain, so the order still reads, though the top two steps are the smallest. The tier label always appears next to the colour (R25). Contrast on `void` is at least 4.5:1; Pwned is the lowest at 4.52:1.
+- Pwned #e5322d, Weak #e76d04, Medium #e19906, Strong #a7cc0a, Uncrackable #56ee66

@@ -12,6 +12,15 @@
   --font-dot: var(--font-doto), var(--font-plex-mono), monospace;
 }
 
+/* D26 tier colours. Built at runtime as var(--color-<tier>), which Tailwind can't see, so `static` always emits them. */
+@theme static {
+  --color-pwned: #e5322d;
+  --color-weak: #e76d04;
+  --color-medium: #e19906;
+  --color-strong: #a7cc0a;
+  --color-uncrackable: #56ee66;
+}
+
 html {
   color-scheme: dark;
 }
