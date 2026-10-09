@@ -20,3 +20,10 @@ export async function loadPuzzle(date: string, today = utcToday(), dir = join(pr
     throw e;
   }
 }
+
+// The only puzzle shape the browser may receive: no counts or notes before a guess is locked in (R13, D7).
+export const clientPuzzle = ({ date, number, passwords }: Puzzle & { number: number }) => ({
+  date,
+  number,
+  passwords: passwords.map((e) => e.password),
+});

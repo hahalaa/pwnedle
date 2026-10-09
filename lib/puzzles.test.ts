@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { expect, test, vi } from "vitest";
 import { LAUNCH_DATE } from "./config";
 import { addDays } from "./days";
-import { loadPuzzle } from "./puzzles";
+import { clientPuzzle, loadPuzzle } from "./puzzles";
 
 vi.mock("server-only", () => ({}));
 
@@ -33,4 +33,9 @@ test("refuses dates outside the window, missing files and bad input", async () =
   for (const date of [early, late, addDays(TODAY, -1), "../config", "2026-10-24.json", ""]) {
     expect(await loadPuzzle(date, TODAY, dir)).toBeNull();
   }
+});
+
+test("client puzzle has only date, number and password text", () => {
+  const p = { date: LAUNCH_DATE, status: "draft" as const, number: 1, passwords: [{ password: "dragon", count: 99, note: "A note." }] };
+  expect(clientPuzzle(p)).toEqual({ date: LAUNCH_DATE, number: 1, passwords: ["dragon"] });
 });

@@ -23,7 +23,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 
 ## Phase 2: game
 - [done] **T10** Server puzzle loader: approved or draft files, date window, `server-only` guard; puzzle number computed from `LAUNCH_DATE`. (R1, R2, R13, R36, D22)
-- [todo] **T11** API route: lock in a guess, return count, score, tier, note. (R10, R11, R14) Add a function that returns the client-safe puzzle (date, number, passwords only) and use it everywhere the browser receives puzzle data; test that counts and notes are absent.
+- [done] **T11** API route: lock in a guess, return count, score, tier, note. (R10, R11, R14) Add a function that returns the client-safe puzzle (date, number, passwords only) and use it everywhere the browser receives puzzle data; test that counts and notes are absent.
 - [done] **T12** Scoring and tier module with unit tests, including zero counts and the K constant. (R10, R11, D5)
 - [todo] **T13** Round UI: password display, log slider with 0 stop, synced number box with k/m parsing, Lock in. (R7, R8)
 - [todo] **T14** Reveal UI and progress dots. (R9)

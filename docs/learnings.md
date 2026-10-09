@@ -28,3 +28,5 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-09 [tooling] Pushes made with the workflow's `GITHUB_TOKEN` don't trigger other workflows, so CI never sees the Action's commits -> the generate workflow runs `pipeline:validate` itself before committing.
 2026-10-09 [tooling] Next handles `import "server-only"` without the npm package, but Vitest can't resolve it -> tests of server modules add `vi.mock("server-only", () => ({}))`.
 2026-10-09 [deploy] `lib/puzzles.ts` reads `data/puzzles/` with `fs` at runtime, which file tracing can miss -> `next.config.ts` lists the folder in `outputFileTracingIncludes`.
+2026-10-09 [api] `RegExp.test` turns its argument into a string, so a JSON body with `"date": ["2026-10-24"]` passes `loadPuzzle`'s date regex -> the guess route checks `typeof date === "string"` first.
+2026-10-09 [api] Before `LAUNCH_DATE`, no date can be served, because the window runs from launch to UTC today+1 -> a live check of `/api/guess` can only return 400 or 404 until then; route tests mock `loadPuzzle`.
