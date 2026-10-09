@@ -26,7 +26,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T11** API route: lock in a guess, return count, score, tier, note. (R10, R11, R14) Add a function that returns the client-safe puzzle (date, number, passwords only) and use it everywhere the browser receives puzzle data; test that counts and notes are absent.
 - [done] **T11a** Dev puzzle: when NODE_ENV is development, the loader serves a fixed fixture puzzle (fake passwords, counts and notes) for any date in the window, ignoring LAUNCH_DATE. Production builds never load it; test that. The fixture's passwords never enter data/puzzles or the used set.
 - [done] **T12** Scoring and tier module with unit tests, including zero counts and the K constant. (R10, R11, D5)
-- [todo] **T13** Round UI: password display, log slider with 0 stop, synced number box with k/m parsing, Lock in. (R7, R8)
+- [done] **T13** Round UI: password display, log slider with 0 stop, synced number box with k/m parsing, Lock in. (R7, R8)
 - [todo] **T14** Reveal UI and progress dots. (R9)
 - [todo] **T15** End screen with breakdown and share text. (R12, R19)
 - [todo] **T16** localStorage progress, resume, stats modal. (R15, R16, R17)
