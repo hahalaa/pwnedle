@@ -52,11 +52,13 @@ body::before {
   border-left: 0;
 }
 
-/* Range: a 1px track with a square thumb in the accent. */
+/* Range: a 1px track from the 1 stop to 100m with a square thumb in the accent.
+   The 0 stop sits a decade to the left, past a gap (lib/guess.ts). */
 input[type="range"] {
   appearance: none;
   height: 24px;
-  background: linear-gradient(var(--color-ash), var(--color-ash)) center / 100% 1px no-repeat;
+  background: linear-gradient(var(--color-ash), var(--color-ash)) right 7px center / calc((100% - 14px) * 8 / 9) 1px
+    no-repeat;
 }
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;

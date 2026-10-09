@@ -28,7 +28,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T12** Scoring and tier module with unit tests, including zero counts and the K constant. (R10, R11, D5)
 - [done] **T13** Round UI: password display, log slider with 0 stop, synced number box with k/m parsing, Lock in. (R7, R8)
 - [done] **T13a** Visual direction: restyle the app from the refs in `.claude/design-refs/`. Near-black background, off-white text, one red accent used sparingly, monospace for labels and data, thin 1px lines and bracket motifs, a subtle dot-matrix or halftone texture. No green terminal text, no heavy glitch effects. Tier colours stay colourblind-safe and labelled and must not clash with the accent. Record the direction as a decision with the colour and type tokens. (R25)
-- [todo] **T13b** Slider scale: a tick at every power of ten from 1 to 100m, evenly spaced, with the 0 stop visually separate; keep the log mapping. (R7)
+- [done] **T13b** Slider scale: a tick at every power of ten from 1 to 100m, evenly spaced, with the 0 stop visually separate; keep the log mapping. (R7)
 - [todo] **T13c** Layout: the game fills the viewport. Vertically centred on desktop at a sensible width; on mobile it fills the screen with Lock in within thumb reach.
 - [todo] **T14** Reveal UI and progress dots. (R9)
 - [todo] **T15** End screen with breakdown and share text. (R12, R19)

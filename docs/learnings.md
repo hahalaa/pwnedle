@@ -33,3 +33,6 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-09 [api] Next inlines `process.env.NODE_ENV` in server bundles, so a dynamic import inside a development-only branch is dropped from production -> check by grepping `.next/server` for fixture text after `npm run build`; tests switch modes with `vi.stubEnv("NODE_ENV", ...)`.
 2026-10-09 [tooling] Tailwind v4 scans every file git does not ignore, so playwright writing console logs into `.playwright-mcp/` made `next dev` rebuild CSS in a loop -> `.playwright-mcp/` is in `.git/info/exclude`, which Tailwind also respects.
 2026-10-09 [ui] Joining `::-webkit-slider-thumb` and `::-moz-range-thumb` in one selector list makes each browser drop the whole rule -> style the range thumb in separate rules per engine, including the `:disabled` variants.
+2026-10-09 [tooling] `npm run build` while `next dev` runs leaves the dev server serving stale CSS -> stop the dev server before building, then restart it.
+2026-10-09 [ui] A native range thumb's centre travels from half its width to 100% minus half its width -> place slider ticks at `calc(7px + (100% - 14px) * f)` for the 14px thumb, not at `f`.
+2026-10-09 [ui] A hydration warning about `caret-color: transparent` comes from Playwright hiding the caret for a screenshot taken before hydration -> ignore it, or wait for hydration before the screenshot.

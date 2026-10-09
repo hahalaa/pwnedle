@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { formatGuess, fromSlider, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 
+// The 0 stop, then every power of ten, one decade apart (lib/guess.ts).
+const TICKS = ["0", "1", "10", "100", "1k", "10k", "100k", "1m", "10m", "100m"];
+
 // ponytail: always the first password; T14 adds the reveal and steps through the rest.
 const index = 0;
 
@@ -41,18 +44,24 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
           value={toSlider(guess)}
           disabled={busy}
           onChange={(e) => {
-            const n = fromSlider(Number(e.target.value));
+            const n = fromSlider(Number(e.target.value), guess);
             setGuess(n);
             setText(formatGuess(n));
           }}
           className="w-full"
         />
-        {/* Labels sit where the slider puts them: 8 decades, so 1k is 3/8 of the way and 1m 6/8. */}
-        <div className="relative h-4 font-mono text-xs text-ash" aria-hidden>
-          <span className="absolute left-0">0</span>
-          <span className="absolute left-[37.5%] -translate-x-1/2">1k</span>
-          <span className="absolute left-3/4 -translate-x-1/2">1m</span>
-          <span className="absolute right-0">100m</span>
+        {/* One tick per stop, at the thumb's centre: it travels from 7px to 100% - 7px (14px thumb, globals.css). */}
+        <div className="relative h-7 font-mono text-xs text-ash" aria-hidden>
+          {TICKS.map((t, i) => (
+            <span
+              key={t}
+              className="absolute flex -translate-x-1/2 flex-col items-center gap-1"
+              style={{ left: `calc(7px + (100% - 14px) * ${i / (TICKS.length - 1)})` }}
+            >
+              <span className="h-1.5 w-px bg-ash" />
+              {t}
+            </span>
+          ))}
         </div>
       </div>
       <label className="flex flex-col gap-1">
