@@ -1,0 +1,22 @@
+import "server-only";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import type { Puzzle } from "../scripts/puzzles.ts";
+import { LAUNCH_DATE } from "./config.ts";
+import { addDays, utcToday } from "./days.ts";
+
+// The puzzle for `date`, draft or approved (R36), if it falls between launch and UTC today+1 (R2).
+// Returns null for anything else, including a missing file. Includes counts and notes, so never send it to the client whole (R13).
+export async function loadPuzzle(date: string, today = utcToday(), dir = join(process.cwd(), "data/puzzles")): Promise<(Puzzle & { number: number }) | null> {
+  // The date may come from a request, so the strict format check also keeps it out of other paths.
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  if (date < LAUNCH_DATE || date > addDays(today, 1)) return null;
+  try {
+    const p: Puzzle = JSON.parse(await readFile(join(dir, `${date}.json`), "utf8"));
+    // Puzzle number is days since launch, starting at #1 (R1, D22).
+    return { ...p, number: (Date.parse(date) - Date.parse(LAUNCH_DATE)) / 86_400_000 + 1 };
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw e;
+  }
+}

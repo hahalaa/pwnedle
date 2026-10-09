@@ -26,3 +26,5 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-09 [pipeline] Generated puzzles are shuffled, so a test that breaks R3 by editing one entry only fails sometimes -> set every count to the same value to break the mix for certain.
 2026-10-09 [tooling] `git add data/puzzles` fails when the folder doesn't exist yet, which ends a `bash -e` Actions step -> the generate workflow lists new files with `git ls-files --others` first and only adds when there are some.
 2026-10-09 [tooling] Pushes made with the workflow's `GITHUB_TOKEN` don't trigger other workflows, so CI never sees the Action's commits -> the generate workflow runs `pipeline:validate` itself before committing.
+2026-10-09 [tooling] Next handles `import "server-only"` without the npm package, but Vitest can't resolve it -> tests of server modules add `vi.mock("server-only", () => ({}))`.
+2026-10-09 [deploy] `lib/puzzles.ts` reads `data/puzzles/` with `fs` at runtime, which file tracing can miss -> `next.config.ts` lists the folder in `outputFileTracingIncludes`.

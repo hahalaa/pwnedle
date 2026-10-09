@@ -1,6 +1,7 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { LAUNCH_DATE } from "../lib/config.ts";
+import { addDays, utcToday } from "../lib/days.ts";
 import { isClean } from "./filter.ts";
 import { NoValidNoteError, draftNote, noteProblem } from "./notes.ts";
 import { pwnedCount } from "./pwned.ts";
@@ -22,10 +23,7 @@ export type Deps = {
 
 export const DIR = "data/puzzles";
 
-export const addDays = (date: string, n: number) =>
-  new Date(Date.parse(`${date}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
-
-export const utcToday = () => new Date().toISOString().slice(0, 10);
+export { addDays, utcToday };
 
 const file = (dir: string, date: string) => join(dir, `${date}.json`);
 
