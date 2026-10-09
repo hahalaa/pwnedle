@@ -79,7 +79,7 @@ Notes are drafted from a band, never the count, so they cannot restate it: never
 In development only, the loader skips the `LAUNCH_DATE` check. It serves the real file for a date when one exists, and otherwise a fixed fixture puzzle numbered #0, so the game can be built and played before launch. The fixture lives in `lib/`, outside `data/puzzles/`, so the pipeline never sees its passwords. Production builds never load it.
 
 ## D25. Visual direction
-Dark and quiet, drawn from old terminal printouts and dot-matrix images. No green terminal text and no glitch effects. Near-black background, off-white text, thin 1px lines, and one red accent kept for the main action (Lock in, the slider thumb) and errors. A faint halftone dot grid fades in toward the bottom of the screen. The password sits in a 1px window whose title bar shows the progress, with square brackets at each side.
+Dark and quiet, drawn from old terminal printouts and dot-matrix images. No green terminal text and no glitch effects. Near-black background, off-white text, thin 1px lines, and one red accent kept for the main action (Lock in, the slider thumb) and errors. The password sits in a 1px window whose title bar shows the progress, with square brackets at each side.
 
 Colour tokens (in `app/globals.css`; T14 adds the tier colours there when it first uses them):
 - `void` #0b0b0c: background

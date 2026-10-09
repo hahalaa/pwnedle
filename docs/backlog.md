@@ -30,6 +30,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T13a** Visual direction: restyle the app from the refs in `.claude/design-refs/`. Near-black background, off-white text, one red accent used sparingly, monospace for labels and data, thin 1px lines and bracket motifs, a subtle dot-matrix or halftone texture. No green terminal text, no heavy glitch effects. Tier colours stay colourblind-safe and labelled and must not clash with the accent. Record the direction as a decision with the colour and type tokens. (R25)
 - [done] **T13b** Slider scale: a tick at every power of ten from 1 to 100m, evenly spaced, with the 0 stop visually separate; keep the log mapping. (R7)
 - [done] **T13c** Layout: the game fills the viewport. Vertically centred on desktop at a sensible width; on mobile it fills the screen with Lock in within thumb reach.
+- [done] **T13d** Polish: plain background, no dot-grid texture; the outer container spans the full viewport with the content centred inside it. The 0-to-1 slider segment is half a decade wide and dotted instead of a gap.
 - [todo] **T14** Reveal UI and progress dots. (R9)
 - [todo] **T15** End screen with breakdown and share text. (R12, R19)
 - [todo] **T16** localStorage progress, resume, stats modal. (R15, R16, R17)
@@ -49,3 +50,4 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [todo] **T26** Event theme days. (R38)
 - [todo] **T27** Unlimited practice mode. (R39)
 - [todo] **T28** Clear the 5 high `npm audit` advisories in the dev-only eslint-config-next chain (braces via micromatch and fast-glob) without `--force`.
+- [todo] **T29** Optional cursor-reactive dot grid (dots enlarge near the cursor); desktop only, subtle, respects `prefers-reduced-motion`.

@@ -12,17 +12,17 @@ test("rejects text, negatives and guesses over 100,000,000", () => {
 });
 
 test("slider has a 0 stop and spans 1 to 100,000,000 on a log scale", () => {
-  expect([fromSlider(0), fromSlider(DECADE), fromSlider(SLIDER_MAX)]).toEqual([0, 1, MAX_GUESS]);
-  expect(fromSlider(5 * DECADE)).toBe(10_000);
-  expect([toSlider(0), toSlider(1), toSlider(MAX_GUESS), toSlider(2_500_000)]).toEqual([0, DECADE, SLIDER_MAX, 740]);
+  expect([fromSlider(0), fromSlider(DECADE / 2), fromSlider(SLIDER_MAX)]).toEqual([0, 1, MAX_GUESS]);
+  expect(fromSlider(4.5 * DECADE)).toBe(10_000);
+  expect([toSlider(0), toSlider(1), toSlider(MAX_GUESS), toSlider(2_500_000)]).toEqual([0, DECADE / 2, SLIDER_MAX, 690]);
 });
 
-test("every power of ten sits one decade apart, with the 0 stop a decade left of 1", () => {
-  expect([1, 10, 100, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8].map(toSlider)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => d * DECADE));
+test("every power of ten sits one decade apart, with the 0 stop half a decade left of 1", () => {
+  expect([1, 10, 100, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8].map(toSlider)).toEqual([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5].map((d) => d * DECADE));
 });
 
 test("the gap between 0 and 1 snaps by direction, so arrow keys cross it both ways", () => {
   expect(fromSlider(1, 0)).toBe(1); // right arrow from 0
-  expect(fromSlider(DECADE - 1, 1)).toBe(0); // left arrow from 1
-  expect(fromSlider(50, 1_000)).toBe(0); // dragged left into the gap
+  expect(fromSlider(DECADE / 2 - 1, 1)).toBe(0); // left arrow from 1
+  expect(fromSlider(25, 1_000)).toBe(0); // dragged left into the gap
 });
