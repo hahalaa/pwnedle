@@ -10,14 +10,19 @@ import { addDays, utcToday } from "./days.ts";
 export async function loadPuzzle(date: string, today = utcToday(), dir = join(process.cwd(), "data/puzzles")): Promise<(Puzzle & { number: number }) | null> {
   // The date may come from a request, so the strict format check also keeps it out of other paths.
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
-  if (date < LAUNCH_DATE || date > addDays(today, 1)) return null;
+  // D24: dev skips the launch check so the game is playable before launch.
+  if ((process.env.NODE_ENV !== "development" && date < LAUNCH_DATE) || date > addDays(today, 1)) return null;
   try {
     const p: Puzzle = JSON.parse(await readFile(join(dir, `${date}.json`), "utf8"));
     // Puzzle number is days since launch, starting at #1 (R1, D22).
     return { ...p, number: (Date.parse(date) - Date.parse(LAUNCH_DATE)) / 86_400_000 + 1 };
   } catch (e) {
-    if ((e as NodeJS.ErrnoException).code === "ENOENT") return null;
-    throw e;
+    if ((e as NodeJS.ErrnoException).code !== "ENOENT") throw e;
+    // D24: Next inlines NODE_ENV, so production builds drop this branch and never load the fixture.
+    if (process.env.NODE_ENV === "development") {
+      return { date, status: "draft", number: 0, passwords: (await import("./dev-puzzle.ts")).devPasswords };
+    }
+    return null;
   }
 }
 

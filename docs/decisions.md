@@ -74,3 +74,6 @@ Each `data/puzzles/YYYY-MM-DD.json` holds `date`, `status` (`draft` or `approved
 
 ## D23. Note bands
 Notes are drafted from a band, never the count, so they cannot restate it: never leaked (0), rare (1 to 999), common (1,000 to 99,999), extremely common (100,000 or more). A draft is one sentence under 140 characters. It is rejected if it uses stock phrases ("attackers", "hackers", "breach corpus"), restates the count, or uses wording that contradicts its band. This tightens D20 and R32.
+
+## D24. Dev fixture puzzle
+In development only, the loader skips the `LAUNCH_DATE` check. It serves the real file for a date when one exists, and otherwise a fixed fixture puzzle numbered #0, so the game can be built and played before launch. The fixture lives in `lib/`, outside `data/puzzles/`, so the pipeline never sees its passwords. Production builds never load it.
