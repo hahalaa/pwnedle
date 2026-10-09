@@ -77,3 +77,18 @@ Notes are drafted from a band, never the count, so they cannot restate it: never
 
 ## D24. Dev fixture puzzle
 In development only, the loader skips the `LAUNCH_DATE` check. It serves the real file for a date when one exists, and otherwise a fixed fixture puzzle numbered #0, so the game can be built and played before launch. The fixture lives in `lib/`, outside `data/puzzles/`, so the pipeline never sees its passwords. Production builds never load it.
+
+## D25. Visual direction
+Dark and quiet, drawn from old terminal printouts and dot-matrix images. No green terminal text and no glitch effects. Near-black background, off-white text, thin 1px lines, and one red accent kept for the main action (Lock in, the slider thumb) and errors. A faint halftone dot grid fades in toward the bottom of the screen. The password sits in a 1px window whose title bar shows the progress, with square brackets at each side.
+
+Colour tokens (in `app/globals.css`; T14 adds the tier colours there when it first uses them):
+- `void` #0b0b0c: background
+- `bone` #e8e5df: text, focus outlines
+- `ash` #8d8a84: secondary text and labels
+- `line` #2a2a2d: 1px borders and rules
+- `signal` #e5322d: the accent
+
+Tier colours run from blue to yellow and get lighter as the tier improves, so their order survives colour blindness; none of them is near the red accent. Each one passes 4.5:1 on `void`, and the tier label always appears next to it (R25):
+- Pwned #5f7fc0, Weak #8fa3c4, Medium #b9b39b, Strong #dcc062, Uncrackable #fde74c
+
+Type: Archivo for prose and buttons; IBM Plex Mono for passwords, numbers and labels (lowercase, never all caps); Doto, a dot-matrix face, only for the Pwnedle wordmark.

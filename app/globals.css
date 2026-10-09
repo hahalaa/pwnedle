@@ -1,14 +1,83 @@
 @import "tailwindcss";
 
+/* D25: visual direction tokens. */
 @theme {
-  --color-paper: #e9edf1;
-  --color-ink: #18202b;
-  --color-cobalt: #2b44c9;
+  --color-void: #0b0b0c;
+  --color-bone: #e8e5df;
+  --color-ash: #8d8a84;
+  --color-line: #2a2a2d;
+  --color-signal: #e5322d;
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-dot: var(--font-doto), var(--font-plex-mono), monospace;
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--color-void);
+  color: var(--color-bone);
+}
+
+/* Halftone: a fixed dot grid that fades in toward the bottom of the screen. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle, var(--color-bone) 0.7px, transparent 1.2px) 0 0 / 5px 5px;
+  opacity: 0.12;
+  mask-image: linear-gradient(to bottom, transparent 35%, black);
+}
+
+/* Square brackets at each side of a 1px frame; the element needs `relative`. */
+.brackets::before,
+.brackets::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 10px;
+  border: 1px solid var(--color-bone);
+}
+.brackets::before {
+  left: -5px;
+  border-right: 0;
+}
+.brackets::after {
+  right: -5px;
+  border-left: 0;
+}
+
+/* Range: a 1px track with a square thumb in the accent. */
+input[type="range"] {
+  appearance: none;
+  height: 24px;
+  background: linear-gradient(var(--color-ash), var(--color-ash)) center / 100% 1px no-repeat;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 22px;
+  background: var(--color-signal);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 22px;
+  border: 0;
+  border-radius: 0;
+  background: var(--color-signal);
+}
+input[type="range"]:focus-visible {
+  outline: 1px solid var(--color-bone);
+  outline-offset: 4px;
+}
+input[type="range"]:disabled::-webkit-slider-thumb {
+  background: var(--color-ash);
+}
+input[type="range"]:disabled::-moz-range-thumb {
+  background: var(--color-ash);
 }

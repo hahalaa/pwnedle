@@ -23,12 +23,13 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
 
   return (
     <section className="flex flex-col gap-6">
-      <p className="text-sm text-ink/60">
-        Password {index + 1} of {passwords.length}
-      </p>
-      <div className="flex flex-col gap-3">
-        <h2 className="text-lg leading-snug">How many times has this password appeared in data breaches?</h2>
-        <p className="font-mono text-3xl break-all sm:text-4xl">{passwords[index]}</p>
+      <h2 className="text-lg leading-snug">How many times has this password appeared in data breaches?</h2>
+      {/* The password sits in a bracketed 1px window; its title bar carries the progress (D25). */}
+      <div className="brackets relative mx-[5px] border border-line">
+        <p className="border-b border-line px-3 py-1.5 font-mono text-xs text-ash">
+          password {index + 1} of {passwords.length}
+        </p>
+        <p className="font-mono px-3 py-6 text-3xl break-all sm:text-4xl">{passwords[index]}</p>
       </div>
       <div className="flex flex-col gap-2">
         <input
@@ -44,10 +45,10 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
             setGuess(n);
             setText(formatGuess(n));
           }}
-          className="w-full accent-cobalt"
+          className="w-full"
         />
         {/* Labels sit where the slider puts them: 8 decades, so 1k is 3/8 of the way and 1m 6/8. */}
-        <div className="relative h-4 font-mono text-xs text-ink/60" aria-hidden>
+        <div className="relative h-4 font-mono text-xs text-ash" aria-hidden>
           <span className="absolute left-0">0</span>
           <span className="absolute left-[37.5%] -translate-x-1/2">1k</span>
           <span className="absolute left-3/4 -translate-x-1/2">1m</span>
@@ -55,7 +56,7 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
         </div>
       </div>
       <label className="flex flex-col gap-1">
-        <span className="text-sm">Your guess</span>
+        <span className="font-mono text-xs text-ash">your guess</span>
         <input
           type="text"
           inputMode="decimal"
@@ -69,9 +70,9 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
             setText(e.target.value);
             setGuess(parseGuess(e.target.value) ?? guess);
           }}
-          className="rounded-md border-2 border-ink/20 bg-white px-3 py-2 font-mono text-xl focus:border-cobalt focus:outline-none aria-invalid:border-red-700"
+          className="border border-line bg-void px-3 py-2 font-mono text-xl focus:border-bone focus:outline-none aria-invalid:border-signal"
         />
-        <span id="guess-help" className="text-sm text-ink/60">
+        <span id="guess-help" className="text-sm text-ash">
           {invalid ? "Enter a whole number from 0 to 100m, like 2,500 or 2.5m." : "Type a number, or use k and m: 40k, 2.5m."}
         </span>
       </label>
@@ -79,12 +80,12 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
         type="button"
         onClick={lockIn}
         disabled={invalid || busy}
-        className="self-start rounded-md bg-cobalt px-6 py-3 font-semibold text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cobalt disabled:opacity-40"
+        className="self-start bg-signal px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash"
       >
         {state === "sending" ? "Locking in…" : state === "locked" ? "Locked in" : "Lock in"}
       </button>
       {state === "error" && (
-        <p role="alert" className="text-sm text-red-700">
+        <p role="alert" className="text-sm text-signal">
           Your guess didn&apos;t go through. Check your connection and press Lock in again.
         </p>
       )}

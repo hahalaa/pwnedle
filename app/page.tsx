@@ -8,7 +8,7 @@ import { Round } from "./round";
 async function Today() {
   await connection();
   const puzzle = await loadPuzzle(utcToday());
-  if (!puzzle) return <p>Coming soon.</p>;
+  if (!puzzle) return <p className="font-mono text-ash">Coming soon.</p>;
   // R13: only passwords go to the browser.
   const { date, passwords } = clientPuzzle(puzzle);
   return <Round date={date} passwords={passwords} />;
@@ -17,7 +17,7 @@ async function Today() {
 export default function Home() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-xl flex-col gap-8 px-4 py-10">
-      <h1 className="text-3xl font-extrabold tracking-tight">Pwnedle</h1>
+      <h1 className="border-b border-line pb-3 font-dot text-4xl">Pwnedle</h1>
       <Suspense>
         <Today />
       </Suspense>

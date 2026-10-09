@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Archivo, IBM_Plex_Mono } from "next/font/google";
+import { Archivo, Doto, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
 const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono" });
+const doto = Doto({ subsets: ["latin"], weight: "900", variable: "--font-doto" });
 
 export const metadata: Metadata = {
   title: "Pwnedle",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${archivo.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${archivo.variable} ${plexMono.variable} ${doto.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   );
