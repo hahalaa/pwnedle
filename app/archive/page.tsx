@@ -1,12 +1,10 @@
 import Link from "next/link";
-import { connection } from "next/server";
 import { Suspense } from "react";
-import { pastPuzzles } from "../../lib/puzzles";
+import { pastPuzzles, playerToday } from "../../lib/puzzles";
 
-// R20: every past puzzle by number and date. Read per request so yesterday appears after UTC midnight.
+// R20: every past puzzle by number and date. Read per request so yesterday appears after the player's local midnight (R2).
 async function List() {
-  await connection();
-  const puzzles = await pastPuzzles();
+  const puzzles = await pastPuzzles(await playerToday());
   if (!puzzles.length) return <p className="font-mono text-ash">No past puzzles yet.</p>;
   return (
     <ol className="divide-y divide-line border-y border-line font-mono">

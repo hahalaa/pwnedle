@@ -5,10 +5,15 @@ import { afterEach, expect, test, vi } from "vitest";
 import { LAUNCH_DATE } from "./config";
 import { addDays } from "./days";
 import { devPasswords } from "./dev-puzzle";
-import { clientPuzzle, loadPuzzle, pastPuzzles } from "./puzzles";
+import { clientPuzzle, loadPuzzle, pastPuzzles, playerToday } from "./puzzles";
 
 vi.mock("server-only", () => ({}));
-afterEach(() => vi.unstubAllEnvs());
+let tz: string | undefined;
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => (tz === undefined ? undefined : { value: tz }) }) }));
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.useRealTimers();
+});
 
 const TODAY = addDays(LAUNCH_DATE, 9);
 
@@ -73,4 +78,18 @@ test("fixture passwords never appear in data/puzzles", async () => {
   const names = await readdir(dir).catch(() => []);
   const files = await Promise.all(names.map((n) => readFile(join(dir, n), "utf8")));
   for (const { password } of devPasswords) expect(files.some((f) => f.includes(JSON.stringify(password)))).toBe(false);
+});
+
+test.each([
+  // 23:30 UTC on the 24th: already the 25th in Auckland, still the 24th in Los Angeles.
+  ["2026-10-24T23:30:00Z", "Pacific/Auckland", "2026-10-25"],
+  ["2026-10-24T23:30:00Z", "America/Los_Angeles", "2026-10-24"],
+  // 03:00 UTC on the 25th: Los Angeles hasn't reached midnight yet.
+  ["2026-10-25T03:00:00Z", "America/Los_Angeles", "2026-10-24"],
+  ["2026-10-24T23:30:00Z", "Not/AZone", "2026-10-24"],
+  ["2026-10-24T23:30:00Z", undefined, "2026-10-24"],
+])("at %s the tz cookie %s gives the player's date %s, falling back to UTC (R2)", async (now, zone, expected) => {
+  vi.useFakeTimers({ now: new Date(now), toFake: ["Date"] });
+  tz = zone;
+  expect(await playerToday()).toBe(expected);
 });

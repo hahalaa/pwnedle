@@ -5,6 +5,7 @@ import { COFFEE_URL } from "../lib/config";
 import "./globals.css";
 import { HowToPlay } from "./how-to-play";
 import { Stats } from "./stats";
+import { TimeZone } from "./time-zone";
 
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
 const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono" });
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${archivo.variable} ${plexMono.variable} ${doto.variable}`}>
       <body className="font-sans antialiased">
+        <TimeZone />
         {/* main spans the viewport; the inner column holds the content at a readable width.
             Mobile: the page fills the screen so Lock in sits at the bottom.
             Desktop: spacers split the free height 2:3, so content sits just above centre, with the top gap capped. */}

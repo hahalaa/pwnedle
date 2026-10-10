@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { utcToday } from "../lib/days";
+import { zoneToday } from "../lib/days";
 import { savedGames, stats } from "../lib/stats";
 import { tierColor } from "./round";
 
@@ -15,7 +15,8 @@ export function Stats() {
       <button
         type="button"
         onClick={() => {
-          setS(stats(savedGames(), utcToday()));
+          // Local date, matching the puzzle dates the player was served (R2).
+          setS(stats(savedGames(), zoneToday()));
           ref.current?.showModal();
         }}
         className="font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"

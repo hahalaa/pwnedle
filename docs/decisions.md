@@ -107,3 +107,6 @@ The site lives at https://pwnedle.vercel.app, stored as `SITE_URL` in `lib/confi
 
 ## D29. Safety note only in how-to-play (amends R22)
 R22 first put the "Pwnedle will never ask for your passwords" note in the footer as well. On every page it was clutter. It now appears only in the how-to-play popup, which every new player sees on their first visit. The footer holds just the about and Buy Me a Coffee links.
+
+## D30. Local date from a time-zone cookie (R2)
+The browser saves its IANA time zone in a first-party `tz` cookie, and server pages work out the player's local date from it on each request. The home page, the archive list and the archive cut-off all use that date. The cookie is untrusted. An unknown or missing zone falls back to UTC, and the date is clamped to within one day of UTC, which covers every real zone. The serving window stays launch to UTC today+1, enforced by `loadPuzzle`. On a first visit the server uses UTC, then the browser sets the cookie and refreshes once. The cookie is functional only, and the about page does not mention it.
