@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Archivo, Doto, IBM_Plex_Mono } from "next/font/google";
 import Link from "next/link";
+import { COFFEE_URL } from "../lib/config";
 import "./globals.css";
+import { HowToPlay } from "./how-to-play";
 import { Stats } from "./stats";
 
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
@@ -28,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <Link href="/">Pwnedle</Link>
               </h1>
               <nav className="flex gap-4">
+                <HowToPlay />
                 <Link href="/archive" className="font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
                   archive
                 </Link>
@@ -35,6 +38,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </nav>
             </header>
             {children}
+            {/* R23, R24 */}
+            <footer className="mt-10 border-t border-line pt-4 text-sm text-ash">
+              <p className="flex gap-4 font-mono">
+                <Link href="/about" className="underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
+                  about
+                </Link>
+                <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
+                  buy me a coffee
+                </a>
+              </p>
+            </footer>
           </div>
         </main>
       </body>

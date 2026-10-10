@@ -46,7 +46,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
 
 ## 7. Site
 - **R21 (v1)** How-to-play modal on first visit, with a worked example.
-- **R22 (v1)** A permanent note in the footer and how-to-play: "Pwnedle will never ask for your passwords. Don't type real passwords into any website to test them."
+- **R22 (v1)** A permanent note in how-to-play (D29): "Pwnedle will never ask for your passwords. Don't type real passwords into any website to test them."
 - **R23 (v1)** Buy Me a Coffee link in the footer and on the end screen. No payment integration.
 - **R24 (v1)** About page crediting Have I Been Pwned's Pwned Passwords (with a link) and any public password lists used, and stating that Pwnedle is not affiliated with or endorsed by HIBP.
 - **R25 (v1)** Mobile-first. No signup, no ads. Tier colours are colourblind-safe and always paired with a text label.

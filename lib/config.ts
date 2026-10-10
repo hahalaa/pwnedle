@@ -6,3 +6,5 @@ export const K = 1.25;
 export const SITE_URL = "https://pwnedle.vercel.app";
 // R23/D27: used on the end screen and in the footer.
 export const COFFEE_URL = "https://buymeacoffee.com/hahalaa";
+// R22: shown in how-to-play.
+export const SAFETY_NOTE = "Pwnedle will never ask for your passwords. Don't type real passwords into any website to test them.";

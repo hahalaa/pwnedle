@@ -104,3 +104,6 @@ The link is https://buymeacoffee.com/hahalaa, stored once as `COFFEE_URL` in `li
 
 ## D28. Custom domain deferred
 The site lives at https://pwnedle.vercel.app, stored as `SITE_URL` in `lib/config.ts`, and the share text ends with `pwnedle.vercel.app`. A custom domain waits until the game has regular players and donations can cover it.
+
+## D29. Safety note only in how-to-play (amends R22)
+R22 first put the "Pwnedle will never ask for your passwords" note in the footer as well. On every page it was clutter. It now appears only in the how-to-play popup, which every new player sees on their first visit. The footer holds just the about and Buy Me a Coffee links.
