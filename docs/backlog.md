@@ -33,7 +33,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T13d** Polish: plain background, no dot-grid texture; the outer container spans the full viewport with the content centred inside it. The 0-to-1 slider segment is half a decade wide and dotted instead of a gap.
 - [done] **T14** Reveal UI and progress dots. (R9)
 - [done] **T15** End screen with breakdown and share text. (R12, R19)
-- [todo] **T16** localStorage progress, resume, stats modal. (R15, R16, R17)
+- [done] **T16** localStorage progress, resume, stats modal. (R15, R16, R17)
 - [todo] **T17** Archive page; archive games excluded from stats. (R18, R20)
 - [todo] **T18** How-to-play modal, footer note, about/credits page, Buy Me a Coffee link. (R21 to R24)
 - [todo] **T19** "Warming up" fallback, only when no file exists for today. (R36b)

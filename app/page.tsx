@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { utcToday } from "../lib/days";
 import { clientPuzzle, loadPuzzle } from "../lib/puzzles";
 import { Round } from "./round";
+import { Stats } from "./stats";
 
 // Reads today's file per request, so the day rolls over at UTC midnight without a rebuild.
 async function Today() {
@@ -20,7 +21,10 @@ export default function Home() {
   return (
     <main className="flex min-h-dvh w-full flex-col items-center px-4 py-6 sm:py-8 sm:before:max-h-24 sm:before:flex-[2] sm:before:content-[''] sm:after:flex-[3] sm:after:content-['']">
       <div className="flex w-full max-w-xl flex-1 flex-col sm:flex-none">
-        <h1 className="mb-8 border-b border-line pb-3 font-dot text-4xl">Pwnedle</h1>
+        <header className="mb-8 flex items-baseline justify-between border-b border-line pb-3">
+          <h1 className="font-dot text-4xl">Pwnedle</h1>
+          <Stats />
+        </header>
         <Suspense>
           <Today />
         </Suspense>

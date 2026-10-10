@@ -1,24 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { COFFEE_URL } from "../lib/config";
 import { formatGuess, fromSlider, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
+import { type Game, loadGame, saveGame } from "../lib/stats";
 
 // The 0 stop, then every power of ten, with each tick at its slider position (lib/guess.ts).
 const TICKS = ["0", "1", "10", "100", "1k", "10k", "100k", "1m", "10m", "100m"].map((t) => [t, toSlider(parseGuess(t)!) / SLIDER_MAX] as const);
 
 // What /api/guess returns (R14), plus the guess that was sent.
 type Result = { guess: number; count: number; score: number; tier: string; note: string };
+type Saved = Game & { results: Result[] };
+
+// True once hydrated: the server can't see localStorage, so the first render must match a fresh game.
+const noop = () => () => {};
+const useHydrated = () => useSyncExternalStore(noop, () => true, () => false);
 
 // D25 tier colours live in globals.css as --color-<tier>.
-const tierColor = (tier: string) => `var(--color-${tier.toLowerCase()})`;
+export const tierColor = (tier: string) => `var(--color-${tier.toLowerCase()})`;
 
 export function Round({ date, number, passwords }: { date: string; number: number; passwords: string[] }) {
-  const [index, setIndex] = useState(0);
-  const [done, setDone] = useState(false);
-  const [results, setResults] = useState<Result[]>([]);
+  // R16: this browser's progress resumes after a refresh. Saved results also keep a locked-in password
+  // from being sent again (R15).
+  const [played, setPlayed] = useState<Saved | null>(null);
+  const hydrated = useHydrated();
+  const game = played ?? (hydrated ? (loadGame(date) as Saved | null) : null) ?? { index: 0, done: false, results: [] };
+  const { index, done, results } = game;
   // guess is the last valid number, so the slider stays put while the box holds a typo.
   const [guess, setGuess] = useState(0);
   const [text, setText] = useState("0");
@@ -27,18 +36,23 @@ export function Round({ date, number, passwords }: { date: string; number: numbe
   const invalid = parseGuess(text) === null;
   const last = index === passwords.length - 1;
 
+  function update(g: Saved) {
+    setPlayed(g);
+    saveGame(date, g);
+  }
+
   async function lockIn() {
     setState("sending");
     // R14: the count only comes back after the guess is sent (D7).
     const res = await fetch("/api/guess", { method: "POST", body: JSON.stringify({ date, index, guess }) }).catch(() => null);
     const body = res?.ok ? await res.json().catch(() => null) : null;
     if (!body) return setState("error");
-    setResults([...results, { guess, ...body }]);
+    update({ ...game, results: [...results, { guess, ...body }] });
     setState("guessing");
   }
 
   function next() {
-    setIndex(index + 1);
+    update({ ...game, index: index + 1 });
     setGuess(0);
     setText("0");
   }
@@ -117,7 +131,7 @@ export function Round({ date, number, passwords }: { date: string; number: numbe
       )}
       <button
         type="button"
-        onClick={result ? (last ? () => setDone(true) : next) : lockIn}
+        onClick={result ? (last ? () => update({ ...game, done: true }) : next) : lockIn}
         disabled={!result && (invalid || state === "sending")}
         className="mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash"
       >
