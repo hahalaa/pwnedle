@@ -21,7 +21,8 @@ const useHydrated = () => useSyncExternalStore(noop, () => true, () => false);
 // D25 tier colours live in globals.css as --color-<tier>.
 export const tierColor = (tier: string) => `var(--color-${tier.toLowerCase()})`;
 
-export function Round({ date, number, passwords }: { date: string; number: number; passwords: string[] }) {
+// `archive` is set when played from the archive, so the game stays out of stats (R18).
+export function Round({ date, number, passwords, archive }: { date: string; number: number; passwords: string[]; archive?: boolean }) {
   // R16: this browser's progress resumes after a refresh. Saved results also keep a locked-in password
   // from being sent again (R15).
   const [played, setPlayed] = useState<Saved | null>(null);
@@ -38,7 +39,7 @@ export function Round({ date, number, passwords }: { date: string; number: numbe
 
   function update(g: Saved) {
     setPlayed(g);
-    saveGame(date, g);
+    saveGame(date, archive ? { ...g, archive } : g);
   }
 
   async function lockIn() {

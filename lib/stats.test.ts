@@ -36,6 +36,11 @@ test("streaks run over consecutive puzzle dates and the current one ends after a
   expect(stats({}, "2026-10-24")).toEqual({ played: 0, average: 0, best: 0, current: 0, max: 0, tiers: expect.any(Array) });
 });
 
+test("archive games are left out of stats and streaks (R18)", () => {
+  const games = { "2026-10-24": finished(50), "2026-10-25": { ...finished(500), archive: true }, "2026-10-26": finished(50) };
+  expect(stats(games, "2026-10-26")).toMatchObject({ played: 2, best: 50, current: 1, max: 1 });
+});
+
 afterEach(() => vi.unstubAllGlobals());
 
 test("games round-trip through localStorage under pwnedle:<date> (R16)", () => {

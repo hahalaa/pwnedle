@@ -2,14 +2,16 @@ import { addDays } from "./days";
 import { tier } from "./scoring";
 
 // R16: one saved game per puzzle date, under `pwnedle:<date>` in localStorage.
-export type Game = { index: number; done: boolean; results: { score: number }[] };
+// `archive` marks a game last played from the archive (R18).
+export type Game = { index: number; done: boolean; results: { score: number }[]; archive?: boolean };
 
 const TIERS = ["Uncrackable", "Strong", "Medium", "Weak", "Pwned"];
 
-// R17: only finished games count. A streak is a run of consecutive puzzle dates; the current one
-// survives until a whole day is missed, so it still counts on the morning before today's game.
+// R17: only finished daily games count; archive games are left out (R18). A streak is a run of
+// consecutive puzzle dates; the current one survives until a whole day is missed, so it still counts
+// on the morning before today's game.
 export function stats(games: Record<string, Game>, today: string) {
-  const dates = Object.keys(games).filter((d) => games[d].done).sort();
+  const dates = Object.keys(games).filter((d) => games[d].done && !games[d].archive).sort();
   const totals = dates.map((d) => games[d].results.reduce((a, r) => a + r.score, 0));
   let run = 0;
   let max = 0;

@@ -5,7 +5,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import { LAUNCH_DATE } from "./config";
 import { addDays } from "./days";
 import { devPasswords } from "./dev-puzzle";
-import { clientPuzzle, loadPuzzle } from "./puzzles";
+import { clientPuzzle, loadPuzzle, pastPuzzles } from "./puzzles";
 
 vi.mock("server-only", () => ({}));
 afterEach(() => vi.unstubAllEnvs());
@@ -35,6 +35,17 @@ test("refuses dates outside the window, missing files and bad input", async () =
   for (const date of [early, late, addDays(TODAY, -1), "../config", "2026-10-24.json", ""]) {
     expect(await loadPuzzle(date, TODAY, dir)).toBeNull();
   }
+});
+
+test("the archive lists files from launch to yesterday, newest first, never today or later (R20)", async () => {
+  const yesterday = addDays(TODAY, -1);
+  const dir = await dirWith(addDays(LAUNCH_DATE, -1), LAUNCH_DATE, yesterday, TODAY, addDays(TODAY, 1));
+  await writeFile(join(dir, "notes.txt"), "");
+  expect(await pastPuzzles(TODAY, dir)).toEqual([
+    { date: yesterday, number: 9 },
+    { date: LAUNCH_DATE, number: 1 },
+  ]);
+  expect(await pastPuzzles(TODAY, join(dir, "missing"))).toEqual([]);
 });
 
 test("client puzzle has only date, number and password text", () => {
