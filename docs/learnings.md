@@ -38,3 +38,4 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-09 [ui] A hydration warning about `caret-color: transparent` comes from Playwright hiding the caret for a screenshot taken before hydration -> ignore it, or wait for hydration before the screenshot.
 2026-10-09 [ui] Flex spacers built from `::before`/`::after` count as flex items, so the parent `gap` applies to them too -> drop the parent gap and space the real children with margins.
 2026-10-09 [ui] Tailwind v4 only emits a `@theme` variable when a scanned file uses it, so tier colours built as `var(--color-${tier})` at runtime went missing unless a test happened to name them -> tier tokens sit in `@theme static`, and a test checks all five are there.
+2026-10-10 [ui] R19's example (412/500 with 🟩🟨🟩🟧🟩) is impossible: those squares cap the total at 408 -> share tests use real score sets, not the example.

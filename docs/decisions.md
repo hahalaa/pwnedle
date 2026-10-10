@@ -98,3 +98,9 @@ Tier colours now match the R19 share squares: green and olive-lime for the top t
 
 A saturated green can't be much lighter than OKLab L 0.85, so the ramp is compressed under it: each tier is about 0.05 to 0.07 OKLab lightness lighter than the one below. Under a deuteranopia simulation (Machado 2009, full severity) the hues collapse to yellows but the steps remain, so the order still reads, though the top two steps are the smallest. The tier label always appears next to the colour (R25). Contrast on `void` is at least 4.5:1; Pwned is the lowest at 4.52:1.
 - Pwned #e5322d, Weak #e76d04, Medium #e19906, Strong #a7cc0a, Uncrackable #56ee66
+
+## D27. Buy Me a Coffee link
+The link is https://buymeacoffee.com/hahalaa, stored once as `COFFEE_URL` in `lib/config.ts` so the end screen (T15) and the footer (T18) share it.
+
+## D28. Custom domain deferred
+The site lives at https://pwnedle.vercel.app, stored as `SITE_URL` in `lib/config.ts`, and the share text ends with `pwnedle.vercel.app`. A custom domain waits until the game has regular players and donations can cover it.

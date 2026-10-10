@@ -10,8 +10,7 @@ async function Today() {
   const puzzle = await loadPuzzle(utcToday());
   if (!puzzle) return <p className="font-mono text-ash">Coming soon.</p>;
   // R13: only passwords go to the browser.
-  const { date, passwords } = clientPuzzle(puzzle);
-  return <Round date={date} passwords={passwords} />;
+  return <Round {...clientPuzzle(puzzle)} />;
 }
 
 export default function Home() {

@@ -3,7 +3,7 @@
 Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticket.
 
 ## Phase 0: setup
-- [done] **T0** Check the pwnedle.com (or alternative) domain and Listdle for name clashes; buy the domain.
+- [done] **T0** Check the pwnedle.com (or alternative) domain and Listdle for name clashes; buy the domain. The purchase is deferred under D28.
 - [done] **T1** Create the GitHub repo with the README and docs. Locally, run `sh .claude/setup-harness.sh` and install the plugins listed in CLAUDE.md.
 - [done] **T2** Next.js + TypeScript + Tailwind skeleton, ESLint, Vitest, deploy to Vercel; fill in Commands in CLAUDE.md.
 
@@ -32,7 +32,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T13c** Layout: the game fills the viewport. Vertically centred on desktop at a sensible width; on mobile it fills the screen with Lock in within thumb reach.
 - [done] **T13d** Polish: plain background, no dot-grid texture; the outer container spans the full viewport with the content centred inside it. The 0-to-1 slider segment is half a decade wide and dotted instead of a gap.
 - [done] **T14** Reveal UI and progress dots. (R9)
-- [todo] **T15** End screen with breakdown and share text. (R12, R19)
+- [done] **T15** End screen with breakdown and share text. (R12, R19)
 - [todo] **T16** localStorage progress, resume, stats modal. (R15, R16, R17)
 - [todo] **T17** Archive page; archive games excluded from stats. (R18, R20)
 - [todo] **T18** How-to-play modal, footer note, about/credits page, Buy Me a Coffee link. (R21 to R24)

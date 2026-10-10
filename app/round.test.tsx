@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
-import { Dots, Reveal, Round } from "./round";
+import { Dots, End, Reveal, Round } from "./round";
 
 test("round shows the R7 prompt, the password in monospace, a slider at the 0 stop and a number box", () => {
-  const html = renderToStaticMarkup(<Round date="2026-10-24" passwords={["hunter2", "b", "c", "d", "e"]} />);
+  const html = renderToStaticMarkup(<Round date="2026-10-24" number={1} passwords={["hunter2", "b", "c", "d", "e"]} />);
   expect(html).toContain("How many times has this password appeared in data breaches?");
   expect(html).toMatch(/<p class="font-mono[^"]*">hunter2<\/p>/);
   expect(html).toMatch(/type="range"[^>]*min="0"[^>]*max="850"[^>]*value="0"/);
@@ -37,4 +37,24 @@ test("every tier colour is always emitted, since the reveal only builds its name
   const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
   const block = /@theme static \{([^}]*)\}/.exec(css)?.[1] ?? "";
   for (const t of ["pwned", "weak", "medium", "strong", "uncrackable"]) expect(block).toContain(`--color-${t}:`);
+});
+
+test("end screen shows the total, the daily tier, each password's breakdown, share and the coffee link (R12)", () => {
+  const scores = [100, 65, 90, 35, 100];
+  const results = scores.map((score, i) => ({ guess: 40_000 + i, count: 12_500_000 + i, score, tier: ["Uncrackable", "Medium", "Uncrackable", "Weak", "Uncrackable"][i], note: "n" }));
+  const html = renderToStaticMarkup(<End number={12} passwords={["hunter2", "b", "c", "d", "e"]} results={results} />);
+  expect(html).toContain('<span class="text-6xl">390</span>');
+  expect(html).toContain("/ 500");
+  // Average 78 is Strong.
+  expect(html).toContain("color:var(--color-strong)");
+  expect(html).toMatch(/<span[^>]*><\/span>strong<\/p>/);
+  expect(html).toContain("puzzle #12");
+  expect(html.match(/<li/g)).toHaveLength(5);
+  for (const t of ["hunter2", "seen 12,500,000, you guessed 40,000", ">65</p>"]) expect(html).toContain(t);
+  // Each row names its tier next to the colour (R25).
+  expect(html).toMatch(/color:var\(--color-medium\)"><span[^>]*><\/span>medium<\/p>/);
+  expect(html).toContain(">Share result</button>");
+  expect(html).toContain('href="https://buymeacoffee.com/hahalaa"');
+  // Notes stay on the reveal; the end screen doesn't repeat them.
+  expect(html).not.toContain(">n<");
 });

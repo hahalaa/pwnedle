@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { COFFEE_URL } from "../lib/config";
 import { formatGuess, fromSlider, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
+import { tier } from "../lib/scoring";
+import { shareText } from "../lib/share";
 
 // The 0 stop, then every power of ten, with each tick at its slider position (lib/guess.ts).
 const TICKS = ["0", "1", "10", "100", "1k", "10k", "100k", "1m", "10m", "100m"].map((t) => [t, toSlider(parseGuess(t)!) / SLIDER_MAX] as const);
@@ -12,8 +15,9 @@ type Result = { guess: number; count: number; score: number; tier: string; note:
 // D25 tier colours live in globals.css as --color-<tier>.
 const tierColor = (tier: string) => `var(--color-${tier.toLowerCase()})`;
 
-export function Round({ date, passwords }: { date: string; passwords: string[] }) {
+export function Round({ date, number, passwords }: { date: string; number: number; passwords: string[] }) {
   const [index, setIndex] = useState(0);
+  const [done, setDone] = useState(false);
   const [results, setResults] = useState<Result[]>([]);
   // guess is the last valid number, so the slider stays put while the box holds a typo.
   const [guess, setGuess] = useState(0);
@@ -38,6 +42,8 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
     setGuess(0);
     setText("0");
   }
+
+  if (done) return <End number={number} passwords={passwords} results={results} />;
 
   return (
     <section className="flex flex-1 flex-col gap-6 sm:flex-none">
@@ -109,10 +115,9 @@ export function Round({ date, passwords }: { date: string; passwords: string[] }
           </label>
         </>
       )}
-      {/* ponytail: "See results" does nothing until T15 adds the end screen. */}
       <button
         type="button"
-        onClick={result ? (last ? undefined : next) : lockIn}
+        onClick={result ? (last ? () => setDone(true) : next) : lockIn}
         disabled={!result && (invalid || state === "sending")}
         className="mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash"
       >
@@ -168,5 +173,77 @@ export function Dots({ results, index, total }: { results: Result[]; index: numb
         />
       ))}
     </ol>
+  );
+}
+
+// R12: total, daily tier, per-password breakdown, share (R19) and the coffee link (R23).
+export function End({ number, passwords, results }: { number: number; passwords: string[]; results: Result[] }) {
+  const [status, setStatus] = useState("");
+  const total = results.reduce((a, r) => a + r.score, 0);
+  const daily = tier(total / results.length);
+
+  async function share() {
+    const text = shareText(number, results.map((r) => r.score));
+    // The share sheet on phones; the clipboard on desktop, where the sheet is less familiar.
+    if (navigator.share && matchMedia("(pointer: coarse)").matches) return navigator.share({ text }).catch(() => {});
+    await navigator.clipboard.writeText(text).then(
+      () => setStatus("Copied to your clipboard."),
+      () => setStatus("Your browser blocked copying. Press Share result to try again."),
+    );
+  }
+
+  return (
+    <section className="flex flex-1 flex-col gap-6 sm:flex-none">
+      <div className="flex items-end justify-between gap-4">
+        <p className="font-mono">
+          <span className="text-6xl">{total}</span> <span className="text-xl text-ash">/ 500</span>
+        </p>
+        <p className="flex items-center gap-2 pb-2 font-mono text-lg" style={{ color: tierColor(daily) }}>
+          <span className="size-3 bg-current" />
+          {daily.toLowerCase()}
+        </p>
+      </div>
+      <div className="brackets relative mx-[5px] border border-line">
+        <div className="flex items-center justify-between border-b border-line px-3 py-1.5 font-mono text-xs text-ash">
+          <p>puzzle #{number}</p>
+          <p>points</p>
+        </div>
+        <ol className="divide-y divide-line">
+          {results.map((r, i) => (
+            <li key={i} className="flex items-start gap-3 px-3 py-3 font-mono">
+              <div className="min-w-0 flex-1">
+                <p className="break-all text-lg">{passwords[i]}</p>
+                <p className="text-xs text-ash">
+                  seen {formatGuess(r.count)}, you guessed {formatGuess(r.guess)}
+                </p>
+              </div>
+              {/* R25: the tier colour always sits next to its name. */}
+              <div className="flex flex-col items-end">
+                <p className="text-lg">{r.score}</p>
+                <p className="flex items-center gap-1.5 text-xs" style={{ color: tierColor(r.tier) }}>
+                  <span className="size-2 bg-current" />
+                  {r.tier.toLowerCase()}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="mt-auto flex flex-col gap-3 sm:mt-0 sm:flex-row sm:items-center sm:gap-6">
+        <button
+          type="button"
+          onClick={share}
+          className="bg-signal px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
+        >
+          Share result
+        </button>
+        <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer" className="text-center text-ash underline underline-offset-4 hover:text-bone">
+          Buy me a coffee
+        </a>
+        <p role="status" className="text-center text-sm text-ash sm:text-left">
+          {status}
+        </p>
+      </div>
+    </section>
   );
 }

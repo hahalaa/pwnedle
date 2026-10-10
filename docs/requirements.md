@@ -37,7 +37,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
   ```
   Pwnedle #12 · 412/500 · Strong
   🟩🟨🟩🟧🟩
-  pwnedle.com
+  pwnedle.vercel.app
   ```
   Squares per password: 🟩 Uncrackable or Strong, 🟨 Medium, 🟧 Weak, 🟥 Pwned. Shared via clipboard or the native share sheet.
 
