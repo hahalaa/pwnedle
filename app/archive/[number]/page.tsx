@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { LAUNCH_DATE } from "../../../lib/config";
 import { addDays, utcToday } from "../../../lib/days";
@@ -9,6 +10,8 @@ import { Round } from "../../round";
 async function Past({ params }: Pick<PageProps<"/archive/[number]">, "params">) {
   const { number } = await params;
   if (!/^[1-9]\d{0,4}$/.test(number)) notFound();
+  // Request time, so utcToday() isn't read while prerendering.
+  await connection();
   const date = addDays(LAUNCH_DATE, Number(number) - 1);
   const puzzle = date < utcToday() ? await loadPuzzle(date) : null;
   if (!puzzle) notFound();
