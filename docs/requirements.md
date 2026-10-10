@@ -35,7 +35,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
 ## 5. Sharing
 - **R19 (v1)** The share text contains no passwords or counts, in this format:
   ```
-  Pwnedle #12 · 412/500 · Strong
+  Pwnedle #12 · 390/500 · Strong
   🟩🟨🟩🟧🟩
   pwnedle.vercel.app
   ```

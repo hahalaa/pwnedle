@@ -54,7 +54,7 @@ test("end screen shows the total, the daily tier, each password's breakdown, sha
   // Each row names its tier next to the colour (R25).
   expect(html).toMatch(/color:var\(--color-medium\)"><span[^>]*><\/span>medium<\/p>/);
   expect(html).toContain(">Share result</button>");
-  expect(html).toContain('href="https://buymeacoffee.com/hahalaa"');
+  expect(html).toContain('href="https://buymeacoffee.com/hahalaa" target="_blank" rel="noopener noreferrer"');
   // Notes stay on the reveal; the end screen doesn't repeat them.
   expect(html).not.toContain(">n<");
 });
