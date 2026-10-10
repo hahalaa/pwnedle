@@ -43,3 +43,4 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-10 [ui] With `cacheComponents`, `notFound()` inside a Suspense boundary streams the not-found page with HTTP 200 and a `noindex` meta -> check refused archive pages by their content, not the status code.
 2026-10-10 [deploy] `readdir(dir)` with a parameter path makes Turbopack trace the whole project -> `lib/puzzles.ts` marks it `/*turbopackIgnore: true*/`, since `outputFileTracingIncludes` already ships `data/puzzles/`.
 2026-10-10 [tooling] Before launch no past puzzles exist, so the archive can't be played locally -> for an audit, set `LAUNCH_DATE` back a few days and add throwaway files to `data/puzzles/`, then revert both.
+2026-10-10 [tooling] The supply-chain auditor's scripts expect `uv`, which isn't installed, and `python3 -I` breaks their sibling imports -> run them with plain `python3` from outside the repo; they need no packages.
