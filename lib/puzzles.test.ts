@@ -2,6 +2,7 @@ import { mkdtemp, readdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
+import { generate } from "../scripts/puzzles";
 import { LAUNCH_DATE } from "./config";
 import { addDays } from "./days";
 import { devPasswords } from "./dev-puzzle";
@@ -56,6 +57,17 @@ test("the archive lists files from launch to yesterday, newest first, never toda
 test("client puzzle has only date, number and password text", () => {
   const p = { date: LAUNCH_DATE, status: "draft" as const, number: 1, passwords: [{ password: "dragon", count: 99, note: "A note." }] };
   expect(clientPuzzle(p)).toEqual({ date: LAUNCH_DATE, number: 1, passwords: ["dragon"] });
+});
+
+test("a generated puzzle reaches the client in the order it was written (R4)", async () => {
+  // A launch on the last of the 14 days means generate writes just that one.
+  const day = addDays(TODAY, 13);
+  const dir = await dirWith();
+  const counts = [1, 10, 100, 1_000, 100_000, 1_000_000];
+  const candidates = counts.map((_, i) => `pw${i}`);
+  await generate(dir, TODAY, { candidates, count: async (pw) => counts[Number(pw.slice(2))], note: async () => "A note.", launch: day });
+  const written = JSON.parse(await readFile(join(dir, `${day}.json`), "utf8")).passwords.map((e: { password: string }) => e.password);
+  expect(clientPuzzle((await loadPuzzle(day, day, dir))!).passwords).toEqual(written);
 });
 
 test("dev serves real files first, the fixture otherwise, ignoring launch but not today+1", async () => {

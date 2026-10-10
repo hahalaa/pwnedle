@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, expect, test } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import { Round } from "./round";
 
 afterEach(() => {
   cleanup();
   localStorage.clear();
+  vi.unstubAllGlobals();
 });
 
 const KEY = "pwnedle:2026-10-24";
@@ -23,4 +24,24 @@ test.each([
   const saved = JSON.parse(localStorage.getItem(KEY)!);
   expect(saved.done).toBe(true);
   expect(saved.archive).toBe(archive);
+});
+
+test("a refresh resumes mid-puzzle with reveals intact and never re-sends a locked-in guess (R15, R16)", async () => {
+  const fetch = vi.fn();
+  vi.stubGlobal("fetch", fetch);
+  const r = { guess: 40_000, count: 12_500_000, score: 3, tier: "Pwned", note: "Seen everywhere." };
+  localStorage.setItem(KEY, JSON.stringify({ index: 1, done: false, results: [r, r] }));
+  render(<Round {...props} />);
+  // The second password's reveal is back, with no way to guess it again.
+  const next = await screen.findByRole("button", { name: "Next password" });
+  expect(screen.getByText("b")).toBeDefined();
+  expect(screen.getByText("Seen everywhere.")).toBeDefined();
+  expect(screen.getByLabelText("2 of 5 revealed")).toBeDefined();
+  expect(screen.queryByRole("button", { name: "Lock in" })).toBeNull();
+  // Moving on asks for the third password, the first one without a result.
+  fireEvent.click(next);
+  expect(screen.getByText("c")).toBeDefined();
+  expect(screen.getByRole("button", { name: "Lock in" })).toBeDefined();
+  expect(JSON.parse(localStorage.getItem(KEY)!).index).toBe(2);
+  expect(fetch).not.toHaveBeenCalled();
 });

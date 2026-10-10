@@ -49,3 +49,4 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-10 [ui] With `cacheComponents`, calling `new Date()` (via `utcToday()`) after `await params` but before `await connection()` builds cleanly but logs a "blocking-prerender-current-time" console error in dev -> call `await connection()` before any date read in a page.
 2026-10-10 [tooling] Clearing localStorage in playwright right after `goto` races hydration: the how-to-play effect sets its seen flag after the clear, so the reload looks like a repeat visit -> test first visits in a fresh browser context.
 2026-10-10 [tooling] `Intl.DateTimeFormat#formatToParts()` with no argument reads the real clock, so `vi.useFakeTimers` does not move it -> `zoneToday` passes `new Date()` explicitly.
+2026-10-10 [tooling] `generate` always fills 14 days, so a test with a handful of candidates runs out -> pass `launch` as the last of the 14 days so it writes only that one.
