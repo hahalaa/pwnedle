@@ -45,3 +45,4 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-10 [tooling] Before launch no past puzzles exist, so the archive can't be played locally -> for an audit, set `LAUNCH_DATE` back a few days and add throwaway files to `data/puzzles/`, then revert both.
 2026-10-10 [tooling] The supply-chain auditor's scripts expect `uv`, which isn't installed, and `python3 -I` breaks their sibling imports -> run them with plain `python3` from outside the repo; they need no packages.
 2026-10-10 [ui] With `cacheComponents`, `usePathname()` in a layout client component outside `<Suspense>` fails the build on dynamic routes ("URL data outside Suspense") -> when the path is only needed on click, read `location.pathname` in the handler.
+2026-10-10 [tooling] In dev `loadPuzzle` falls back to the fixture, so the no-file messages never show there -> check them with `next start` after setting `LAUNCH_DATE` back; the first visit opens how-to-play over the page.

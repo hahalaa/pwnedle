@@ -36,7 +36,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T16** localStorage progress, resume, stats modal. (R15, R16, R17)
 - [done] **T17** Archive page; archive games excluded from stats. (R18, R20)
 - [done] **T18** How-to-play modal, footer note, about/credits page, Buy Me a Coffee link. (R21 to R24)
-- [todo] **T19** "Warming up" fallback, only when no file exists for today. (R36b)
+- [done] **T19** "Warming up" fallback, only when no file exists for today. (R36b)
 
 ## Phase 3: launch
 - [todo] **T20** Mobile and accessibility pass; colourblind check of tiers. (R25)
