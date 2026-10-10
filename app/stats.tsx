@@ -19,7 +19,7 @@ export function Stats() {
           setS(stats(savedGames(), zoneToday()));
           ref.current?.showModal();
         }}
-        className="font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
+        className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
       >
         stats
       </button>

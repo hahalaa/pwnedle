@@ -10,9 +10,9 @@ async function List() {
     <ol className="divide-y divide-line border-y border-line font-mono">
       {puzzles.map(({ date, number }) => (
         <li key={date}>
-          <Link href={`/archive/${number}`} className="flex justify-between px-3 py-3 hover:bg-line focus-visible:outline-1 focus-visible:outline-bone">
+          <Link href={`/archive/${number}`} className="group flex justify-between px-3 py-3 hover:bg-line focus-visible:outline-1 focus-visible:outline-bone">
             <span>#{number}</span>
-            <span className="text-ash">{date}</span>
+            <span className="text-ash group-hover:text-bone">{date}</span>
           </Link>
         </li>
       ))}

@@ -33,7 +33,7 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-09 [api] Next inlines `process.env.NODE_ENV` in server bundles, so a dynamic import inside a development-only branch is dropped from production -> check by grepping `.next/server` for fixture text after `npm run build`; tests switch modes with `vi.stubEnv("NODE_ENV", ...)`.
 2026-10-09 [tooling] Tailwind v4 scans every file git does not ignore, so playwright writing console logs into `.playwright-mcp/` made `next dev` rebuild CSS in a loop -> `.playwright-mcp/` is in `.git/info/exclude`, which Tailwind also respects.
 2026-10-09 [ui] Joining `::-webkit-slider-thumb` and `::-moz-range-thumb` in one selector list makes each browser drop the whole rule -> style the range thumb in separate rules per engine, including the `:disabled` variants.
-2026-10-09 [tooling] `next dev` sometimes keeps serving the old CSS after `app/globals.css` changes, even with no build in between -> before judging a style change, check the served CSS (or restart the dev server).
+2026-10-09 [tooling] `next dev` sometimes keeps serving the old CSS after `app/globals.css` changes, even with no build in between -> before judging a style change, check the served CSS; if it's stale, stop the server and delete `.next/dev`, since a plain restart can still serve removed rules.
 2026-10-09 [ui] A native range thumb's centre travels from half its width to 100% minus half its width -> place slider ticks at `calc(7px + (100% - 14px) * f)` for the 14px thumb, not at `f`.
 2026-10-09 [ui] A hydration warning about `caret-color: transparent` comes from Playwright hiding the caret for a screenshot taken before hydration -> ignore it, or wait for hydration before the screenshot.
 2026-10-09 [ui] Flex spacers built from `::before`/`::after` count as flex items, so the parent `gap` applies to them too -> drop the parent gap and space the real children with margins.
@@ -50,3 +50,6 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-10 [tooling] Clearing localStorage in playwright right after `goto` races hydration: the how-to-play effect sets its seen flag after the clear, so the reload looks like a repeat visit -> test first visits in a fresh browser context.
 2026-10-10 [tooling] `Intl.DateTimeFormat#formatToParts()` with no argument reads the real clock, so `vi.useFakeTimers` does not move it -> `zoneToday` passes `new Date()` explicitly.
 2026-10-10 [tooling] `generate` always fills 14 days, so a test with a handful of candidates runs out -> pass `launch` as the last of the 14 days so it writes only that one.
+2026-10-10 [ui] A focused button that turns `disabled` drops keyboard focus to the page -> Lock in stays enabled while sending, and `lockIn` returns early on a second press.
+2026-10-10 [ui] Screen readers usually skip an `aria-live` region that mounts together with its text -> `Round` keeps one region mounted and changes its text on each reveal and password.
+2026-10-10 [ui] A negative `outline-offset` pulls the outline in on all four sides, so the slider thumb poked out of the focus frame at both ends -> the slider is 44px tall with its outline at offset 0.

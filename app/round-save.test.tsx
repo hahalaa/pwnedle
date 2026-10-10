@@ -45,3 +45,28 @@ test("a refresh resumes mid-puzzle with reveals intact and never re-sends a lock
   expect(JSON.parse(localStorage.getItem(KEY)!).index).toBe(2);
   expect(fetch).not.toHaveBeenCalled();
 });
+
+test("Lock in keeps focus through the reveal, the reveal is announced, and finishing moves focus to Share (T20)", async () => {
+  const r = { count: 12_500_000, score: 3, tier: "Pwned", note: "Seen everywhere." };
+  vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, json: async () => r })));
+  localStorage.setItem(KEY, JSON.stringify({ ...lastPassword, results: lastPassword.results.slice(0, 4) }));
+  render(<Round {...props} />);
+  const button = await screen.findByRole("button", { name: "Lock in" });
+  const live = document.querySelector("[aria-live=polite]")!;
+  expect(live.textContent).toBe("Password 5 of 5: e");
+  button.focus();
+  fireEvent.click(button);
+  // Still enabled while sending, so focus can't drop to the page.
+  expect(screen.getByRole("button", { name: "Locking in…" })).toHaveProperty("disabled", false);
+  await screen.findByRole("button", { name: "See results" });
+  expect(document.activeElement).toBe(button);
+  expect(live.textContent).toBe("Seen 12,500,000 times. You guessed 0. 3 points, pwned. Seen everywhere.");
+  fireEvent.click(button);
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: "Share result" }));
+});
+
+test("a finished game loaded on refresh doesn't take focus", async () => {
+  localStorage.setItem(KEY, JSON.stringify({ ...lastPassword, done: true }));
+  render(<Round {...props} />);
+  expect(document.activeElement).not.toBe(await screen.findByRole("button", { name: "Share result" }));
+});

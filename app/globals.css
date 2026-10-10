@@ -49,11 +49,26 @@ body {
   border-left: 0;
 }
 
+/* A tap area of at least 44px around a small link, without moving it or its focus outline. */
+.tap {
+  position: relative;
+}
+.tap::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translate(-50%, -50%);
+}
+
 /* Range: a 1px track from the 1 stop to 100m (16/17 of the travel) and a dotted half decade back to the 0 stop
    (1/17), with a square thumb in the accent (lib/guess.ts). */
 input[type="range"] {
   appearance: none;
-  height: 24px;
+  /* 44px tall to tap. */
+  height: 44px;
   background:
     linear-gradient(var(--color-ash), var(--color-ash)) right 7px center / calc((100% - 14px) * 16 / 17) 1px no-repeat,
     repeating-linear-gradient(to right, var(--color-ash) 0 1px, transparent 1px 4px) left 7px center /
@@ -74,7 +89,7 @@ input[type="range"]::-moz-range-thumb {
 }
 input[type="range"]:focus-visible {
   outline: 1px solid var(--color-bone);
-  outline-offset: 4px;
+  outline-offset: 0;
 }
 input[type="range"]:disabled::-webkit-slider-thumb {
   background: var(--color-ash);

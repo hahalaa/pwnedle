@@ -39,7 +39,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T19** "Warming up" fallback, only when no file exists for today. (R36b)
 
 ## Phase 3: launch
-- [todo] **T20** Mobile and accessibility pass; colourblind check of tiers. (R25)
+- [done] **T20** Mobile and accessibility pass; colourblind check of tiers. (R25)
 - [todo] **T21** Open Graph image and cookie-free analytics. (R26, R27)
 - [todo] **T22** Set `LAUNCH_DATE`, turn on the weekly Action schedule, then generate and approve the first 14 days. (D22)
 - [todo] **T23** Playtest with 5 or more people; tune K and the mix rules; log the outcome in decisions. Check zero-count passwords look plausible.
@@ -53,3 +53,4 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [todo] **T29** Optional cursor-reactive dot grid (dots enlarge near the cursor); desktop only, subtle, respects `prefers-reduced-motion`.
 - [done] **T30** The home page picks today's puzzle by UTC date, so it rolls over at UTC midnight rather than the player's local midnight. Choose the date from the player's local clock within the server's launch-to-today+1 window, and match the archive cut-off. (R2)
 - [done] **T31** Missing tests: a Round test that a refresh resumes mid-puzzle with reveals intact and never re-sends a locked-in guess (R15, R16); a test that a generated puzzle's display order is kept as written (R4).
+- [todo] **T32** In dev the home page logs "Next.js encountered the unstable value `new Date()` while prerendering" from `utcToday` in `playerToday`, even though `cookies()` is read first. Find out why and clear it, likely with `await connection()` (see learnings). (R2)

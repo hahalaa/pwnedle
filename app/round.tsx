@@ -43,6 +43,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   }
 
   async function lockIn() {
+    if (state === "sending") return;
     setState("sending");
     // R14: the count only comes back after the guess is sent (D7).
     const res = await fetch("/api/guess", { method: "POST", body: JSON.stringify({ date, index, guess }) }).catch(() => null);
@@ -58,7 +59,8 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     setText("0");
   }
 
-  if (done) return <End number={number} passwords={passwords} results={results} />;
+  // Focus moves to Share when the game ends during this visit; a finished game loaded from storage leaves focus alone.
+  if (done) return <End number={number} passwords={passwords} results={results} autoFocus={played !== null} />;
 
   return (
     <section className="flex flex-1 flex-col gap-6 sm:flex-none">
@@ -73,6 +75,12 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
         </div>
         <p className="font-mono px-3 py-6 text-3xl break-all sm:text-4xl">{passwords[index]}</p>
       </div>
+      {/* Stays mounted so screen readers announce each reveal and each new password when the text changes. */}
+      <p className="sr-only" aria-live="polite">
+        {result
+          ? `Seen ${formatGuess(result.count)} times. You guessed ${formatGuess(result.guess)}. ${result.score} points, ${result.tier.toLowerCase()}. ${result.note}`
+          : `Password ${index + 1} of ${passwords.length}: ${passwords[index]}`}
+      </p>
       {result ? (
         <Reveal result={result} />
       ) : (
@@ -133,7 +141,8 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
       <button
         type="button"
         onClick={result ? (last ? () => update({ ...game, done: true }) : next) : lockIn}
-        disabled={!result && (invalid || state === "sending")}
+        // Not disabled while sending: a disabled button drops keyboard focus to the page.
+        disabled={!result && invalid}
         className="mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash"
       >
         {result ? (last ? "See results" : "Next password") : state === "sending" ? "Locking in…" : "Lock in"}
@@ -150,7 +159,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
 // R9: everything the API sent back, with the tier in its colour and always named (R25).
 export function Reveal({ result }: { result: Result }) {
   return (
-    <div className="flex flex-col gap-5" aria-live="polite">
+    <div className="flex flex-col gap-5">
       <dl className="grid grid-cols-2 gap-x-6 gap-y-4 font-mono">
         <div className="col-span-2">
           <dt className="text-xs text-ash">times seen in breaches</dt>
@@ -192,7 +201,7 @@ export function Dots({ results, index, total }: { results: Result[]; index: numb
 }
 
 // R12: total, daily tier, per-password breakdown, share (R19) and the coffee link (R23).
-export function End({ number, passwords, results }: { number: number; passwords: string[]; results: Result[] }) {
+export function End({ number, passwords, results, autoFocus }: { number: number; passwords: string[]; results: Result[]; autoFocus?: boolean }) {
   const [status, setStatus] = useState("");
   const total = results.reduce((a, r) => a + r.score, 0);
   const daily = tier(total / results.length);
@@ -210,10 +219,10 @@ export function End({ number, passwords, results }: { number: number; passwords:
   return (
     <section className="flex flex-1 flex-col gap-6 sm:flex-none">
       <div className="flex items-end justify-between gap-4">
-        <p className="font-mono">
+        <p id="end-total" className="font-mono">
           <span className="text-6xl">{total}</span> <span className="text-xl text-ash">/ 500</span>
         </p>
-        <p className="flex items-center gap-2 pb-2 font-mono text-lg" style={{ color: tierColor(daily) }}>
+        <p id="end-tier" className="flex items-center gap-2 pb-2 font-mono text-lg" style={{ color: tierColor(daily) }}>
           <span className="size-3 bg-current" />
           {daily.toLowerCase()}
         </p>
@@ -248,11 +257,13 @@ export function End({ number, passwords, results }: { number: number; passwords:
         <button
           type="button"
           onClick={share}
+          autoFocus={autoFocus}
+          aria-describedby="end-total end-tier"
           className="bg-signal px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
         >
           Share result
         </button>
-        <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer" className="text-center text-ash underline underline-offset-4 hover:text-bone">
+        <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer" className="tap text-center text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
           Buy me a coffee
         </a>
         <p role="status" className="text-center text-sm text-ash sm:text-left">

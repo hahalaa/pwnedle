@@ -29,11 +29,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="flex w-full max-w-xl flex-1 flex-col sm:flex-none">
             <header className="mb-8 flex items-baseline justify-between border-b border-line pb-3">
               <h1 className="font-dot text-4xl">
-                <Link href="/">Pwnedle</Link>
+                <Link href="/" className="tap focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">Pwnedle</Link>
               </h1>
               <nav className="flex gap-4">
                 <HowToPlay />
-                <Link href="/archive" className="font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
+                <Link href="/archive" className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
                   archive
                 </Link>
                 <Stats />
@@ -43,10 +43,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {/* R23, R24 */}
             <footer className="mt-10 border-t border-line pt-4 text-sm text-ash">
               <p className="flex gap-4 font-mono">
-                <Link href="/about" className="underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
+                <Link href="/about" className="tap underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
                   about
                 </Link>
-                <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
+                <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer" className="tap underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
                   buy me a coffee
                 </a>
               </p>
