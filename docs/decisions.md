@@ -113,3 +113,8 @@ The browser saves its IANA time zone in a first-party `tz` cookie, and server pa
 
 ## D31. End screen keeps only Share (amends R12, R23 and D27)
 R12 and R23 first put the Buy Me a Coffee link on the end screen as well as in the footer. The end screen now shows Share result alone, and the link stays in the footer. `COFFEE_URL` is still set once in `lib/config.ts`; only the footer uses it. The stats heading "daily tiers" is now "tiers". R17 still describes the same data.
+
+## D32. Analytics: Umami Cloud (R27)
+Checked on 2026-10-11. Vercel Web Analytics on the free Hobby plan counts page views but has no custom events, which need Pro. Umami Cloud's free Hobby plan has custom events, 100k events a month, one site and 6 months of history, and it sets no cookies. Umami loads as one script tag, so there is no npm package. Its site ID is public and lives in `lib/config.ts` as `UMAMI_WEBSITE_ID`. `data-domains` limits counting to the live site.
+
+Two events go with the page views: `puzzle-start` on a puzzle's first lock-in and `puzzle-complete` on See results. Each carries only the puzzle number and the archive flag, never a password, guess or count.

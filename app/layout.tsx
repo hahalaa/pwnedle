@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Archivo, Doto, IBM_Plex_Mono } from "next/font/google";
 import Link from "next/link";
-import { COFFEE_URL } from "../lib/config";
+import Script from "next/script";
+import { COFFEE_URL, SITE_URL, UMAMI_WEBSITE_ID } from "../lib/config";
 import "./globals.css";
 import { HowToPlay } from "./how-to-play";
 import { Stats } from "./stats";
@@ -11,10 +12,15 @@ const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
 const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono" });
 const doto = Doto({ subsets: ["latin"], weight: "900", variable: "--font-doto" });
 
+const description = "Five passwords a day. Guess how many times each one has turned up in data breaches.";
+
+// R26: app/opengraph-image.png is added to every page; metadataBase makes its URL absolute.
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Pwnedle",
-  description:
-    "Five passwords a day. Guess how many times each one has turned up in data breaches.",
+  description,
+  openGraph: { title: "Pwnedle", description, type: "website" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -22,6 +28,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${archivo.variable} ${plexMono.variable} ${doto.variable}`}>
       <body className="font-sans antialiased">
         <TimeZone />
+        {/* R27/D32: Umami sets no cookies. data-domains keeps dev and preview visits out of the counts. */}
+        <Script src="https://cloud.umami.is/script.js" data-website-id={UMAMI_WEBSITE_ID} data-domains={new URL(SITE_URL).host} />
         {/* main spans the viewport; the inner column holds the content at a readable width.
             Mobile: the page fills the screen so Lock in sits at the bottom.
             Desktop: spacers split the free height 2:3, so content sits just above centre, with the top gap capped. */}

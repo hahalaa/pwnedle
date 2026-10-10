@@ -8,3 +8,5 @@ export const SITE_URL = "https://pwnedle.vercel.app";
 export const COFFEE_URL = "https://buymeacoffee.com/hahalaa";
 // R22: shown in how-to-play.
 export const SAFETY_NOTE = "Pwnedle will never ask for your passwords. Don't type real passwords into any website to test them.";
+// R27/D32: Umami Cloud site ID. Public: it appears in every page's source.
+export const UMAMI_WEBSITE_ID = "6c99dc08-3553-4422-a640-ad15dbd123f7";

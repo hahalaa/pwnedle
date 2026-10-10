@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test, vi } from "vitest";
-import { COFFEE_URL } from "../lib/config";
+import { COFFEE_URL, SITE_URL } from "../lib/config";
 import RootLayout from "./layout";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({}) }));
@@ -21,4 +21,11 @@ test("the footer has only the about and coffee links (R23, R24, D29)", () => {
   expect(footer).toMatch(/<a [^>]*href="\/about"[^>]*>about<\/a>/);
   expect(footer).toContain(`href="${COFFEE_URL}"`);
   expect(html).toContain(">help</button>");
+});
+
+test("link previews get a title, description and large image card from the live site (R26)", async () => {
+  const { metadata } = await import("./layout");
+  expect(String(metadata.metadataBase)).toBe(`${SITE_URL}/`);
+  expect(metadata.openGraph).toMatchObject({ title: "Pwnedle", description: metadata.description });
+  expect(metadata.twitter).toMatchObject({ card: "summary_large_image" });
 });

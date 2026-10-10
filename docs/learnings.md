@@ -53,3 +53,6 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-10 [ui] A focused button that turns `disabled` drops keyboard focus to the page -> Lock in stays enabled while sending, and `lockIn` returns early on a second press.
 2026-10-10 [ui] Screen readers usually skip an `aria-live` region that mounts together with its text -> `Round` keeps one region mounted and changes its text on each reveal and password.
 2026-10-10 [ui] A negative `outline-offset` pulls the outline in on all four sides, so the slider thumb poked out of the focus frame at both ends -> the slider is 44px tall with its outline at offset 0.
+2026-10-11 [ui] Next copies `opengraph-image.alt.txt` into `og:image:alt` as is, trailing newline included -> write the file without a final newline.
+2026-10-11 [ui] In dev, `og:image` points at localhost even with `metadataBase` set -> check the absolute URL with `next start` after a build.
+2026-10-11 [tooling] Playwright MCP blocks `file:` URLs -> serve a local HTML file with `python3 -m http.server` from `.playwright-mcp/`.

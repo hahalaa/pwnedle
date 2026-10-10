@@ -20,6 +20,11 @@ const useHydrated = () => useSyncExternalStore(noop, () => true, () => false);
 // D25 tier colours live in globals.css as --color-<tier>.
 export const tierColor = (tier: string) => `var(--color-${tier.toLowerCase()})`;
 
+// R27: an Umami event, once its script has loaded (app/layout.tsx). It carries the puzzle number and archive flag,
+// never a password, guess or count.
+const track = (event: string, puzzle: number, archive = false) =>
+  (window as { umami?: { track: (event: string, data: object) => void } }).umami?.track(event, { puzzle, archive });
+
 // `archive` is set when played from the archive, so the game stays out of stats (R18).
 export function Round({ date, number, passwords, archive }: { date: string; number: number; passwords: string[]; archive?: boolean }) {
   // R16: this browser's progress resumes after a refresh. Saved results also keep a locked-in password
@@ -48,6 +53,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     const res = await fetch("/api/guess", { method: "POST", body: JSON.stringify({ date, index, guess }) }).catch(() => null);
     const body = res?.ok ? await res.json().catch(() => null) : null;
     if (!body) return setState("error");
+    if (!results.length) track("puzzle-start", number, archive);
     update({ ...game, results: [...results, { guess, ...body }] });
     setState("guessing");
   }
@@ -56,6 +62,11 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     update({ ...game, index: index + 1 });
     setGuess(0);
     setText("0");
+  }
+
+  function finish() {
+    update({ ...game, done: true });
+    track("puzzle-complete", number, archive);
   }
 
   // Focus moves to Share when the game ends during this visit; a finished game loaded from storage leaves focus alone.
@@ -139,7 +150,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
       )}
       <button
         type="button"
-        onClick={result ? (last ? () => update({ ...game, done: true }) : next) : lockIn}
+        onClick={result ? (last ? finish : next) : lockIn}
         // Not disabled while sending: a disabled button drops keyboard focus to the page.
         disabled={!result && invalid}
         className="mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash"

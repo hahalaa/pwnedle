@@ -70,3 +70,19 @@ test("a finished game loaded on refresh doesn't take focus", async () => {
   render(<Round {...props} />);
   expect(document.activeElement).not.toBe(await screen.findByRole("button", { name: "Share result" }));
 });
+
+test("the first lock-in sends puzzle-start once and See results sends puzzle-complete, with only the puzzle number (R27)", async () => {
+  const track = vi.fn();
+  vi.stubGlobal("umami", { track });
+  const r = { count: 12_500_000, score: 3, tier: "Pwned", note: "Seen everywhere." };
+  vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, json: async () => r })));
+  render(<Round {...props} archive />);
+  for (const next of ["Next password", "Next password", "Next password", "Next password", "See results"]) {
+    fireEvent.click(await screen.findByRole("button", { name: "Lock in" }));
+    fireEvent.click(await screen.findByRole("button", { name: next }));
+  }
+  expect(track.mock.calls).toEqual([
+    ["puzzle-start", { puzzle: 1, archive: true }],
+    ["puzzle-complete", { puzzle: 1, archive: true }],
+  ]);
+});
