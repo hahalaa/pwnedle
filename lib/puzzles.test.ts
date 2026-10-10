@@ -10,6 +10,8 @@ import { clientPuzzle, loadPuzzle, pastPuzzles, playerToday } from "./puzzles";
 
 vi.mock("server-only", () => ({}));
 let tz: string | undefined;
+const connection = vi.hoisted(() => vi.fn(async () => {}));
+vi.mock("next/server", () => ({ connection }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => (tz === undefined ? undefined : { value: tz }) }) }));
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -104,4 +106,6 @@ test.each([
   vi.useFakeTimers({ now: new Date(now), toFake: ["Date"] });
   tz = zone;
   expect(await playerToday()).toBe(expected);
+  // Request time, so pages that read the date are never prerendered with it.
+  expect(connection).toHaveBeenCalled();
 });

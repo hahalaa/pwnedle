@@ -2,6 +2,7 @@ import "server-only";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import type { Puzzle } from "../scripts/puzzles.ts";
 import { LAUNCH_DATE } from "./config.ts";
 import { addDays, utcToday, zoneToday } from "./days.ts";
@@ -28,8 +29,10 @@ export async function loadPuzzle(date: string, today = utcToday(), dir = join(pr
 
 // R2/D30: the player's local date, from the `tz` cookie set by app/time-zone.tsx. The cookie is untrusted:
 // an unknown zone falls back to UTC, and the result is clamped to UTC ±1 day, the range every real zone falls in.
-// Dates before launch are left to loadPuzzle to refuse. Reads the cookie first, so pages are dynamic before the clock is read.
+// Dates before launch are left to loadPuzzle to refuse. Waits for the request before reading the clock: with
+// cacheComponents a cookie read alone still lets Next prerender, and the page would be built with that day's date.
 export async function playerToday() {
+  await connection();
   const tz = (await cookies()).get("tz")?.value ?? "UTC";
   const utc = utcToday();
   return [addDays(utc, -1), zoneToday(tz), addDays(utc, 1)].sort()[1];
