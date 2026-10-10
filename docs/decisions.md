@@ -110,3 +110,6 @@ R22 first put the "Pwnedle will never ask for your passwords" note in the footer
 
 ## D30. Local date from a time-zone cookie (R2)
 The browser saves its IANA time zone in a first-party `tz` cookie, and server pages work out the player's local date from it on each request. The home page, the archive list and the archive cut-off all use that date. The cookie is untrusted. An unknown or missing zone falls back to UTC, and the date is clamped to within one day of UTC, which covers every real zone. The serving window stays launch to UTC today+1, enforced by `loadPuzzle`. On a first visit the server uses UTC, then the browser sets the cookie and refreshes once. The cookie is functional only, and the about page does not mention it.
+
+## D31. End screen keeps only Share (amends R12, R23 and D27)
+R12 and R23 first put the Buy Me a Coffee link on the end screen as well as in the footer. The end screen now shows Share result alone, and the link stays in the footer. `COFFEE_URL` is still set once in `lib/config.ts`; only the footer uses it. The stats heading "daily tiers" is now "tiers". R17 still describes the same data.

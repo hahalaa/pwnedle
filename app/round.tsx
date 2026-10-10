@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { COFFEE_URL } from "../lib/config";
 import { formatGuess, fromSlider, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
@@ -200,7 +199,7 @@ export function Dots({ results, index, total }: { results: Result[]; index: numb
   );
 }
 
-// R12: total, daily tier, per-password breakdown, share (R19) and the coffee link (R23).
+// R12: total, daily tier, per-password breakdown and share (R19). The coffee link is only in the footer (D31).
 export function End({ number, passwords, results, autoFocus }: { number: number; passwords: string[]; results: Result[]; autoFocus?: boolean }) {
   const [status, setStatus] = useState("");
   const total = results.reduce((a, r) => a + r.score, 0);
@@ -263,9 +262,6 @@ export function End({ number, passwords, results, autoFocus }: { number: number;
         >
           Share result
         </button>
-        <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer" className="tap text-center text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
-          Buy me a coffee
-        </a>
         <p role="status" className="text-center text-sm text-ash sm:text-left">
           {status}
         </p>

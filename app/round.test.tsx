@@ -39,7 +39,7 @@ test("every tier colour is always emitted, since the reveal only builds its name
   for (const t of ["pwned", "weak", "medium", "strong", "uncrackable"]) expect(block).toContain(`--color-${t}:`);
 });
 
-test("end screen shows the total, the daily tier, each password's breakdown, share and the coffee link (R12)", () => {
+test("end screen shows the total, the daily tier, each password's breakdown and share, with no coffee link (R12, D31)", () => {
   const scores = [100, 65, 90, 35, 100];
   const results = scores.map((score, i) => ({ guess: 40_000 + i, count: 12_500_000 + i, score, tier: ["Uncrackable", "Medium", "Uncrackable", "Weak", "Uncrackable"][i], note: "n" }));
   const html = renderToStaticMarkup(<End number={12} passwords={["hunter2", "b", "c", "d", "e"]} results={results} />);
@@ -54,7 +54,7 @@ test("end screen shows the total, the daily tier, each password's breakdown, sha
   // Each row names its tier next to the colour (R25).
   expect(html).toMatch(/color:var\(--color-medium\)"><span[^>]*><\/span>medium<\/p>/);
   expect(html).toContain(">Share result</button>");
-  expect(html).toContain('href="https://buymeacoffee.com/hahalaa" target="_blank" rel="noopener noreferrer"');
+  expect(html).not.toContain("buymeacoffee.com");
   // Notes stay on the reveal; the end screen doesn't repeat them.
   expect(html).not.toContain(">n<");
 });

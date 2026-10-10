@@ -66,7 +66,7 @@ export function StatsBody({ s }: { s: ReturnType<typeof stats> }) {
         ))}
       </dl>
       <div className="flex flex-col gap-2">
-        <h3 className="text-xs text-ash">daily tiers</h3>
+        <h3 className="text-xs text-ash">tiers</h3>
         {/* R25: each bar is labelled with its tier name. */}
         <ul className="flex flex-col gap-1.5 text-sm">
           {s.tiers.map(([t, n]) => (
