@@ -56,7 +56,7 @@ Players should never be stuck. If Harry hasn't approved a day, its draft is serv
 Conventional Commits: `<type>(<optional scope>): <Description>`, imperative mood, capitalised, no full stop, subject aimed at 50 characters and capped at 72, body wrapped at 72 explaining what and why. No AI attribution trailers. A local commit-msg hook enforces this.
 
 ## D18. Local tooling stays out of the repo
-Editor and agent configuration is kept local through `.git/info/exclude`, so the repository holds only the product, its docs and its CI.
+Editor configuration is kept local through `.git/info/exclude`, so the repository holds only the product, its docs and its CI.
 
 ## D19. One-line commits (supersedes part of D17)
 Commit messages are a single Conventional Commits subject line with no body. The commit-msg hook rejects bodies. Context that would have gone in a body goes in `docs/learnings.md` or a decision instead.
