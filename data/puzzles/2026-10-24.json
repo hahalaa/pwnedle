@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-24",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "Bulls2024",
+      "count": 30,
+      "note": "Sports team name plus a recent year is a predictable pattern, so it's rarer than plain words but still guessable."
+    },
+    {
+      "password": "Password2025",
+      "count": 1979,
+      "note": "Capitalized \"Password\" plus a year is a predictable word-and-number habit that crackers try first."
+    },
+    {
+      "password": "anchor",
+      "count": 43033,
+      "note": "Short, dictionary-word simplicity makes \"anchor\" a favorite that crackers try almost immediately."
+    },
+    {
+      "password": "karin",
+      "count": 33306,
+      "note": "\"Karin\" is a short, common first name, and people often reuse it as a password.\""
+    },
+    {
+      "password": "volcom",
+      "count": 172760,
+      "note": "\"Volcom\" is a surf-brand name, and short brand words like it get reused everywhere."
+    }
+  ]
+}
