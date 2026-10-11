@@ -30,3 +30,14 @@ test("the gap between 0 and 1 snaps by direction, so arrow keys cross it both wa
   expect(fromSlider(DECADE / 2 - 1, 1)).toBe(0); // left arrow from 1
   expect(fromSlider(25, 1_000)).toBe(0); // dragged left into the gap
 });
+
+test("every arrow key press moves the thumb, end to end in both directions", () => {
+  for (const [start, dir] of [[0, 1], [MAX_GUESS, -1]]) {
+    let guess = start;
+    while (guess !== MAX_GUESS - start) {
+      const next = fromSlider(toSlider(guess) + dir, guess);
+      expect(Math.sign(toSlider(next) - toSlider(guess))).toBe(dir);
+      guess = next;
+    }
+  }
+});
