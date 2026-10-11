@@ -12,13 +12,13 @@ afterEach(() => {
 const KEY = "pwnedle:2026-10-24";
 const props = { date: "2026-10-24", number: 1, passwords: ["a", "b", "c", "d", "e"] };
 // A game on its last revealed password, so the next press finishes it.
-const lastPassword = { index: 4, done: false, results: Array(5).fill({ guess: 1, count: 1, score: 100, tier: "Uncrackable", note: "" }) };
+const lastRound = { index: 4, done: false, results: Array(5).fill({ guess: 1, count: 1, score: 100, tier: "Uncrackable", note: "" }) };
 
 test.each([
   ["the archive", { archive: true }, true],
   ["the home page", {}, undefined],
 ])("finishing a game from %s saves the archive flag only for the archive (R18)", async (_, extra, archive) => {
-  localStorage.setItem(KEY, JSON.stringify(lastPassword));
+  localStorage.setItem(KEY, JSON.stringify(lastRound));
   render(<Round {...props} {...extra} />);
   fireEvent.click(await screen.findByRole("button", { name: "See results" }));
   const saved = JSON.parse(localStorage.getItem(KEY)!);
@@ -49,7 +49,7 @@ test("a refresh resumes mid-puzzle with reveals intact and never re-sends a lock
 test("Lock in keeps focus through the reveal, the reveal is announced, and finishing moves focus to Share (T20)", async () => {
   const r = { count: 12_500_000, score: 3, tier: "Pwned", note: "Seen everywhere." };
   vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, json: async () => r })));
-  localStorage.setItem(KEY, JSON.stringify({ ...lastPassword, results: lastPassword.results.slice(0, 4) }));
+  localStorage.setItem(KEY, JSON.stringify({ ...lastRound, results: lastRound.results.slice(0, 4) }));
   render(<Round {...props} />);
   const button = await screen.findByRole("button", { name: "Lock in" });
   const live = document.querySelector("[aria-live=polite]")!;
@@ -66,7 +66,7 @@ test("Lock in keeps focus through the reveal, the reveal is announced, and finis
 });
 
 test("a finished game loaded on refresh doesn't take focus", async () => {
-  localStorage.setItem(KEY, JSON.stringify({ ...lastPassword, done: true }));
+  localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true }));
   render(<Round {...props} />);
   expect(document.activeElement).not.toBe(await screen.findByRole("button", { name: "Share result" }));
 });
