@@ -15,6 +15,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history so the frozen check can diff against the push or PR base.
+          fetch-depth: 0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
@@ -25,3 +27,8 @@ jobs:
       - run: npm test
       # Fails on any puzzle error; drafts in the next 7 days show as warnings (R35).
       - run: npm run pipeline:validate
+      # Fails if a puzzle dated before today+2 was edited or deleted (D11, D21, R37).
+      # A new branch's first push has an all-zero `before`, so there is nothing to diff.
+      - run: if [ "$BASE" != 0000000000000000000000000000000000000000 ]; then node scripts/pipeline.ts frozen "$BASE"; fi
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}

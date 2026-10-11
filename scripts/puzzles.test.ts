@@ -2,7 +2,7 @@ import { mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test, vi } from "vitest";
-import { addDays, generate, replace, validate, type Puzzle } from "./puzzles";
+import { addDays, frozenChanges, generate, replace, validate, type Puzzle } from "./puzzles";
 import { NoValidNoteError } from "./notes";
 import { baseWord, meetsMix, selectReplacement } from "./select";
 
@@ -195,4 +195,14 @@ test("validate flags a shared base word under 14 days apart, not 14 or more (D33
   expect(errors.filter((e) => e.includes("base word"))).toEqual([
     `${d13}.json: password 0 shares the base word "${baseWord(twin)}" with ${d0}.json, under 14 days apart (D33)`,
   ]);
+});
+
+test("frozenChanges rejects edits and deletions before today+2 and allows new files", () => {
+  const f = (status: string, date: string) => frozenChanges(`${status}\tdata/puzzles/${date}.json\n`, TODAY);
+  expect(f("M", "2026-10-01")).toHaveLength(1);
+  expect(f("D", "2026-10-01")).toHaveLength(1);
+  expect(f("M", addDays(TODAY, 1))).toHaveLength(1);
+  expect(f("M", addDays(TODAY, 2))).toEqual([]);
+  expect(f("A", "2026-10-01")).toEqual([]);
+  expect(f("A", addDays(TODAY, 1))).toEqual([]);
 });

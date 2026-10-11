@@ -150,3 +150,15 @@ export async function validate(dir: string, today: string): Promise<{ errors: st
   }
   return { errors, warnings };
 }
+
+// Takes `git diff --name-status --no-renames` output. Files dated before today+2 can already
+// be served, so editing or deleting one fails CI; adding a file for any date is fine (D11, D21, R37).
+export function frozenChanges(diff: string, today: string): string[] {
+  const cutoff = addDays(today, 2);
+  return diff.split("\n").flatMap((line) => {
+    const [status, path] = line.split("\t");
+    const date = path?.match(/^data\/puzzles\/(\d{4}-\d{2}-\d{2})\.json$/)?.[1];
+    if (!date || status === "A" || date >= cutoff) return [];
+    return [`${path}: dated before ${cutoff}, so it can already be served and must not change`];
+  });
+}
