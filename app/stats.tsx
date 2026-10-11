@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { zoneToday } from "../lib/days";
 import { savedGames, stats } from "../lib/stats";
+import { NavLabel } from "./nav-label";
 import { tierColor } from "./round";
 
 // R17: worked out from this browser's saved games each time the modal opens.
@@ -19,9 +20,12 @@ export function Stats() {
           setS(stats(savedGames(), zoneToday()));
           ref.current?.showModal();
         }}
+        aria-label="stats"
         className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
       >
-        stats
+        <NavLabel text="stats">
+          <path d="M3.5 20.5h17M5.5 20.5v-9h3v9M10.5 20.5v-17h3v17M15.5 20.5v-6h3v6" />
+        </NavLabel>
       </button>
       <dialog
         ref={ref}

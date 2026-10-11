@@ -65,3 +65,5 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-11 [ui] Two significant figures map several slider positions to one value just above 1 and each power of ten, so a one-step arrow press rounded back to the same guess and the thumb stayed put -> `fromSlider` keeps stepping in the key's direction until the value changes.
 2026-10-11 [ui] A fourth header link ("sound") pushed the nav 2px past a 390px screen and made the page scroll sideways -> the nav gap is `gap-3` on mobile; measure `scrollWidth` at 390px when adding to the header.
 2026-10-11 [tooling] Grepping `.next` for dev-only code also matches `.next/dev`, the dev server's output -> check production builds with `grep -r --exclude-dir=dev`, and skip `.map` files.
+2026-10-11 [ui] The `.tap` 44px `::after` layer sits over a nav icon, so hovering hits the button and the SVG `<title>` tooltip never shows -> the icon SVG is `relative z-10`; clicks still reach the button.
+2026-10-11 [ui] `items-baseline` in the header put the phone nav icons at y=32.5, which blurs 1px lines across two pixel rows -> centre the icon nav (`items-center` below `sm`) and check `getBoundingClientRect().top` is a whole number.

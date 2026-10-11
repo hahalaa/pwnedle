@@ -47,6 +47,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T34** Sound effects: one short retro "pixel" sound per tier on each reveal, most positive for Uncrackable and most negative for Pwned. Made with the Web Audio API, so no audio files and no new packages. Includes a mute toggle that is remembered.
 - [todo] **T35** Subtle animations: short fades for the reveal, the modals and page changes. Nothing bouncy or slow, and none at all under `prefers-reduced-motion`.
 - [done] **T36** Arrow keys get stuck on the slider: from 1, ArrowRight moves to a position that rounds back to 1, so the thumb never moves. The same happens just above each power of ten, where two significant figures map several positions to one value. (R7, R25)
+- [done] **T37** The header nav is cramped on phones: below `sm`, show help, archive, stats and sound as 1px line icons (inline SVG, no icon package), each with an aria-label, a 44px tap target and the focus outline. Desktop keeps the text links. (R25, D25)
 - [todo] **T24** Launch: submit to Listdle, post to r/cybersecurity and r/InternetIsBeautiful, Show HN.
 
 ## Later

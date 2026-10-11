@@ -6,11 +6,16 @@ import RootLayout from "./layout";
 vi.mock("next/navigation", () => ({ useRouter: () => ({}) }));
 vi.mock("next/font/google", () => ({ Archivo: () => ({}), Doto: () => ({}), IBM_Plex_Mono: () => ({}) }));
 
-test("every page has the title linking home, an archive link and stats", () => {
+test("every page has the title linking home, an archive link and stats, as words on desktop and icons on phones (T37)", () => {
   const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
   expect(html).toMatch(/<a [^>]*href="\/"[^>]*>Pwnedle<\/a>/);
-  expect(html).toMatch(/<a [^>]*href="\/archive"[^>]*>archive<\/a>/);
-  expect(html).toContain(">stats</button>");
+  for (const item of ["help", "archive", "stats"]) {
+    expect(html).toMatch(new RegExp(`aria-label="${item}"[^>]*><span class="max-sm:hidden">${item}</span><svg aria-hidden="true"`));
+    // The icon's hover tooltip matches the aria-label; the desktop word has none.
+    expect(html).toContain(`<title>${item}</title>`);
+    expect(html).not.toContain(`title="${item}"`);
+  }
+  expect(html).toContain(`href="/archive"`);
   expect(html).toContain("page");
 });
 
@@ -20,7 +25,6 @@ test("the footer has only the about and coffee links (R23, R24, D29)", () => {
   expect(footer).not.toContain("never ask");
   expect(footer).toMatch(/<a [^>]*href="\/about"[^>]*>about<\/a>/);
   expect(footer).toContain(`href="${COFFEE_URL}"`);
-  expect(html).toContain(">help</button>");
 });
 
 test("link previews get a title, description and large image card from the live site (R26)", async () => {

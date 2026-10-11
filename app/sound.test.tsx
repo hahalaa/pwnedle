@@ -38,7 +38,10 @@ test("tunes run from the highest ending note for Uncrackable down to the lowest 
 
 test("the mute toggle is remembered after a refresh", async () => {
   render(<Sound />);
-  fireEvent.click(await screen.findByRole("button", { name: "sound on" }));
+  const on = await screen.findByRole("button", { name: "sound on" });
+  expect(on.querySelector("title")?.textContent).toBe("sound on");
+  fireEvent.click(on);
+  expect(on.querySelector("title")?.textContent).toBe("sound muted");
   expect(localStorage.getItem(MUTED_KEY)).toBe("1");
   cleanup();
   // A fresh mount reads localStorage, like a page refresh.

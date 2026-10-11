@@ -15,6 +15,6 @@ test("stats show played, average, best, both streaks and the tier distribution, 
 
 test("the stats button opens a closed modal", () => {
   const html = renderToStaticMarkup(<Stats />);
-  expect(html).toContain(">stats</button>");
+  expect(html).toMatch(/<button [^>]*aria-label="stats"/);
   expect(html).toMatch(/<dialog(?![^>]*open)/);
 });

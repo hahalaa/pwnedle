@@ -127,3 +127,6 @@ Outcome, 2026-10-11: Harry played all 14. Scores averaged about 270 out of 500, 
 
 ## D35. Tier sounds are on by default (T34)
 Each reveal plays a short square-wave sound for its tier, made with the Web Audio API. Sound is on for a new player. A reveal always follows a click on Lock in, so browsers let it play. The mute toggle sits in the header nav after stats, labelled "sound" or "muted" so the nav still fits on one line at 390px. The choice is saved in localStorage under `pwnedle-muted`.
+
+## D36. Icon nav on phones (amends D35)
+Below the `sm` breakpoint the header nav shows icons instead of words: a circled question mark for help, a calendar for archive, a bar chart for stats, and a speaker for sound, crossed when muted. The icons are inline SVG with 1px lines to match D25, and need no icon package. Each item has an aria-label (help, archive, stats, sound on or sound muted). The icon repeats it as a hover tooltip through an SVG `<title>`, so the desktop text links show no tooltip. All four icons are drawn on a 24px grid with their outer lines on the same box, from 3.5 to 20.5, so they line up and look the same size. Each has a 44px tap target, and the 20px gap between icons keeps the targets from overlapping. On phones the nav is centred against the wordmark, which keeps the 1px lines on whole pixels. Desktop keeps the text links.

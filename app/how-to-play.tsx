@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { SAFETY_NOTE } from "../lib/config";
+import { NavLabel } from "./nav-label";
 import { tierColor } from "./round";
 
 // Outside the `pwnedle:<date>` prefix so savedGames() never reads it.
@@ -41,9 +42,13 @@ export function HowToPlay() {
       <button
         type="button"
         onClick={() => ref.current?.showModal()}
+        aria-label="help"
         className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
       >
-        help
+        <NavLabel text="help">
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 16.5v.5" />
+        </NavLabel>
       </button>
       <dialog
         ref={ref}

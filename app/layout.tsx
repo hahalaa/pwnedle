@@ -5,6 +5,7 @@ import Script from "next/script";
 import { COFFEE_URL, SITE_URL, UMAMI_WEBSITE_ID } from "../lib/config";
 import "./globals.css";
 import { HowToPlay } from "./how-to-play";
+import { NavLabel } from "./nav-label";
 import { Sound } from "./sound";
 import { Stats } from "./stats";
 import { TimeZone } from "./time-zone";
@@ -36,14 +37,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             Desktop: spacers split the free height 2:3, so content sits just above centre, with the top gap capped. */}
         <main className="flex min-h-dvh w-full flex-col items-center px-4 py-6 sm:py-8 sm:before:max-h-24 sm:before:flex-[2] sm:before:content-[''] sm:after:flex-[3] sm:after:content-['']">
           <div className="flex w-full max-w-xl flex-1 flex-col sm:flex-none">
-            <header className="mb-8 flex items-baseline justify-between border-b border-line pb-3">
+            <header className="mb-8 flex items-center sm:items-baseline justify-between border-b border-line pb-3">
               <h1 className="font-dot text-4xl">
                 <Link href="/" className="tap focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">Pwnedle</Link>
               </h1>
-              <nav className="flex gap-3 sm:gap-4">
+              <nav className="flex gap-5 sm:gap-4">
                 <HowToPlay />
-                <Link href="/archive" className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
-                  archive
+                <Link href="/archive" aria-label="archive" className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
+                  <NavLabel text="archive">
+                    <path d="M3.5 5.5h17v15h-17zM3.5 9.5h17M8.5 3.5v4M15.5 3.5v4" />
+                  </NavLabel>
                 </Link>
                 <Stats />
                 <Sound />
