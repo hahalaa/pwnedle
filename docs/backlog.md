@@ -53,3 +53,4 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [todo] **T29** Optional cursor-reactive dot grid (dots enlarge near the cursor); desktop only, subtle, respects `prefers-reduced-motion`.
 - [done] **T30** The home page picks today's puzzle by UTC date, so it rolls over at UTC midnight rather than the player's local midnight. Choose the date from the player's local clock within the server's launch-to-today+1 window, and match the archive cut-off. (R2)
 - [done] **T31** Missing tests: a Round test that a refresh resumes mid-puzzle with reveals intact and never re-sends a locked-in guess (R15, R16); a test that a generated puzzle's display order is kept as written (R4).
+- [todo] **T32** Remove the tinyglobby override in package.json once eslint-config-next no longer pulls in fast-glob/braces; check on each Next.js upgrade.
