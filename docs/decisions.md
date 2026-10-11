@@ -133,3 +133,6 @@ Below the `sm` breakpoint the header nav shows icons instead of words: a circled
 
 ## D37. Motion (T35)
 Animations last 150 to 250 ms and use only fades and slides of a few pixels. Nothing bounces or scales. The reveal, the end screen and each new page fade in over 200 ms with a 4px rise. The help and stats dialogs and their backdrops fade in and out over 200 ms. Under `prefers-reduced-motion: reduce`, one rule in `app/globals.css` turns off every animation and transition.
+
+## D38. Upcoming puzzles are readable on GitHub
+The repository is public, so anyone can open `data/puzzles/` and read the counts and notes for days that haven't been played yet. This is accepted for the same reason as D7: anyone can look a password up on HIBP anyway.
