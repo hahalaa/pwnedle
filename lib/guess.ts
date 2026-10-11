@@ -8,9 +8,10 @@ const GAP = DECADE / 2;
 export const SLIDER_MAX = GAP + 8 * DECADE;
 
 // A position in the gap snaps by direction (left to 0, right to 1), so arrow keys can cross it both ways.
-// Two significant figures, so dragging lands on numbers like 1,300 instead of 1,258.
+// Two significant figures, so dragging lands on numbers like 1,300 instead of 1,258. Rounded, since below 10
+// two figures give decimals like 8.5 and guesses are whole numbers (R8).
 export const fromSlider = (pos: number, prev = 0) =>
-  pos <= 0 ? 0 : pos < GAP ? (pos < toSlider(prev) ? 0 : 1) : Number((10 ** ((pos - GAP) / DECADE)).toPrecision(2));
+  pos <= 0 ? 0 : pos < GAP ? (pos < toSlider(prev) ? 0 : 1) : Math.round(Number((10 ** ((pos - GAP) / DECADE)).toPrecision(2)));
 
 export const toSlider = (guess: number) => (guess < 1 ? 0 : Math.round(Math.log10(guess) * DECADE) + GAP);
 

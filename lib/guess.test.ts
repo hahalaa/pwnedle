@@ -17,6 +17,10 @@ test("slider has a 0 stop and spans 1 to 100,000,000 on a log scale", () => {
   expect([toSlider(0), toSlider(1), toSlider(MAX_GUESS), toSlider(2_500_000)]).toEqual([0, DECADE / 2, SLIDER_MAX, 690]);
 });
 
+test("every slider position gives a whole number, including the first decade (R8)", () => {
+  for (let pos = 0; pos <= SLIDER_MAX; pos++) expect(Number.isInteger(fromSlider(pos))).toBe(true);
+});
+
 test("every power of ten sits one decade apart, with the 0 stop half a decade left of 1", () => {
   expect([1, 10, 100, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8].map(toSlider)).toEqual([0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5].map((d) => d * DECADE));
 });

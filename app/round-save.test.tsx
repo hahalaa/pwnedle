@@ -86,3 +86,13 @@ test("the first lock-in sends puzzle-start once and See results sends puzzle-com
     ["puzzle-complete", { puzzle: 1, archive: true }],
   ]);
 });
+
+test.each([
+  ["a rejected guess names the guess", { ok: false, status: 400 }, "That guess wasn't accepted."],
+  ["a server error blames the connection", { ok: false, status: 500 }, "Check your connection"],
+])("%s", async (_, res, message) => {
+  vi.stubGlobal("fetch", vi.fn(async () => res));
+  render(<Round {...props} />);
+  fireEvent.click(await screen.findByRole("button", { name: "Lock in" }));
+  expect((await screen.findByRole("alert")).textContent).toContain(message);
+});

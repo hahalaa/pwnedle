@@ -36,7 +36,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   // guess is the last valid number, so the slider stays put while the box holds a typo.
   const [guess, setGuess] = useState(0);
   const [text, setText] = useState("0");
-  const [state, setState] = useState<"guessing" | "sending" | "error">("guessing");
+  const [state, setState] = useState<"guessing" | "sending" | "error" | "rejected">("guessing");
   const result = results[index];
   const invalid = parseGuess(text) === null;
   const last = index === passwords.length - 1;
@@ -51,6 +51,8 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     setState("sending");
     // R14: the count only comes back after the guess is sent (D7).
     const res = await fetch("/api/guess", { method: "POST", body: JSON.stringify({ date, index, guess }) }).catch(() => null);
+    // A 400 means the API refused the guess itself, so blaming the connection would mislead.
+    if (res?.status === 400) return setState("rejected");
     const body = res?.ok ? await res.json().catch(() => null) : null;
     if (!body) return setState("error");
     if (!results.length) track("puzzle-start", number, archive);
@@ -157,9 +159,11 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
       >
         {result ? (last ? "See results" : "Next password") : state === "sending" ? "Locking in…" : "Lock in"}
       </button>
-      {state === "error" && (
+      {(state === "error" || state === "rejected") && (
         <p role="alert" className="text-sm text-signal">
-          Your guess didn&apos;t go through. Check your connection and press Lock in again.
+          {state === "rejected"
+            ? "That guess wasn't accepted. Enter a whole number from 0 to 100m and press Lock in again."
+            : "Your guess didn't go through. Check your connection and press Lock in again."}
         </p>
       )}
     </section>
