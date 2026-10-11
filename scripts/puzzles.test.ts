@@ -4,12 +4,14 @@ import { join } from "node:path";
 import { expect, test, vi } from "vitest";
 import { addDays, generate, replace, validate, type Puzzle } from "./puzzles";
 import { NoValidNoteError } from "./notes";
-import { meetsMix, selectReplacement } from "./select";
+import { baseWord, meetsMix, selectReplacement } from "./select";
 
 // Counts cycle through 1, 10, ..., 10,000,000 and 0, as in select.test.ts.
-const pool = Array.from({ length: 2000 }, (_, i) => `pw${i}`);
+// Each index spelled in consonants keeps base words distinct: pw(12) is "cd12" (D33).
+const pw = (i: number) => [...String(i)].map((d) => "bcdfghjklm"[+d]).join("") + i;
+const pool = Array.from({ length: 2000 }, (_, i) => pw(i));
 const fakeCount = async (pw: string) => {
-  const i = Number(pw.slice(2)) % 9;
+  const i = Number(pw.replace(/\D/g, "")) % 9;
   return i === 8 ? 0 : 10 ** i;
 };
 const TODAY = "2026-10-08";
@@ -30,7 +32,7 @@ test("generate fills only missing days, today to today+13, with no repeats", asy
   const existing: Puzzle = {
     date: addDays(TODAY, 3),
     status: "approved",
-    passwords: ["pw0", "pw1", "pw2", "pw5", "pw8"].map((password) => ({ password, count: 1, note: "x" })),
+    passwords: [0, 1, 2, 5, 8].map(pw).map((password) => ({ password, count: 1, note: "x" })),
   };
   await writeFile(join(dir, `${existing.date}.json`), JSON.stringify(existing));
 
@@ -94,10 +96,10 @@ test("replace refuses servable dates, approved files and bad input", async () =>
 test("selectReplacement skips used and unclean passwords and candidates that break R3", async () => {
   const count = vi.fn(fakeCount);
   // Without a count of 100 or less, only pw0, pw1, pw2 (1, 10, 100) or pw8 (0) can fit.
-  const e = await selectReplacement([...pool.slice(0, 9), "fuckyou1"], new Set(["pw0", "pw1", "pw2"]), [1_000, 10_000, 100_000, 1_000_000], count);
-  expect(e).toEqual({ password: "pw8", count: 0 });
+  const e = await selectReplacement([...pool.slice(0, 9), "fuckyou1"], new Set([0, 1, 2].map(pw)), [1_000, 10_000, 100_000, 1_000_000], count);
+  expect(e).toEqual({ password: pw(8), count: 0 });
   expect(count.mock.calls.map(([pw]) => pw)).not.toContain("fuckyou1");
-  await expect(selectReplacement(["pw3"], new Set(), [1_000, 10_000, 100_000, 1_000_000], fakeCount)).rejects.toThrow("No candidate");
+  await expect(selectReplacement([pw(3)], new Set(), [1_000, 10_000, 100_000, 1_000_000], fakeCount)).rejects.toThrow("No candidate");
 });
 
 test("generate swaps a password whose note keeps failing, and fails only when the pool runs out", async () => {
@@ -163,4 +165,34 @@ test("validate reports mix, reuse, content, note and shape errors", async () => 
     "2026-01-01.json: needs exactly 5 passwords",
     "2026-01-03.json: not valid JSON",
   ]));
+});
+
+test("generate and replace never place one base word twice within 14 days (D33)", async () => {
+  const dir = await tmp();
+  // 150 base words, each in two forms, so picking without the rule would clash.
+  const candidates = pool.slice(0, 150).flatMap((p) => [p, p.replace(/\d+$/, "").toUpperCase() + p.replace(/\D/g, "")]);
+  await generate(dir, TODAY, { ...deps, candidates });
+  for (const i of [3, 7, 11]) await replace(dir, addDays(TODAY, i), 0, TODAY, { ...deps, candidates });
+  expect((await validate(dir, TODAY)).errors).toEqual([]);
+});
+
+test("validate flags a shared base word under 14 days apart, not 14 or more (D33)", async () => {
+  const dir = await tmp();
+  await generate(dir, TODAY, deps);
+  const [d0, d13, d14] = [0, 13, 14].map((i) => addDays(TODAY, i));
+  const p = await read(dir, d0);
+  const q = await read(dir, d13);
+  const [twin, far] = [0, 2].map((i) => p.passwords[i].password.toUpperCase() + "!");
+  q.passwords[0].password = twin;
+  p.passwords[1].password = "2020";
+  q.passwords[1].password = "1962";
+  await writeFile(join(dir, `${d0}.json`), JSON.stringify(p));
+  await writeFile(join(dir, `${d13}.json`), JSON.stringify(q));
+  const r = { date: d14, status: "draft", passwords: [far, "11", "22", "33", "44"].map((password) => ({ password, count: 1, note: "x" })) };
+  await writeFile(join(dir, `${d14}.json`), JSON.stringify(r));
+
+  const { errors } = await validate(dir, TODAY);
+  expect(errors.filter((e) => e.includes("base word"))).toEqual([
+    `${d13}.json: password 0 shares the base word "${baseWord(twin)}" with ${d0}.json, under 14 days apart (D33)`,
+  ]);
 });

@@ -116,3 +116,6 @@ R12 and R23 first put the Buy Me a Coffee link on the end screen as well as in t
 Checked on 2026-10-11. Vercel Web Analytics on the free Hobby plan counts page views but has no custom events, which need Pro. Umami Cloud's free Hobby plan has custom events, 100k events a month, one site and 6 months of history, and it sets no cookies. Umami loads as one script tag, so there is no npm package. Its site ID is public and lives in `lib/config.ts` as `UMAMI_WEBSITE_ID`. `data-domains` limits counting to the live site.
 
 Two events go with the page views: `puzzle-start` on a puzzle's first lock-in and `puzzle-complete` on See results. Each carries only the puzzle number and the archive flag, never a password, guess or count.
+
+## D33. No near-duplicates within 14 days
+A password's base word is its letters, lowercased, with digits and symbols removed: "Whatever123" and "whatever2024" both give "whatever". No two passwords dated less than 14 days apart, including two in the same puzzle, may share a base word. All-digit passwords such as "1962" have no base word and are exempt. Leetspeak is not undone, so "m@nutd" gives "mnutd". The selector, `generate` and `replace` avoid such pairs, and `pipeline:validate` reports them as errors. This tightens R5 and R31.

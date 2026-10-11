@@ -5,7 +5,7 @@ import { addDays, utcToday } from "../lib/days.ts";
 import { isClean } from "./filter.ts";
 import { NoValidNoteError, draftNote, noteProblem } from "./notes.ts";
 import { pwnedCount } from "./pwned.ts";
-import { meetsMix, selectPuzzle, selectReplacement } from "./select.ts";
+import { baseWord, meetsMix, selectPuzzle, selectReplacement } from "./select.ts";
 
 // D21: one file per date, entries in display order.
 export type Puzzle = {
@@ -35,6 +35,17 @@ async function loadAll(dir: string): Promise<Puzzle[]> {
 // Every password in every puzzle file, so no password is reused (R5, R31).
 const usedSet = (puzzles: Puzzle[]) => new Set(puzzles.flatMap((p) => p.passwords.map((e) => e.password)));
 
+const daysApart = (a: string, b: string) => Math.abs(Date.parse(a) - Date.parse(b)) / 86_400_000;
+
+// Base words of every password dated less than 14 days from `date`, leaving out `skip` (D33).
+const nearBases = (puzzles: Puzzle[], date: string, skip?: string) =>
+  new Set(
+    puzzles
+      .filter((p) => daysApart(p.date, date) < 14)
+      .flatMap((p) => p.passwords.filter((e) => e.password !== skip).map((e) => baseWord(e.password)))
+      .filter(Boolean),
+  );
+
 async function save(dir: string, p: Puzzle) {
   await mkdir(dir, { recursive: true });
   await writeFile(file(dir, p.date), JSON.stringify(p, null, 2) + "\n");
@@ -51,7 +62,8 @@ export async function generate(dir: string, today: string, { candidates, count =
   for (let i = 0; i < 14; i++) {
     const date = addDays(start, i);
     if (have.has(date)) continue;
-    const picked = await selectPuzzle(candidates, used, count);
+    const near = nearBases(puzzles, date);
+    const picked = await selectPuzzle(candidates, used, count, near);
     picked.forEach((e) => used.add(e.password));
     const passwords = [];
     for (let j = 0; j < 5; j++) {
@@ -64,12 +76,16 @@ export async function generate(dir: string, today: string, { candidates, count =
           break;
         } catch (err) {
           if (!(err instanceof NoValidNoteError)) throw err;
-          picked[j] = await selectReplacement(candidates, used, picked.filter((_, k) => k !== j).map((x) => x.count), count);
+          const rest = picked.filter((_, k) => k !== j);
+          const avoid = new Set([...near, ...rest.map((x) => baseWord(x.password))]);
+          picked[j] = await selectReplacement(candidates, used, rest.map((x) => x.count), count, avoid);
           used.add(picked[j].password);
         }
       }
     }
-    await save(dir, { date, status: "draft", passwords });
+    const p: Puzzle = { date, status: "draft", passwords };
+    await save(dir, p);
+    puzzles.push(p);
     written.push(date);
   }
   return written;
@@ -88,17 +104,18 @@ export async function replace(dir: string, date: string, index: number, today: s
   if (p.status !== "draft") throw new Error(`${date} is ${p.status}; set it back to draft first`);
 
   const others = p.passwords.filter((_, i) => i !== index).map((e) => e.count);
-  const e = await selectReplacement(candidates, usedSet(puzzles), others, count);
+  const e = await selectReplacement(candidates, usedSet(puzzles), others, count, nearBases(puzzles, date, p.passwords[index].password));
   p.passwords[index] = { ...e, note: await note(e.password, e.count) };
   await save(dir, p);
 }
 
-// Checks every puzzle file against R3, R5, R30 and the note limits (R35).
+// Checks every puzzle file against R3, R5, R30, D33 and the note limits (R35).
 // Errors should fail CI; warnings flag drafts dated today to today+6 as a review reminder.
 export async function validate(dir: string, today: string): Promise<{ errors: string[]; warnings: string[] }> {
   const errors: string[] = [];
   const warnings: string[] = [];
   const seen = new Map<string, string>();
+  const bases: { date: string; base: string; name: string }[] = [];
   const names = (await readdir(dir).catch(() => [])).filter((n) => n.endsWith(".json")).sort();
   for (const name of names) {
     const err = (msg: string) => errors.push(`${name}: ${msg}`);
@@ -120,6 +137,10 @@ export async function validate(dir: string, today: string): Promise<{ errors: st
       if (!isClean(e.password)) err(`password ${i} fails the content filter`);
       if (seen.has(e.password)) err(`password ${i} is also in ${seen.get(e.password)}`);
       seen.set(e.password, name);
+      const base = baseWord(e.password);
+      const twin = base && bases.find((b) => b.base === base && daysApart(b.date, p.date) < 14);
+      if (twin) err(`password ${i} shares the base word "${base}" with ${twin.name}, under 14 days apart (D33)`);
+      bases.push({ date: p.date, base, name });
       if (!Number.isInteger(e.count) || e.count < 0) return err(`password ${i} has a bad count`);
       const problem = typeof e.note === "string" ? noteProblem(e.note, e.count, e.password) : "missing";
       if (problem) err(`note ${i}: ${problem}`);

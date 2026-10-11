@@ -42,6 +42,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T20** Mobile and accessibility pass; colourblind check of tiers. (R25)
 - [done] **T21** Open Graph image and cookie-free analytics. (R26, R27)
 - [done] **T22** Set `LAUNCH_DATE`, turn on the weekly Action schedule, then generate and approve the first 14 days. (D22)
+- [done] **T33** Selector and validator avoid near-duplicates: no two passwords within 14 days share the same base word after removing case, digits, years and symbols.
 - [todo] **T23** Playtest with 5 or more people; tune K and the mix rules; log the outcome in decisions. Check zero-count passwords look plausible.
 - [todo] **T24** Launch: submit to Listdle, post to r/cybersecurity and r/InternetIsBeautiful, Show HN.
 
@@ -54,4 +55,3 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T30** The home page picks today's puzzle by UTC date, so it rolls over at UTC midnight rather than the player's local midnight. Choose the date from the player's local clock within the server's launch-to-today+1 window, and match the archive cut-off. (R2)
 - [done] **T31** Missing tests: a Round test that a refresh resumes mid-puzzle with reveals intact and never re-sends a locked-in guess (R15, R16); a test that a generated puzzle's display order is kept as written (R4).
 - [todo] **T32** Remove the tinyglobby override in package.json once eslint-config-next no longer pulls in fast-glob/braces; check on each Next.js upgrade.
-- [todo] **T33** Selector and validator avoid near-duplicates: no two passwords within 14 days share the same base word after removing case, digits, years and symbols.

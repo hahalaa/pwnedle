@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vitest";
-import { meetsMix, selectPuzzle } from "./select";
+import { baseWord, meetsMix, selectPuzzle } from "./select";
 
 test("meetsMix accepts a puzzle that follows every R3 rule", () => {
   expect(meetsMix([0, 50, 5_000, 200_000, 3_000_000])).toBe(true);
@@ -15,10 +15,12 @@ test("meetsMix rejects each broken rule", () => {
   expect(meetsMix([5, 5_000, 50_000, 200_000])).toBe(false); // four passwords
 });
 
+// Each index spelled in consonants keeps base words distinct: pw(12) is "cd12" (D33).
+const pw = (i: number) => [...String(i)].map((d) => "bcdfghjklm"[+d]).join("") + i;
 // Counts cycle through 1, 10, ..., 10,000,000 and 0.
-const pool = Array.from({ length: 1000 }, (_, i) => `pw${i}`);
+const pool = Array.from({ length: 1000 }, (_, i) => pw(i));
 const fakeCount = (pw: string) => {
-  const i = Number(pw.slice(2)) % 9;
+  const i = Number(pw.replace(/\D/g, "")) % 9;
   return i === 8 ? 0 : 10 ** i;
 };
 
@@ -48,4 +50,21 @@ test("never picks or looks up a used or unclean password", async () => {
 
 test("throws when the pool cannot meet the mix rules", async () => {
   await expect(selectPuzzle(pool, new Set(), async () => 500_000)).rejects.toThrow("Not enough candidates");
+});
+
+test("baseWord drops case, digits and symbols", () => {
+  expect(baseWord("Whatever123")).toBe(baseWord("whatever2024!"));
+  expect(baseWord("m@nutd")).toBe("mnutd");
+  expect(baseWord("1962")).toBe("");
+});
+
+test("never picks two passwords with one base word, or one whose base is near", async () => {
+  const twins = ["Dragon1", "dragon2024", "DRAGON!", "1962", "2020"];
+  const count = async (p: string) => fakeCount(p);
+  for (let run = 0; run < 20; run++) {
+    const puzzle = await selectPuzzle([...pool.slice(0, 30), ...twins], new Set(), count, new Set([baseWord(pool[0])]));
+    const bases = puzzle.map((e) => baseWord(e.password)).filter(Boolean);
+    expect(new Set(bases).size).toBe(bases.length);
+    expect(puzzle.map((e) => e.password)).not.toContain(pool[0]);
+  }
 });

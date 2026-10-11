@@ -3,6 +3,9 @@ import { pwnedCount } from "./pwned.ts";
 
 type Entry = { password: string; count: number };
 
+// Lowercase letters only, so "Whatever123" and "whatever2024" share "whatever". All-digit passwords get "" (D33).
+export const baseWord = (pw: string) => pw.toLowerCase().replace(/[^a-z]/g, "");
+
 // Order of magnitude as digit count. 0 shares a bucket with 1 to 9, the stricter reading of R3.
 const magnitude = (count: number) => String(count).length;
 
@@ -40,15 +43,20 @@ function pick(seen: Entry[]): Entry[] | null {
 }
 
 // One puzzle of 5 passwords meeting R3, none in `used` (R5, R31), in random order (R4).
+// No two share a base word, and none has a base word in `near` (D33).
 // Counts are looked up one at a time in shuffled order and stop once a puzzle fits.
 export async function selectPuzzle(
   candidates: string[],
   used: Set<string>,
   count: (password: string) => Promise<number> = pwnedCount,
+  near: Set<string> = new Set(),
 ): Promise<Entry[]> {
   const seen: Entry[] = [];
+  const bases = new Set(near);
   for (const password of shuffle(candidates)) {
-    if (used.has(password) || !isClean(password)) continue;
+    const base = baseWord(password);
+    if (used.has(password) || bases.has(base) || !isClean(password)) continue;
+    if (base) bases.add(base);
     seen.push({ password, count: await count(password) });
     const puzzle = pick(seen);
     if (puzzle) return shuffle(puzzle);
@@ -56,15 +64,16 @@ export async function selectPuzzle(
   throw new Error("Not enough candidates to meet the mix rules");
 }
 
-// One unused, clean candidate whose count keeps R3 when added to `others` (R34).
+// One unused, clean candidate whose count keeps R3 when added to `others` (R34), with no base word in `near` (D33).
 export async function selectReplacement(
   candidates: string[],
   used: Set<string>,
   others: number[],
   count: (password: string) => Promise<number> = pwnedCount,
+  near: Set<string> = new Set(),
 ): Promise<Entry> {
   for (const password of shuffle(candidates)) {
-    if (used.has(password) || !isClean(password)) continue;
+    if (used.has(password) || near.has(baseWord(password)) || !isClean(password)) continue;
     const c = await count(password);
     if (meetsMix([...others, c])) return { password, count: c };
   }

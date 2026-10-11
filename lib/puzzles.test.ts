@@ -66,8 +66,8 @@ test("a generated puzzle reaches the client in the order it was written (R4)", a
   const day = addDays(TODAY, 1);
   const dir = await dirWith(...Array.from({ length: 13 }, (_, i) => addDays(day, i + 1)));
   const counts = [1, 10, 100, 1_000, 100_000, 1_000_000];
-  const candidates = counts.map((_, i) => `pw${i}`);
-  await generate(dir, day, { candidates, count: async (pw) => counts[Number(pw.slice(2))], note: async () => "A note.", launch: day });
+  const candidates = counts.map((_, i) => `${"bcdfgh"[i]}${i}`);
+  await generate(dir, day, { candidates, count: async (pw) => counts[Number(pw.slice(1))], note: async () => "A note.", launch: day });
   const written = JSON.parse(await readFile(join(dir, `${day}.json`), "utf8")).passwords.map((e: { password: string }) => e.password);
   expect(clientPuzzle((await loadPuzzle(day, day, dir))!).passwords).toEqual(written);
 });
