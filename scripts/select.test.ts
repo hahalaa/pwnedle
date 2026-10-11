@@ -52,9 +52,10 @@ test("throws when the pool cannot meet the mix rules", async () => {
   await expect(selectPuzzle(pool, new Set(), async () => 500_000)).rejects.toThrow("Not enough candidates");
 });
 
-test("baseWord drops case, digits and symbols", () => {
+test("baseWord drops case, digit and symbol suffixes, and undoes leetspeak", () => {
   expect(baseWord("Whatever123")).toBe(baseWord("whatever2024!"));
-  expect(baseWord("m@nutd")).toBe("mnutd");
+  expect(baseWord("m@nutd")).toBe(baseWord("manutd"));
+  expect(baseWord("r3@lm@drid")).toBe("realmadrid");
   expect(baseWord("1962")).toBe("");
 });
 

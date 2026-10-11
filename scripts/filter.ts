@@ -9,8 +9,8 @@ const parts = terms.filter((t) => !t.startsWith("="));
 
 const LEET: Record<string, string> = { "@": "a", "4": "a", "0": "o", "3": "e", "$": "s", "5": "s", "1": "i", "!": "i", "7": "t" };
 
-// Letters left once suffixes are cut and leetspeak undone: "Sh1t123!" -> "shit".
-function letters(pw: string): string {
+// Letters left once suffixes are cut and leetspeak undone: "Sh1t123!" -> "shit". Also the base word in D33.
+export function letters(pw: string): string {
   return pw
     .toLowerCase()
     .replace(/[^a-z@$]+$/, "")

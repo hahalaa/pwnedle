@@ -1,10 +1,11 @@
-import { isClean } from "./filter.ts";
+import { isClean, letters } from "./filter.ts";
 import { pwnedCount } from "./pwned.ts";
 
 type Entry = { password: string; count: number };
 
-// Lowercase letters only, so "Whatever123" and "whatever2024" share "whatever". All-digit passwords get "" (D33).
-export const baseWord = (pw: string) => pw.toLowerCase().replace(/[^a-z]/g, "");
+// The content filter's normalisation, so "Whatever123" and "whatever2024" share "whatever"
+// and "m@nutd" and "manutd" share "manutd". All-digit passwords get "" (D33).
+export const baseWord = letters;
 
 // Order of magnitude as digit count. 0 shares a bucket with 1 to 9, the stricter reading of R3.
 const magnitude = (count: number) => String(count).length;
