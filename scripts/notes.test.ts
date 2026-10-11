@@ -9,21 +9,29 @@ test("band follows D23 cutoffs", () => {
 });
 
 test("noteProblem accepts a short plain note", () => {
-  expect(noteProblem("A keyboard walk anyone can type without looking.", 5_000_000)).toBeNull();
-  expect(noteProblem("Adding 2024 to a word is a common habit.", 5_000)).toBeNull();
+  expect(noteProblem("A keyboard walk anyone can type without looking.", 5_000_000, "pw")).toBeNull();
+  expect(noteProblem("Adding 2024 to a word is a common habit.", 5_000, "pw")).toBeNull();
+  expect(noteProblem('"karin" is a short first name, and it\'s often reused.', 5_000, "karin")).toBeNull();
+  expect(noteProblem('Capitalising "Password" and adding the year.', 5_000, "Password2025")).toBeNull();
 });
 
 test("noteProblem rejects each R32 and D23 break", () => {
-  expect(noteProblem("", 5)).toBe("empty");
-  expect(noteProblem("a".repeat(140), 5)).toBe("140 characters or more");
-  expect(noteProblem("One. Two.", 5)).toBe("more than 1 sentence");
-  expect(noteProblem("It leaked in the RockYou dump.", 5)).toBe("names a breach");
-  expect(noteProblem("About 3% of people use it.", 5)).toBe("unverifiable statistic");
-  expect(noteProblem("Attackers try this first.", 5)).toBe("stock phrase");
-  expect(noteProblem("It shows up 12,345 times.", 12_345)).toBe("restates the count");
-  expect(noteProblem("Millions of people pick this.", 0)).toBe('contradicts band "never leaked"');
-  expect(noteProblem("A rare choice of word.", 500_000)).toBe('contradicts band "extremely common"');
-  expect(noteProblem("Millions of people pick this.", 5_000)).toBe('contradicts band "common"');
+  expect(noteProblem("", 5, "pw")).toBe("empty");
+  expect(noteProblem("a".repeat(140), 5, "pw")).toBe("140 characters or more");
+  expect(noteProblem("One. Two.", 5, "pw")).toBe("more than 1 sentence");
+  expect(noteProblem("It leaked in the RockYou dump.", 5, "pw")).toBe("names a breach");
+  expect(noteProblem("About 3% of people use it.", 5, "pw")).toBe("unverifiable statistic");
+  expect(noteProblem("Attackers try this first.", 5, "pw")).toBe("stock phrase");
+  expect(noteProblem("Crackers try this first.", 5, "pw")).toBe("stock phrase");
+  expect(noteProblem("Easily cracked by a word list.", 5, "pw")).toBe("stock phrase");
+  expect(noteProblem("A cracking favourite.", 5, "pw")).toBe("stock phrase");
+  expect(noteProblem('"Karin" is a short first name."', 5, "pw")).toBe("unbalanced quotes");
+  expect(noteProblem("“Karin” is a short first name.”", 5, "pw")).toBe("unbalanced quotes");
+  expect(noteProblem('"Volcom" is a surf brand.', 5, "volcom")).toBe("quotes the password in the wrong case");
+  expect(noteProblem("It shows up 12,345 times.", 12_345, "pw")).toBe("restates the count");
+  expect(noteProblem("Millions of people pick this.", 0, "pw")).toBe('contradicts band "never leaked"');
+  expect(noteProblem("A rare choice of word.", 500_000, "pw")).toBe('contradicts band "extremely common"');
+  expect(noteProblem("Millions of people pick this.", 5_000, "pw")).toBe('contradicts band "common"');
 });
 
 const reply = (text: string, stop_reason: Anthropic.StopReason = "end_turn") =>

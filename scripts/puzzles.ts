@@ -120,7 +120,7 @@ export async function validate(dir: string, today: string): Promise<{ errors: st
       if (seen.has(e.password)) err(`password ${i} is also in ${seen.get(e.password)}`);
       seen.set(e.password, name);
       if (!Number.isInteger(e.count) || e.count < 0) return err(`password ${i} has a bad count`);
-      const problem = typeof e.note === "string" ? noteProblem(e.note, e.count) : "missing";
+      const problem = typeof e.note === "string" ? noteProblem(e.note, e.count, e.password) : "missing";
       if (problem) err(`note ${i}: ${problem}`);
     });
     if (!meetsMix(p.passwords.map((e) => e.count))) err("counts break the mix rules (R3)");

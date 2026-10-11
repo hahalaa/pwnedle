@@ -10,11 +10,11 @@ export const band = (count: number): Band =>
 
 const SYSTEM = `You write the reveal note for a password guessing game. Players guessed how many times a password appears in Have I Been Pwned's Pwned Passwords, then see the real count and your note.
 You get the password and a band: never leaked, rare, common or extremely common. Write one short sentence, about 12 words, on why this password lands in that band. Be specific to this password: its words, pattern or habit. A note that would fit any password is wrong.
-Never name a breach, company, website or person. Never cite numbers, statistics, rankings or dates. Never say "attackers", "hackers" or "breach corpus".
+Never name a breach, company, website or person. Never cite numbers, statistics, rankings or dates. If you quote the password, copy its exact case. Never say "attackers", "hackers", "crackers", "cracking", "cracked" or "breach corpus".
 Do not name the band. Reply with the sentence only.`;
 
 const BREACHES = /rockyou|linkedin|adobe|yahoo|myspace|ashley madison|dropbox|collection #?1|canva|zynga|equifax|facebook|anti public|exploit\.in/i;
-const STOCK = /\battackers?\b|\bhackers?\b|\bcybercriminals?\b|\bbreach corpus\b/i;
+const STOCK = /\battackers?\b|\bhackers?\b|\bcrack(ers?|ing|ed)\b|\bcybercriminals?\b|\bbreach corpus\b/i;
 const SAYS_LOW = /\b(very|extremely|hugely|so) (common|popular)\b|\bmillions\b|\bthousands\b|\bone of the most\b|\beveryone\b/i;
 const SAYS_HIGH = /\b(rare|rarely|uncommon|obscure|unique)\b|\bnever (leaked|appears|seen|shows up)\b/i;
 const CONTRADICTS: Record<Band, RegExp> = {
@@ -25,10 +25,14 @@ const CONTRADICTS: Record<Band, RegExp> = {
 };
 
 // Why a note breaks R32 or D23, or null if it is fine. T9's validator reuses this.
-export function noteProblem(note: string, count: number): string | null {
+export function noteProblem(note: string, count: number, password: string): string | null {
   if (!note) return "empty";
   if (note.length >= 140) return "140 characters or more";
   if ((note.match(/[.!?]+(\s|$)/g) ?? []).length > 1) return "more than 1 sentence";
+  const n = (re: RegExp) => note.match(re)?.length ?? 0;
+  if (n(/"/g) % 2 || n(/“/g) !== n(/”/g)) return "unbalanced quotes";
+  const quoted = [...note.matchAll(/["“]([^"”]+)["”]/g)].map((m) => m[1]);
+  if (quoted.some((q) => q !== password && q.toLowerCase() === password.toLowerCase())) return "quotes the password in the wrong case";
   if (BREACHES.test(note)) return "names a breach";
   if (/%|\bpercent\b/i.test(note)) return "unverifiable statistic";
   if (STOCK.test(note)) return "stock phrase";
@@ -59,7 +63,7 @@ export async function draftNote(
       messages: [{ role: "user", content: `Password: ${JSON.stringify(password)}\nBand: ${band(count)}` }],
     });
     const note = res.content.map((b) => (b.type === "text" ? b.text : "")).join("").trim();
-    problem = res.stop_reason === "end_turn" ? (noteProblem(note, count) ?? "") : `stopped: ${res.stop_reason}`;
+    problem = res.stop_reason === "end_turn" ? (noteProblem(note, count, password) ?? "") : `stopped: ${res.stop_reason}`;
     if (!problem) return note;
   }
   throw new NoValidNoteError(`No valid note for a password after 3 tries (last: ${problem})`);
