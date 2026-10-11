@@ -1,6 +1,6 @@
 {
   "date": "2026-10-24",
-  "status": "draft",
+  "status": "approved",
   "passwords": [
     {
       "password": "Bulls2024",
@@ -10,22 +10,22 @@
     {
       "password": "Password2025",
       "count": 1979,
-      "note": "Capitalized \"Password\" plus a year is a predictable word-and-number habit that crackers try first."
+      "note": "Capitalising \"Password\" and adding the year is how many people satisfy password rules."
     },
     {
       "password": "anchor",
       "count": 43033,
-      "note": "Short, dictionary-word simplicity makes \"anchor\" a favorite that crackers try almost immediately."
+      "note": "A short dictionary word like \"anchor\" is exactly why so many people picked it."
     },
     {
       "password": "karin",
       "count": 33306,
-      "note": "\"Karin\" is a short, common first name, and people often reuse it as a password.\""
+      "note": "A short, common first name like \"karin\" is among the most reused passwords."
     },
     {
       "password": "volcom",
       "count": 172760,
-      "note": "\"Volcom\" is a surf-brand name, and short brand words like it get reused everywhere."
+      "note": "\"volcom\" is a surf-brand name, and short brand words like it get reused everywhere."
     }
   ]
 }
