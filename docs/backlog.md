@@ -44,7 +44,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 - [done] **T22** Set `LAUNCH_DATE`, turn on the weekly Action schedule, then generate and approve the first 14 days. (D22)
 - [done] **T33** Selector and validator avoid near-duplicates: no two passwords within 14 days share the same base word after removing case, digits, years and symbols.
 - [done] **T23** Playtest with 1 or more people (D34); tune K and the mix rules; log the outcome in decisions. Check zero-count passwords look plausible.
-- [todo] **T34** Sound effects: one short retro "pixel" sound per tier on each reveal, most positive for Uncrackable and most negative for Pwned. Made with the Web Audio API, so no audio files and no new packages. Includes a mute toggle that is remembered.
+- [done] **T34** Sound effects: one short retro "pixel" sound per tier on each reveal, most positive for Uncrackable and most negative for Pwned. Made with the Web Audio API, so no audio files and no new packages. Includes a mute toggle that is remembered.
 - [todo] **T35** Subtle animations: short fades for the reveal, the modals and page changes. Nothing bouncy or slow, and none at all under `prefers-reduced-motion`.
 - [done] **T36** Arrow keys get stuck on the slider: from 1, ArrowRight moves to a position that rounds back to 1, so the thumb never moves. The same happens just above each power of ten, where two significant figures map several positions to one value. (R7, R25)
 - [todo] **T24** Launch: submit to Listdle, post to r/cybersecurity and r/InternetIsBeautiful, Show HN.

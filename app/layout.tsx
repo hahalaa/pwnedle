@@ -5,6 +5,7 @@ import Script from "next/script";
 import { COFFEE_URL, SITE_URL, UMAMI_WEBSITE_ID } from "../lib/config";
 import "./globals.css";
 import { HowToPlay } from "./how-to-play";
+import { Sound } from "./sound";
 import { Stats } from "./stats";
 import { TimeZone } from "./time-zone";
 
@@ -39,12 +40,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <h1 className="font-dot text-4xl">
                 <Link href="/" className="tap focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">Pwnedle</Link>
               </h1>
-              <nav className="flex gap-4">
+              <nav className="flex gap-3 sm:gap-4">
                 <HowToPlay />
                 <Link href="/archive" className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
                   archive
                 </Link>
                 <Stats />
+                <Sound />
               </nav>
             </header>
             {children}

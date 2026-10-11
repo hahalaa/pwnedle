@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { formatGuess, fromSlider, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
+import { isMuted, playTier } from "../lib/sound";
 import { type Game, loadGame, saveGame } from "../lib/stats";
 
 // The 0 stop, then every power of ten, with each tick at its slider position (lib/guess.ts).
@@ -15,7 +16,7 @@ type Saved = Game & { results: Result[] };
 
 // True once hydrated: the server can't see localStorage, so the first render must match a fresh game.
 const noop = () => () => {};
-const useHydrated = () => useSyncExternalStore(noop, () => true, () => false);
+export const useHydrated = () => useSyncExternalStore(noop, () => true, () => false);
 
 // D25 tier colours live in globals.css as --color-<tier>.
 export const tierColor = (tier: string) => `var(--color-${tier.toLowerCase()})`;
@@ -56,6 +57,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     const body = res?.ok ? await res.json().catch(() => null) : null;
     if (!body) return setState("error");
     if (!results.length) track("puzzle-start", number, archive);
+    if (!isMuted()) playTier(body.tier);
     update({ ...game, results: [...results, { guess, ...body }] });
     setState("guessing");
   }
