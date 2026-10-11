@@ -175,7 +175,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
 // R9: everything the API sent back, with the tier in its colour and always named (R25).
 export function Reveal({ result }: { result: Result }) {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex animate-enter flex-col gap-5">
       <dl className="grid grid-cols-2 gap-x-6 gap-y-4 font-mono">
         <div className="col-span-2">
           <dt className="text-xs text-ash">times seen in breaches</dt>
@@ -233,7 +233,7 @@ export function End({ number, passwords, results, autoFocus }: { number: number;
   }
 
   return (
-    <section className="flex flex-1 flex-col gap-6 sm:flex-none">
+    <section className="flex flex-1 animate-enter flex-col gap-6 sm:flex-none">
       <div className="flex items-end justify-between gap-4">
         <p id="end-total" className="font-mono">
           <span className="text-6xl">{total}</span> <span className="text-xl text-ash">/ 500</span>

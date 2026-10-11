@@ -130,3 +130,6 @@ Each reveal plays a short square-wave sound for its tier, made with the Web Audi
 
 ## D36. Icon nav on phones (amends D35)
 Below the `sm` breakpoint the header nav shows icons instead of words: a circled question mark for help, a calendar for archive, a bar chart for stats, and a speaker for sound, crossed when muted. The icons are inline SVG with 1px lines to match D25, and need no icon package. Each item has an aria-label (help, archive, stats, sound on or sound muted). The icon repeats it as a hover tooltip through an SVG `<title>`, so the desktop text links show no tooltip. All four icons are drawn on a 24px grid with their outer lines on the same box, from 3.5 to 20.5, so they line up and look the same size. Each has a 44px tap target, and the 20px gap between icons keeps the targets from overlapping. On phones the nav is centred against the wordmark, which keeps the 1px lines on whole pixels. Desktop keeps the text links.
+
+## D37. Motion (T35)
+Animations last 150 to 250 ms and use only fades and slides of a few pixels. Nothing bounces or scales. The reveal, the end screen and each new page fade in over 200 ms with a 4px rise. The help and stats dialogs and their backdrops fade in and out over 200 ms. Under `prefers-reduced-motion: reduce`, one rule in `app/globals.css` turns off every animation and transition.

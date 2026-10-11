@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
 import { Dots, End, Reveal, Round } from "./round";
+import Template from "./template";
 
 test("round shows the R7 prompt, the password in monospace, a slider at the 0 stop and a number box", () => {
   const html = renderToStaticMarkup(<Round date="2026-10-24" number={1} passwords={["hunter2", "b", "c", "d", "e"]} />);
@@ -37,6 +38,22 @@ test("every tier colour is always emitted, since the reveal only builds its name
   const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
   const block = /@theme static \{([^}]*)\}/.exec(css)?.[1] ?? "";
   for (const t of ["pwned", "weak", "medium", "strong", "uncrackable"]) expect(block).toContain(`--color-${t}:`);
+});
+
+test("the reveal, end screen and pages fade in briefly, and reduced motion turns every animation off (T35)", () => {
+  const result = { guess: 1, count: 1, score: 100, tier: "Uncrackable", note: "n" };
+  for (const html of [
+    renderToStaticMarkup(<Reveal result={result} />),
+    renderToStaticMarkup(<End number={1} passwords={["a"]} results={[result]} />),
+    renderToStaticMarkup(<Template>page</Template>),
+  ])
+    expect(html).toMatch(/^<[^>]*animate-enter/);
+  const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
+  expect(css).toContain("--animate-enter: enter 200ms ease-out;");
+  const reduced = /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+  expect(reduced).toContain("::backdrop");
+  expect(reduced).toContain("animation: none !important;");
+  expect(reduced).toContain("transition: none !important;");
 });
 
 test("end screen shows the total, the daily tier, each password's breakdown and share, with no coffee link (R12, D31)", () => {
