@@ -80,6 +80,8 @@ export function StatsBody({ s }: { s: ReturnType<typeof stats> }) {
           ))}
         </ul>
       </div>
+      {/* R18: archive games are saved but left out of these numbers. */}
+      <p className="text-xs text-ash">Archive games don&apos;t count towards stats.</p>
     </div>
   );
 }
