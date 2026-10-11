@@ -40,16 +40,17 @@ async function save(dir: string, p: Puzzle) {
   await writeFile(file(dir, p.date), JSON.stringify(p, null, 2) + "\n");
 }
 
-// Writes a draft for each day from today to today+13 that has no file yet and is not before launch (R33, D21, D22).
+// Writes a draft for each of the 14 days from today, or from launch if that is later, that has no file yet (R33, D21, D22).
 // Returns the dates written.
 export async function generate(dir: string, today: string, { candidates, count = pwnedCount, note = draftNote, launch = LAUNCH_DATE }: Deps): Promise<string[]> {
   const puzzles = await loadAll(dir);
   const have = new Set(puzzles.map((p) => p.date));
   const used = usedSet(puzzles);
   const written: string[] = [];
+  const start = today < launch ? launch : today;
   for (let i = 0; i < 14; i++) {
-    const date = addDays(today, i);
-    if (date < launch || have.has(date)) continue;
+    const date = addDays(start, i);
+    if (have.has(date)) continue;
     const picked = await selectPuzzle(candidates, used, count);
     picked.forEach((e) => used.add(e.password));
     const passwords = [];

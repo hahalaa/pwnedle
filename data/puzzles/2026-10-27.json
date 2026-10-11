@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-27",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "winter2025",
+      "count": 259,
+      "note": "Seasonal word plus a year tacked on is a predictable pattern, so it shows up in leaks often enough to be uncommon rather than unique."
+    },
+    {
+      "password": "store",
+      "count": 23901,
+      "note": "Short, dictionary-word passwords like \"store\" get tried first and turn up in leak lists over and over."
+    },
+    {
+      "password": "drpepper",
+      "count": 233665,
+      "note": "Drpepper is a famous soda brand name, and people reach for it as a simple, memorable word with no digits or symbols."
+    },
+    {
+      "password": "broncos123",
+      "count": 9812,
+      "note": "Pairing a team nickname with the sequence \"123\" is a predictable combo many people reach for."
+    },
+    {
+      "password": "r3@lm@drid",
+      "count": 4,
+      "note": "Real Madrid with \"3\" for \"e\" and \"@\" for \"a\", a disguise few people bother with."
+    }
+  ]
+}

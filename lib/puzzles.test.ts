@@ -62,12 +62,12 @@ test("client puzzle has only date, number and password text", () => {
 });
 
 test("a generated puzzle reaches the client in the order it was written (R4)", async () => {
-  // A launch on the last of the 14 days means generate writes just that one.
-  const day = addDays(TODAY, 13);
-  const dir = await dirWith();
+  // With the 13 days after it already filled, generate writes just this one.
+  const day = addDays(TODAY, 1);
+  const dir = await dirWith(...Array.from({ length: 13 }, (_, i) => addDays(day, i + 1)));
   const counts = [1, 10, 100, 1_000, 100_000, 1_000_000];
   const candidates = counts.map((_, i) => `pw${i}`);
-  await generate(dir, TODAY, { candidates, count: async (pw) => counts[Number(pw.slice(2))], note: async () => "A note.", launch: day });
+  await generate(dir, day, { candidates, count: async (pw) => counts[Number(pw.slice(2))], note: async () => "A note.", launch: day });
   const written = JSON.parse(await readFile(join(dir, `${day}.json`), "utf8")).passwords.map((e: { password: string }) => e.password);
   expect(clientPuzzle((await loadPuzzle(day, day, dir))!).passwords).toEqual(written);
 });

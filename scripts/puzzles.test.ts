@@ -53,11 +53,12 @@ test("generate fills only missing days, today to today+13, with no repeats", asy
   expect(await generate(dir, TODAY, deps)).toEqual([]);
 });
 
-test("generate writes nothing dated before launch", async () => {
+test("before launch, generate writes the 14 days from launch", async () => {
   const dir = await tmp();
-  const written = await generate(dir, TODAY, { ...deps, launch: addDays(TODAY, 10) });
-  expect(written).toEqual([10, 11, 12, 13].map((i) => addDays(TODAY, i)));
-  expect(await readdir(dir)).toHaveLength(4);
+  const launch = addDays(TODAY, 10);
+  const written = await generate(dir, TODAY, { ...deps, launch });
+  expect(written).toEqual(Array.from({ length: 14 }, (_, i) => addDays(launch, i)));
+  expect(await readdir(dir)).toHaveLength(14);
 });
 
 test("replace swaps one password in a draft, keeping R3 and R5", async () => {

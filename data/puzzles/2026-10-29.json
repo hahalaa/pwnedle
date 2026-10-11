@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-29",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "nittany",
+      "count": 24588,
+      "note": "\"nittany\" is a Penn State mascot-related word, a regional sports nickname people pick by habit."
+    },
+    {
+      "password": "amigos",
+      "count": 214813,
+      "note": "\"amigos\" is just a plain Spanish word, the kind of easy pick people reach for without a second thought."
+    },
+    {
+      "password": "anthony",
+      "count": 1419958,
+      "note": "Anthony is a popular first name, and people often reuse their own names as passwords, so it turns up everywhere."
+    },
+    {
+      "password": "firewall",
+      "count": 73898,
+      "note": "It's a tech word people reach for first, so it turns up in countless passwords."
+    },
+    {
+      "password": "youknowit1234",
+      "count": 17,
+      "note": "Padding a phrase like \"youknowit\" with \"1234\" makes it feel unique, but the common phrase is still guessable."
+    }
+  ]
+}

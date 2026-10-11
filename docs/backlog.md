@@ -41,7 +41,7 @@ Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticke
 ## Phase 3: launch
 - [done] **T20** Mobile and accessibility pass; colourblind check of tiers. (R25)
 - [done] **T21** Open Graph image and cookie-free analytics. (R26, R27)
-- [todo] **T22** Set `LAUNCH_DATE`, turn on the weekly Action schedule, then generate and approve the first 14 days. (D22)
+- [done] **T22** Set `LAUNCH_DATE`, turn on the weekly Action schedule, then generate and approve the first 14 days. (D22)
 - [todo] **T23** Playtest with 5 or more people; tune K and the mix rules; log the outcome in decisions. Check zero-count passwords look plausible.
 - [todo] **T24** Launch: submit to Listdle, post to r/cybersecurity and r/InternetIsBeautiful, Show HN.
 

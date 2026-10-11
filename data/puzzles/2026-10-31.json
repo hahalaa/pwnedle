@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-31",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "Qweasd2025",
+      "count": 0,
+      "note": "Two keyboard rows zigzagged plus a year, a pattern that never showed up in a leak."
+    },
+    {
+      "password": "photo",
+      "count": 36322,
+      "note": "It's a single everyday word with no digits or symbols, the kind people reach for first."
+    },
+    {
+      "password": "Michael2020",
+      "count": 8666,
+      "note": "Pairing a common first name with a year is a predictable habit, so it turns up often in leaked lists."
+    },
+    {
+      "password": "Anna1!",
+      "count": 252,
+      "note": "Short, name-plus-digit-plus-symbol habit makes it a common pattern, yet this exact combination stays uncommon."
+    },
+    {
+      "password": "penguin1",
+      "count": 191471,
+      "note": "\"penguin1\" is a dictionary word with a single digit tacked on, the exact pattern people reach for when a password needs a number."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-28",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "raymond",
+      "count": 339833,
+      "note": "Raymond is just a common first name, and people often pick plain names as passwords."
+    },
+    {
+      "password": "stupid",
+      "count": 401595,
+      "note": "It's a plain dictionary word with no digits or symbols, the kind people reach for first."
+    },
+    {
+      "password": "princess1",
+      "count": 1395109,
+      "note": "A plain word with a single \"1\" on the end, the usual fix when a site asks for a number."
+    },
+    {
+      "password": "1q@z2w$x",
+      "count": 11,
+      "note": "Built from keyboard-adjacent columns, \"1q@z2w$x\" zigzags down the left side, so it's easy to type yet unusual."
+    },
+    {
+      "password": "Eagles1990",
+      "count": 459,
+      "note": "A sports nickname plus a birth-year suffix is a common pattern, yet the specific team-and-year combo here stays uncommon."
+    }
+  ]
+}

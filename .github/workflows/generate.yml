@@ -1,7 +1,9 @@
 name: Generate puzzles
 
-# Manual only until T22 adds the weekly schedule (D22).
+# Weekly, and by hand when needed (R36a, D22).
 on:
+  schedule:
+    - cron: "17 6 * * 1"
   workflow_dispatch:
 
 permissions:

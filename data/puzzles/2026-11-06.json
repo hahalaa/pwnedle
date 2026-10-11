@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-06",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "click",
+      "count": 19535,
+      "note": "A short, common English verb with no digits or symbols, so people reach for it without thinking."
+    },
+    {
+      "password": "2020",
+      "count": 1445352,
+      "note": "Just a year, and a recent one, so people reach for it as an easy default."
+    },
+    {
+      "password": "elwood",
+      "count": 67348,
+      "note": "Elwood is a real name, and people reach for names like it because they're easy to remember."
+    },
+    {
+      "password": "Cheese2025",
+      "count": 1,
+      "note": "A common word plus a year is an easy pattern, but almost nobody uses this exact one."
+    },
+    {
+      "password": "antoine",
+      "count": 358943,
+      "note": "\"antoine\" is just a first name, and short lowercase names are everyone's go-to picks."
+    }
+  ]
+}

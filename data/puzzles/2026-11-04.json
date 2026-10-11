@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-04",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "matthew",
+      "count": 1231985,
+      "note": "It's a common first name, and people pick it as a password because it's short and easy to remember."
+    },
+    {
+      "password": "Guitar2025",
+      "count": 5,
+      "note": "A common word plus a recent year makes it predictable, yet this exact pairing is less widespread than the usual suspects."
+    },
+    {
+      "password": "tiffany1",
+      "count": 315552,
+      "note": "\"tiffany1\" is a common name with a bare \"1\" tacked on, the first thing people try."
+    },
+    {
+      "password": "Grace1",
+      "count": 13478,
+      "note": "Grace plus a trailing 1 is the classic name-and-digit pattern people reach for when a site demands a number."
+    },
+    {
+      "password": "notredam",
+      "count": 5008,
+      "note": "\"notredam\" is just \"Notre Dame\" with the final e dropped, a near-miss that still gets typed out by sports fans and students."
+    }
+  ]
+}

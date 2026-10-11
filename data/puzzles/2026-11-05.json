@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-05",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "1962",
+      "count": 194058,
+      "note": "A bare year is among the first numbers people reach for, so it turns up everywhere."
+    },
+    {
+      "password": "dolphin2000",
+      "count": 1167,
+      "note": "A familiar animal word tacked onto a year-style number, the exact pattern people reach for when a site demands digits."
+    },
+    {
+      "password": "talon",
+      "count": 18684,
+      "note": "Short, common English word with no digits or symbols, so guessing lists reach it quickly."
+    },
+    {
+      "password": "Cowboys2025",
+      "count": 123,
+      "note": "Sports-team nicknames with a year tacked on are a familiar habit, but the specific combination keeps this one out of the most-used tier."
+    },
+    {
+      "password": "coffee2025",
+      "count": 24,
+      "note": "A common word plus a year is an easy pattern, but this exact pairing is rare."
+    }
+  ]
+}

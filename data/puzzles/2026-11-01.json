@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-01",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "chocolate1",
+      "count": 567912,
+      "note": "Dictionary word plus a bare \"1\" is the first thing anyone tries, so it turns up everywhere."
+    },
+    {
+      "password": "1104",
+      "count": 104412,
+      "note": "Four digits with no other pattern, a PIN shape so common it shows up in almost every leaked list."
+    },
+    {
+      "password": "jayhawks",
+      "count": 49148,
+      "note": "It's a sports team nickname, the sort of word people reach for as a fan password without adding anything else."
+    },
+    {
+      "password": "Celtic1990",
+      "count": 143,
+      "note": "Pairing a football club name with a birth year is a common pattern, but adding \"1990\" makes it less predictable than the usual forms."
+    },
+    {
+      "password": "Nevergiveup2025",
+      "count": 4,
+      "note": "A motivational phrase with a year tacked on is a predictable habit, yet the exact combination stays uncommon."
+    }
+  ]
+}

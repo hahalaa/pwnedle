@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-02",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "Dragon!",
+      "count": 12758,
+      "note": "Just one word plus a trailing \"!\", the most predictable way to make a password look stronger."
+    },
+    {
+      "password": "godisgood2024",
+      "count": 192,
+      "note": "Faith phrase plus a year tacked on, a mix people reach for often, yet this exact combo is less common."
+    },
+    {
+      "password": "Bestfriend1990",
+      "count": 29,
+      "note": "Pairing \"Bestfriend\" with a birth-year-style suffix is a common habit, but the specific combination keeps this one uncommon."
+    },
+    {
+      "password": "nicole12",
+      "count": 153132,
+      "note": "A common first name with \"12\" tacked on is the classic low-effort pattern that gets tried first everywhere."
+    },
+    {
+      "password": "ella1",
+      "count": 2604,
+      "note": "It's a first name with a \"1\" tacked on, the exact habit people reach for when a bare name is too short."
+    }
+  ]
+}

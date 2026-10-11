@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-03",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "rrpass1",
+      "count": 3484,
+      "note": "\"rrpass1\" is just \"pass\" with a doubled-letter prefix and a trailing 1, a tiny tweak on a word everyone reaches for."
+    },
+    {
+      "password": "freedom",
+      "count": 1235255,
+      "note": "Freedom is a single dictionary word with no digits or symbols, the kind of pick people make first."
+    },
+    {
+      "password": "123abc1!",
+      "count": 36,
+      "note": "Its sequential \"123\" and \"abc\" pieces are popular building blocks, but the \"1!\" ending makes it less predictable."
+    },
+    {
+      "password": "allie",
+      "count": 34919,
+      "note": "Allie is a short first name, and people often pick names like it for passwords."
+    },
+    {
+      "password": "silver1",
+      "count": 216622,
+      "note": "Plain dictionary word plus a single trailing digit, the first thing people reach for when adding a number."
+    }
+  ]
+}

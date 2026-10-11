@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-26",
+  "status": "approved",
+  "passwords": [
+    {
+      "password": "sword",
+      "count": 39378,
+      "note": "Short, dictionary-word passwords like \"sword\" get tried first by anyone guessing with common word lists."
+    },
+    {
+      "password": "wave",
+      "count": 9621,
+      "note": "Short, common, and dictionary-friendly, \"wave\" is the kind of plain English word people reach for first."
+    },
+    {
+      "password": "lucas1990",
+      "count": 12923,
+      "note": "Pairing a first name with a birth year is a predictable habit that shows up in huge numbers of leaked lists."
+    },
+    {
+      "password": "welcomehome2024",
+      "count": 0,
+      "note": "A phrase plus a year looks like an easy guess, yet this one never turned up in a leak."
+    },
+    {
+      "password": "charlie123",
+      "count": 197245,
+      "note": "Pairing a popular first name with the lazy \"123\" tail is exactly what everyone reaches for first."
+    }
+  ]
+}
