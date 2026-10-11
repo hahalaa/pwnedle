@@ -3,7 +3,7 @@
 The order to build Pwnedle in. Each step ends with something you can check.
 
 ## 1. Set up (T0 to T2)
-Check the domain and Listdle first, so you don't build under a name you can't use. Create the repo with the README and `docs/`, set up your local tooling, then do T2. You're done when an empty page is live on a Vercel URL and Commands in CLAUDE.md is filled in.
+Check the domain and Listdle first, so you don't build under a name you can't use. Create the repo with the README and `docs/`, set up your local tooling, then do T2. You're done when an empty page is live on a Vercel URL and the dev, test and build commands are written down.
 
 ## 2. Prove the data works (T3, T4, T5)
 Build the pipeline before any UI, because the game is only as good as its passwords. Do T3, then T4 and T5. You're done when one command prints a few hundred filtered candidates with counts, and you've skimmed them and found them interesting. If they're dull, fix the seed lists now; this is the cheapest point to change anything.
