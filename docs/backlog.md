@@ -3,7 +3,7 @@
 Status: `todo`, `doing`, `done`. Update in the same commit that finishes a ticket.
 
 ## Phase 0: setup
-- [done] **T0** Check the pwnedle.com (or alternative) domain and Listdle for name clashes; buy the domain. The purchase is deferred under D28.
+- [done] **T0** Check the pwnedle.com (or alternative) domain and Listdle for name clashes; buy the domain. Bought pwnedle.com through Vercel on 2026-10-11 (D39).
 - [done] **T1** Create the GitHub repo with the README and docs, and set up local editor tooling.
 - [done] **T2** Next.js + TypeScript + Tailwind skeleton, ESLint, Vitest, deploy to Vercel; write down the dev, test and build commands.
 

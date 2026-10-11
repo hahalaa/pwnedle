@@ -100,7 +100,7 @@ A saturated green can't be much lighter than OKLab L 0.85, so the ramp is compre
 ## D27. Buy Me a Coffee link
 The link is https://buymeacoffee.com/hahalaa, stored once as `COFFEE_URL` in `lib/config.ts` so the end screen (T15) and the footer (T18) share it.
 
-## D28. Custom domain deferred
+## D28. Custom domain deferred (superseded by D39)
 The site lives at https://pwnedle.vercel.app, stored as `SITE_URL` in `lib/config.ts`, and the share text ends with `pwnedle.vercel.app`. A custom domain waits until the game has regular players and donations can cover it.
 
 ## D29. Safety note only in how-to-play (amends R22)
@@ -136,3 +136,6 @@ Animations last 150 to 250 ms and use only fades and slides of a few pixels. Not
 
 ## D38. Upcoming puzzles are readable on GitHub
 The repository is public, so anyone can open `data/puzzles/` and read the counts and notes for days that haven't been played yet. This is accepted for the same reason as D7: anyone can look a password up on HIBP anyway.
+
+## D39. Domain: pwnedle.com (supersedes D28)
+Bought through Vercel on 2026-10-11. The site lives at https://pwnedle.com, stored as `SITE_URL` in `lib/config.ts`, and the share text ends with `pwnedle.com`. `metadataBase` and Umami's `data-domains` both take their host from `SITE_URL`. www.pwnedle.com and pwnedle.vercel.app redirect to it with a permanent 308. Both redirects live in the Vercel domain settings, so preview URLs are unaffected. The link preview image's source is `docs/og-source.html`.

@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500&family=Doto:wght@900&family=IBM+Plex+Mono:wght@400&display=block">
+<style>
+  :root { --void:#0b0b0c; --bone:#e8e5df; --ash:#8d8a84; --line:#2a2a2d; --signal:#e5322d; }
+  * { margin:0; box-sizing:border-box; }
+  html, body { width:1200px; height:630px; background:var(--void); color:var(--bone); }
+  body { padding:64px 80px 56px; display:flex; flex-direction:column; font-family:Archivo, sans-serif; }
+  h1 { font-family:Doto, monospace; font-weight:900; font-size:168px; line-height:.8; letter-spacing:-2px; }
+  p.q { margin-top:44px; font-size:46px; line-height:1.18; max-width:900px; }
+  .slider { margin-top:auto; position:relative; height:22px; }
+  .track { position:absolute; top:11px; right:7px; height:1px; width:calc((100% - 14px) * 16 / 17); background:var(--ash); }
+  .dots { position:absolute; top:11px; left:7px; height:1px; width:calc((100% - 14px) / 17);
+          background:repeating-linear-gradient(to right, var(--ash) 0 1px, transparent 1px 4px); }
+  .thumb { position:absolute; top:0; width:14px; height:22px; background:var(--signal); left:calc((100% - 14px) * .53); }
+  .ticks { position:relative; height:44px; margin-top:6px; font:400 20px "IBM Plex Mono", monospace; color:var(--ash); }
+  .ticks span { position:absolute; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .ticks span::before { content:""; width:1px; height:9px; background:var(--ash); }
+  footer { margin-top:28px; padding-top:20px; border-top:1px solid var(--line); display:flex; justify-content:flex-end; align-items:center;
+           font:400 22px "IBM Plex Mono", monospace; color:var(--ash); }
+  .sq { display:flex; gap:8px; }
+  .sq i { width:22px; height:22px; }
+</style>
+</head>
+<body>
+  <h1>Pwnedle</h1>
+  <p class="q">How many times has this password appeared in data breaches?</p>
+  <div class="slider"><div class="dots"></div><div class="track"></div><div class="thumb"></div></div>
+  <div class="ticks">
+    <span style="left:calc(7px + (100% - 14px) * 0)">0</span>
+    <span style="left:calc(7px + (100% - 14px) * 0.0588)">1</span>
+    <span style="left:calc(7px + (100% - 14px) * 0.2941)">100</span>
+    <span style="left:calc(7px + (100% - 14px) * 0.5294)">10k</span>
+    <span style="left:calc(7px + (100% - 14px) * 0.7647)">1m</span>
+    <span style="left:calc(7px + (100% - 14px) * 1)">100m</span>
+  </div>
+  <footer>
+    <span class="sq"><i style="background:#56ee66"></i><i style="background:#a7cc0a"></i><i style="background:#e19906"></i><i style="background:#e76d04"></i><i style="background:#e5322d"></i></span>
+  </footer>
+</body>
+</html>

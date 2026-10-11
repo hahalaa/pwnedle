@@ -11,7 +11,7 @@ Areas: pipeline, api, ui, deploy, tooling.
 -->
 2026-10-07 [tooling] `tsc` fails on `LayoutProps` until Next generates route types -> `npm run typecheck` runs `next typegen` first.
 2026-10-07 [tooling] Vitest 5 peer-requires `@types/node` 22 or later; create-next-app pins `^20` -> keep `@types/node` on `^22`.
-2026-10-07 [deploy] The project isn't linked with `vercel link` or `vercel git connect` -> Harry imports the repo in the Vercel dashboard; pushes to `main` then deploy to https://pwnedle.vercel.app.
+2026-10-07 [deploy] The project isn't linked with `vercel link` or `vercel git connect` -> Harry imports the repo in the Vercel dashboard; pushes to `main` then deploy to https://pwnedle.com.
 2026-10-08 [pipeline] The range cache stores whole range responses per 5-char prefix in gitignored `.cache/pwned/` -> the cache never holds a password or full hash; padding rows have count 0 so they read as misses.
 2026-10-08 [tooling] Plain `node` runs `scripts/*.ts` but warns "Reparsing as ES module" -> package.json now has `"type": "module"` (T8).
 2026-10-08 [pipeline] SecLists `10k-most-common.txt` contains profanity and other junk -> candidates go through the T5 filter before selection; never feed the raw list to the selector.

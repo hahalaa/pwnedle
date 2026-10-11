@@ -2,8 +2,8 @@
 export const LAUNCH_DATE = "2026-10-24";
 // R10/D5: scoring width on the log scale. Tune after playtesting (T23).
 export const K = 1.25;
-// D28: the live address until a custom domain is bought.
-export const SITE_URL = "https://pwnedle.vercel.app";
+// D39: the live address. Also sets metadataBase and the Umami data-domains host.
+export const SITE_URL = "https://pwnedle.com";
 // R23/D27/D31: used in the footer.
 export const COFFEE_URL = "https://buymeacoffee.com/hahalaa";
 // R22: shown in how-to-play.
