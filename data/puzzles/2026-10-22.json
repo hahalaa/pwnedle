@@ -1,31 +1,31 @@
 {
   "date": "2026-10-22",
-  "status": "draft",
+  "status": "approved",
   "passwords": [
     {
       "password": "florence",
       "count": 417038,
-      "note": "Florence is a plain first name, and people reach for familiar names like it without a second thought."
+      "note": "Florence is both a first name and a city, so plenty of people pick it."
     },
     {
       "password": "toto",
       "count": 99227,
-      "note": "It's a short name-like word that people reach for as a quick, easy-to-type choice."
+      "note": "Toto is a short doubled syllable and the dog from The Wizard of Oz, so it's a familiar pick."
     },
     {
       "password": "rangers2025",
       "count": 1,
-      "note": "Pairing a sports team name with a current year is a common habit, but adding a specific season makes it less widespread."
+      "note": "A team name plus a year looks predictable, yet almost nobody has used this exact one."
     },
     {
       "password": "alexander",
       "count": 1511979,
-      "note": "Alexander is a popular first name, and people reach for it as a simple, familiar word with no added symbols or digits."
+      "note": "Alexander is a popular first name, typed as a plain lowercase word with nothing added."
     },
     {
       "password": "diamond2010",
       "count": 4649,
-      "note": "Pairing a familiar word with a year is a classic pattern, which is why \"diamond2010\" shows up so often."
+      "note": "Pairing a familiar word with a year is a classic pattern, which keeps this one fairly common."
     }
   ]
 }

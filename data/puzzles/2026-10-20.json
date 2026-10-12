@@ -1,6 +1,6 @@
 {
   "date": "2026-10-20",
-  "status": "draft",
+  "status": "approved",
   "passwords": [
     {
       "password": "baseball2025",
@@ -10,7 +10,7 @@
     {
       "password": "rainbow6",
       "count": 133444,
-      "note": "A common word plus a tiny digit tacked on the end is exactly what people reach for."
+      "note": "A common word with a single digit on the end is about as predictable as a password gets."
     },
     {
       "password": "Asdfghjkl2025",
@@ -20,12 +20,12 @@
     {
       "password": "cloudy",
       "count": 35886,
-      "note": "A plain dictionary word with no digits or symbols, so it turns up in leaked lists constantly."
+      "note": "A plain weather word with no digits or symbols, simple enough that many people pick it."
     },
     {
       "password": "Jordan!",
       "count": 6553,
-      "note": "Its a first name plus an exclamation mark, the kind of simple tweak people reach for to meet symbol rules."
+      "note": "It's a first name plus an exclamation mark, the simple tweak people use to meet symbol rules."
     }
   ]
 }

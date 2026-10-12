@@ -1,11 +1,11 @@
 {
   "date": "2026-10-21",
-  "status": "draft",
+  "status": "approved",
   "passwords": [
     {
       "password": "juventus2020",
       "count": 2532,
-      "note": "Football club name plus a recent year is a predictable pattern fans reuse everywhere."
+      "note": "A football club name plus a year, a pattern popular with fans."
     },
     {
       "password": "kevin2000",
@@ -25,7 +25,7 @@
     {
       "password": "131313",
       "count": 1527332,
-      "note": "Alternating \"13\" pairs are a lazy pattern people reach for, so it shows up everywhere."
+      "note": "Repeating \"13\" three times makes a six-digit code that is easy to remember and type."
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "date": "2026-10-23",
-  "status": "draft",
+  "status": "approved",
   "passwords": [
     {
       "password": "0p3n$3$@m3",
@@ -15,17 +15,17 @@
     {
       "password": "tobydog",
       "count": 35773,
-      "note": "Pairing a name with \"dog\" is a predictable pet-based habit that shows up everywhere."
+      "note": "A pet's name with \"dog\" added, a pairing many owners land on."
     },
     {
       "password": "thumper1",
       "count": 133388,
-      "note": "Thumper is a cartoon bunny, and a trailing \"1\" is the lazy add-on everyone reaches for."
+      "note": "Thumper is a cartoon bunny, and a trailing \"1\" is the laziest way to add a digit."
     },
     {
-      "password": "loveme2010",
-      "count": 4511,
-      "note": "Pairing \"love me\" with a year-style ending is a predictable pattern people reuse everywhere."
+      "password": "iron",
+      "count": 18957,
+      "note": "A short, common English word, quick to type and easy to remember."
     }
   ]
 }
