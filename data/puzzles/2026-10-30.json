@@ -10,12 +10,12 @@
     {
       "password": "shadows",
       "count": 82728,
-      "note": "Shadows is a plain dictionary word with no digits or symbols, so people reach for it constantly."
+      "note": "A moody plural noun that suits gamers and fans of dark fantasy."
     },
     {
       "password": "Emily12",
       "count": 5880,
-      "note": "Emily plus \"12\" is a name-and-number pattern people reach for constantly, so it turns up everywhere."
+      "note": "A popular girl's name plus two digits, maybe a birthday or an age."
     },
     {
       "password": "azerty123",
@@ -25,7 +25,7 @@
     {
       "password": "hello1234",
       "count": 215495,
-      "note": "\"hello1234\" is just a greeting plus the most predictable digit run, the first thing people reach for."
+      "note": "A greeting followed by the first four digits, both the easiest things to type."
     }
   ]
 }

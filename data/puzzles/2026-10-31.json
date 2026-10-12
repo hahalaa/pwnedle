@@ -10,7 +10,7 @@
     {
       "password": "photo",
       "count": 36322,
-      "note": "It's a single everyday word with no digits or symbols, the kind people reach for first."
+      "note": "A plain five-letter noun that comes to mind when a photo site asks for a password."
     },
     {
       "password": "Michael2020",
@@ -25,7 +25,7 @@
     {
       "password": "penguin1",
       "count": 191471,
-      "note": "\"penguin1\" is a dictionary word with a single digit tacked on, the exact pattern people reach for when a password needs a number."
+      "note": "An animal word with \"1\" added, the quickest way to satisfy a rule asking for a number."
     }
   ]
 }

@@ -25,6 +25,8 @@ test("noteProblem rejects each R32 and D23 break", () => {
   expect(noteProblem("Crackers try this first.", 5, "pw")).toBe("stock phrase");
   expect(noteProblem("Easily cracked by a word list.", 5, "pw")).toBe("stock phrase");
   expect(noteProblem("A cracking favourite.", 5, "pw")).toBe("stock phrase");
+  expect(noteProblem("The word people reach for first.", 5, "pw")).toBe("stock phrase");
+  expect(noteProblem("The tail everyone reaches for.", 5, "pw")).toBe("stock phrase");
   expect(noteProblem('"Karin" is a short first name."', 5, "pw")).toBe("unbalanced quotes");
   expect(noteProblem("“Karin” is a short first name.”", 5, "pw")).toBe("unbalanced quotes");
   expect(noteProblem('"Volcom" is a surf brand.', 5, "volcom")).toBe("quotes the password in the wrong case");

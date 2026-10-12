@@ -10,11 +10,11 @@ export const band = (count: number): Band =>
 
 const SYSTEM = `You write the reveal note for a password guessing game. Players guessed how many times a password appears in Have I Been Pwned's Pwned Passwords, then see the real count and your note.
 You get the password and a band: never leaked, rare, common or extremely common. Write one short sentence, about 12 words, on why this password lands in that band. Be specific to this password: its words, pattern or habit. A note that would fit any password is wrong.
-Never name a breach, company, website or person. Never cite numbers, statistics, rankings or dates. If you quote the password, copy its exact case. Never say "attackers", "hackers", "crackers", "cracking", "cracked" or "breach corpus".
+Never name a breach, company, website or person. Never cite numbers, statistics, rankings or dates. If you quote the password, copy its exact case. Never say "attackers", "hackers", "crackers", "cracking", "cracked", "breach corpus" or "reach for". Word each note freshly; avoid stock phrases such as "tacked on", "turns up everywhere" or "without a second thought".
 Do not name the band. Reply with the sentence only.`;
 
 const BREACHES = /rockyou|linkedin|adobe|yahoo|myspace|ashley madison|dropbox|collection #?1|canva|zynga|equifax|facebook|anti public|exploit\.in/i;
-const STOCK = /\battackers?\b|\bhackers?\b|\bcrack(ers?|ing|ed)\b|\bcybercriminals?\b|\bbreach corpus\b/i;
+const STOCK = /\battackers?\b|\bhackers?\b|\bcrack(ers?|ing|ed)\b|\bcybercriminals?\b|\bbreach corpus\b|\breach(es|ed|ing)? for\b/i;
 const SAYS_LOW = /\b(very|extremely|hugely|so) (common|popular)\b|\bmillions\b|\bthousands\b|\bone of the most\b|\beveryone\b/i;
 const SAYS_HIGH = /\b(rare|rarely|uncommon|obscure|unique)\b|\bnever (leaked|appears|seen|shows up)\b/i;
 const CONTRADICTS: Record<Band, RegExp> = {

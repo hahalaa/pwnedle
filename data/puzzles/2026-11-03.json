@@ -5,7 +5,7 @@
     {
       "password": "rrpass1",
       "count": 3484,
-      "note": "\"rrpass1\" is just \"pass\" with a doubled-letter prefix and a trailing 1, a tiny tweak on a word everyone reaches for."
+      "note": "\"rrpass1\" is the word \"pass\" with a doubled letter in front and a 1 behind, a small twist on an obvious base."
     },
     {
       "password": "freedom",
@@ -25,7 +25,7 @@
     {
       "password": "silver1",
       "count": 216622,
-      "note": "Plain dictionary word plus a single trailing digit, the first thing people reach for when adding a number."
+      "note": "A colour word with one digit on the end, the standard fix when a site insists on a number."
     }
   ]
 }
