@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-20",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "baseball2025",
+      "count": 48,
+      "note": "A sports word plus a year is a predictable combo, yet adding a specific season makes it less common than the usual suspects."
+    },
+    {
+      "password": "rainbow6",
+      "count": 133444,
+      "note": "A common word plus a tiny digit tacked on the end is exactly what people reach for."
+    },
+    {
+      "password": "Asdfghjkl2025",
+      "count": 448,
+      "note": "It's a keyboard-row run of \"asdfghjkl\" plus a year, a habit that's common yet far less widespread than plain words."
+    },
+    {
+      "password": "cloudy",
+      "count": 35886,
+      "note": "A plain dictionary word with no digits or symbols, so it turns up in leaked lists constantly."
+    },
+    {
+      "password": "Jordan!",
+      "count": 6553,
+      "note": "Its a first name plus an exclamation mark, the kind of simple tweak people reach for to meet symbol rules."
+    }
+  ]
+}

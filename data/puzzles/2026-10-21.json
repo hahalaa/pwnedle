@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-21",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "juventus2020",
+      "count": 2532,
+      "note": "Football club name plus a recent year is a predictable pattern fans reuse everywhere."
+    },
+    {
+      "password": "kevin2000",
+      "count": 27729,
+      "note": "Predictable pairing of a common first name with a year-style number, a pattern people reuse constantly."
+    },
+    {
+      "password": "Liam1!",
+      "count": 45,
+      "note": "Adding \"1!\" to a short name is a common habit, but \"Liam\" alone is uncommon enough to keep this one rare."
+    },
+    {
+      "password": "hellokitty2020",
+      "count": 181,
+      "note": "A familiar pop-culture name paired with a year makes it guessable, yet the extra word keeps it uncommon."
+    },
+    {
+      "password": "131313",
+      "count": 1527332,
+      "note": "Alternating \"13\" pairs are a lazy pattern people reach for, so it shows up everywhere."
+    }
+  ]
+}

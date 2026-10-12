@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-23",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "0p3n$3$@m3",
+      "count": 268,
+      "note": "Leetspeak swaps of \"open sesame\" make it feel clever, but the pattern is familiar enough to be guessable."
+    },
+    {
+      "password": "Lovelove2025",
+      "count": 0,
+      "note": "Doubled \"love\" with a year suffix is a sweet pattern, yet this exact combo never turned up in any leak."
+    },
+    {
+      "password": "tobydog",
+      "count": 35773,
+      "note": "Pairing a name with \"dog\" is a predictable pet-based habit that shows up everywhere."
+    },
+    {
+      "password": "thumper1",
+      "count": 133388,
+      "note": "Thumper is a cartoon bunny, and a trailing \"1\" is the lazy add-on everyone reaches for."
+    },
+    {
+      "password": "loveme2010",
+      "count": 4511,
+      "note": "Pairing \"love me\" with a year-style ending is a predictable pattern people reuse everywhere."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-22",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "florence",
+      "count": 417038,
+      "note": "Florence is a plain first name, and people reach for familiar names like it without a second thought."
+    },
+    {
+      "password": "toto",
+      "count": 99227,
+      "note": "It's a short name-like word that people reach for as a quick, easy-to-type choice."
+    },
+    {
+      "password": "rangers2025",
+      "count": 1,
+      "note": "Pairing a sports team name with a current year is a common habit, but adding a specific season makes it less widespread."
+    },
+    {
+      "password": "alexander",
+      "count": 1511979,
+      "note": "Alexander is a popular first name, and people reach for it as a simple, familiar word with no added symbols or digits."
+    },
+    {
+      "password": "diamond2010",
+      "count": 4649,
+      "note": "Pairing a familiar word with a year is a classic pattern, which is why \"diamond2010\" shows up so often."
+    }
+  ]
+}
