@@ -14,7 +14,7 @@ const post = (body: unknown) =>
 test("returns count, score, tier and note for the locked-in password", async () => {
   const res = await post({ date: "2026-10-24", index: 0, guess: 9 });
   expect(res.status).toBe(200);
-  expect(await res.json()).toEqual({ count: 99, score: 53, tier: "Medium", note: "A note." });
+  expect(await res.json()).toEqual({ count: 99, score: 53, tier: "Mid", note: "A note." });
 });
 
 test("accepts both ends of the guess range", async () => {

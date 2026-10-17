@@ -2,7 +2,7 @@ import { SITE_URL } from "./config";
 import { tier } from "./scoring";
 
 // R19 squares: the top two tiers share green.
-const SQUARE: Record<string, string> = { Uncrackable: "🟩", Strong: "🟩", Medium: "🟨", Weak: "🟧", Pwned: "🟥" };
+const SQUARE: Record<string, string> = { Uncrackable: "🟩", Strong: "🟩", Mid: "🟨", Weak: "🟧", Pwned: "🟥" };
 
 // R19: no passwords or counts, only the puzzle number, total, daily tier (R11, on the average) and one square per password.
 export function shareText(number: number, scores: number[]) {

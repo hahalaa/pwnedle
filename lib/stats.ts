@@ -5,7 +5,7 @@ import { tier } from "./scoring";
 // `archive` marks a game last played from the archive (R18).
 export type Game = { index: number; done: boolean; results: { score: number }[]; archive?: boolean };
 
-const TIERS = ["Uncrackable", "Strong", "Medium", "Weak", "Pwned"];
+const TIERS = ["Uncrackable", "Strong", "Mid", "Weak", "Pwned"];
 
 // R17: only finished daily games count; archive games are left out (R18). A streak is a run of
 // consecutive puzzle dates; the current one survives until a whole day is missed, so it still counts
@@ -33,9 +33,10 @@ export function stats(games: Record<string, Game>, today: string) {
 // localStorage can throw (blocked storage, some private modes); the game still plays, it just won't resume.
 const KEY = "pwnedle:";
 
+// Games saved before D40 name the Mid tier "Medium".
 export function loadGame(date: string): Game | null {
   try {
-    return JSON.parse(localStorage.getItem(KEY + date) ?? "null");
+    return JSON.parse(localStorage.getItem(KEY + date) ?? "null", (k, v) => (k === "tier" && v === "Medium" ? "Mid" : v));
   } catch {
     return null;
   }

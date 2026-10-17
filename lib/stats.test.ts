@@ -16,7 +16,7 @@ test("stats count finished games only, with average, best and daily tier distrib
   expect(s.played).toBe(3);
   expect(s.average).toBe(Math.round((500 + 390 + 1) / 3));
   expect(s.best).toBe(500);
-  expect(s.tiers).toEqual([["Uncrackable", 1], ["Strong", 1], ["Medium", 0], ["Weak", 0], ["Pwned", 1]]);
+  expect(s.tiers).toEqual([["Uncrackable", 1], ["Strong", 1], ["Mid", 0], ["Weak", 0], ["Pwned", 1]]);
 });
 
 test("streaks run over consecutive puzzle dates and the current one ends after a missed day", () => {
@@ -52,6 +52,12 @@ test("games round-trip through localStorage under pwnedle:<date> (R16)", () => {
   expect(loadGame("2026-10-24")).toEqual(g);
   expect(loadGame("2026-10-25")).toBeNull();
   expect(savedGames()).toEqual({ "2026-10-24": g });
+});
+
+test("a game saved before D40 reads its Medium results as Mid", () => {
+  const store: Record<string, string> = { "pwnedle:2026-10-24": JSON.stringify({ index: 1, done: false, results: [{ score: 50, tier: "Medium" }] }) };
+  vi.stubGlobal("localStorage", { getItem: (k: string) => store[k] ?? null });
+  expect(loadGame("2026-10-24")?.results).toEqual([{ score: 50, tier: "Mid" }]);
 });
 
 test("blocked storage never breaks the game", () => {

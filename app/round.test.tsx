@@ -37,7 +37,7 @@ test("dots colour revealed passwords by tier and outline the current one", () =>
 test("every tier colour is always emitted, since the reveal only builds its name at runtime", () => {
   const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
   const block = /@theme static \{([^}]*)\}/.exec(css)?.[1] ?? "";
-  for (const t of ["pwned", "weak", "medium", "strong", "uncrackable"]) expect(block).toContain(`--color-${t}:`);
+  for (const t of ["pwned", "weak", "mid", "strong", "uncrackable"]) expect(block).toContain(`--color-${t}:`);
 });
 
 test("the reveal, end screen and pages fade in briefly, and reduced motion turns every animation off (T35)", () => {
@@ -58,7 +58,7 @@ test("the reveal, end screen and pages fade in briefly, and reduced motion turns
 
 test("end screen shows the total, the daily tier, each password's breakdown and share, with no coffee link (R12, D31)", () => {
   const scores = [100, 65, 90, 35, 100];
-  const results = scores.map((score, i) => ({ guess: 40_000 + i, count: 12_500_000 + i, score, tier: ["Uncrackable", "Medium", "Uncrackable", "Weak", "Uncrackable"][i], note: "n" }));
+  const results = scores.map((score, i) => ({ guess: 40_000 + i, count: 12_500_000 + i, score, tier: ["Uncrackable", "Mid", "Uncrackable", "Weak", "Uncrackable"][i], note: "n" }));
   const html = renderToStaticMarkup(<End number={12} passwords={["hunter2", "b", "c", "d", "e"]} results={results} />);
   expect(html).toContain('<span class="text-6xl">390</span>');
   expect(html).toContain("/ 500");
@@ -69,7 +69,7 @@ test("end screen shows the total, the daily tier, each password's breakdown and 
   expect(html.match(/<li/g)).toHaveLength(5);
   for (const t of ["hunter2", "seen 12,500,000, you guessed 40,000", ">65</p>"]) expect(html).toContain(t);
   // Each row names its tier next to the colour (R25).
-  expect(html).toMatch(/color:var\(--color-medium\)"><span[^>]*><\/span>medium<\/p>/);
+  expect(html).toMatch(/color:var\(--color-mid\)"><span[^>]*><\/span>mid<\/p>/);
   expect(html).toContain(">Share result</button>");
   expect(html).not.toContain("buymeacoffee.com");
   // Notes stay on the reveal; the end screen doesn't repeat them.

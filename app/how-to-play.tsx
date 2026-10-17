@@ -13,7 +13,7 @@ export const SEEN_KEY = "pwnedle-seen-help";
 export const EXAMPLE = [
   ["50,000", 100, "Uncrackable"],
   ["10,000", 73, "Strong"],
-  ["5,000", 53, "Medium"],
+  ["5,000", 53, "Mid"],
   ["1,000,000", 34, "Weak"],
   ["100", 1, "Pwned"],
 ] as const;

@@ -32,7 +32,7 @@ function stubAudio() {
 }
 
 test("tunes run from the highest ending note for Uncrackable down to the lowest for Pwned", () => {
-  const last = ["Uncrackable", "Strong", "Medium", "Weak", "Pwned"].map((t) => TUNES[t][0].at(-1)!);
+  const last = ["Uncrackable", "Strong", "Mid", "Weak", "Pwned"].map((t) => TUNES[t][0].at(-1)!);
   expect(last).toEqual([...last].sort((a, b) => b - a));
 });
 

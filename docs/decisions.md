@@ -19,7 +19,7 @@ Players only ever type numbers. A security game must not train people to type pa
 ## D5. Scoring: bell curve on the log scale
 `score = 100 * e^(-(d/K)^2)` with `K = 1.25`. A straight-line penalty felt harsh on near misses and generous on large misses; the bell curve is forgiving within about 3x and near zero beyond about 100x. K is a single tuning value for after playtesting. `count + 1` is used inside the log so zero counts work.
 
-## D6. Tier labels mirror a password-strength meter
+## D6. Tier labels mirror a password-strength meter (Medium label superseded by D40)
 Uncrackable, Strong, Medium, Weak, Pwned. Used per password, for the daily result, and in the share text.
 
 ## D7. Counts revealed by the server, one at a time
@@ -139,3 +139,6 @@ The repository is public, so anyone can open `data/puzzles/` and read the counts
 
 ## D39. Domain: pwnedle.com (supersedes D28)
 Bought through Vercel on 2026-10-11. The site lives at https://pwnedle.com, stored as `SITE_URL` in `lib/config.ts`, and the share text ends with `pwnedle.com`. `metadataBase` and Umami's `data-domains` both take their host from `SITE_URL`. www.pwnedle.com and pwnedle.vercel.app redirect to it with a permanent 308. Both redirects live in the Vercel domain settings, so preview URLs are unaffected. The link preview image's source is `docs/og-source.html`.
+
+## D40. Mid replaces Medium (supersedes the D6 label)
+The tiers are now Uncrackable, Strong, Mid, Weak and Pwned, with the same score bands (R11). The colour token `--color-medium` is now `--color-mid`, with the same D26 colour. Saved games store each result's tier, so `loadGame` reads an old "Medium" as Mid. Stats work from scores and need no change.

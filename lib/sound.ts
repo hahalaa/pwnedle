@@ -3,7 +3,7 @@
 export const TUNES: Record<string, [number[], number]> = {
   Uncrackable: [[523, 659, 784, 1047], 0.07],
   Strong: [[659, 784], 0.08],
-  Medium: [[440], 0.1],
+  Mid: [[440], 0.1],
   Weak: [[330, 262], 0.1],
   Pwned: [[196, 165, 131], 0.13],
 };

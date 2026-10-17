@@ -19,7 +19,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
 - **R8 (v1)** Guess input is a log-scale slider from 0 to 100,000,000 with a dedicated 0 stop, plus a number box kept in sync with it. The box accepts plain numbers, commas, and k/m shorthand ("2.5m"). Guesses are whole numbers from 0 to 100,000,000.
 - **R9 (v1)** Pressing "Lock in" reveals, for that password: the actual count, the player's guess, points earned, the tier label, and the reveal note. Then "Next password" or, after the fifth, "See results".
 - **R10 (v1)** Scoring per password: `d = |log10(guess + 1) - log10(actual + 1)|`, `score = round(100 * e^(-(d / K)^2))`, with `K = 1.25` stored as a single config value.
-- **R11 (v1)** Tier per password, by score: Uncrackable 90 to 100, Strong 70 to 89, Medium 40 to 69, Weak 10 to 39, Pwned 0 to 9. The daily tier uses the same bands on the average score.
+- **R11 (v1)** Tier per password, by score: Uncrackable 90 to 100, Strong 70 to 89, Mid 40 to 69, Weak 10 to 39, Pwned 0 to 9. The daily tier uses the same bands on the average score.
 - **R12 (v1)** The end screen shows the total out of 500, the daily tier, a per-password breakdown (password, count, guess, points), and the share button (D31).
 
 ## 3. Answer handling
@@ -39,7 +39,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
   🟩🟨🟩🟧🟩
   pwnedle.com
   ```
-  Squares per password: 🟩 Uncrackable or Strong, 🟨 Medium, 🟧 Weak, 🟥 Pwned. Shared via clipboard or the native share sheet.
+  Squares per password: 🟩 Uncrackable or Strong, 🟨 Mid, 🟧 Weak, 🟥 Pwned. Shared via clipboard or the native share sheet.
 
 ## 6. Archive
 - **R20 (v1)** A free archive of every past puzzle, selectable by puzzle number or date. Future puzzles are never listed.
