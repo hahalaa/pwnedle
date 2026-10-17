@@ -1,18 +1,37 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { type ComponentProps, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { formatGuess, fromSlider, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
 import { isMuted, playTier } from "../lib/sound";
 import { type Game, loadGame, saveGame } from "../lib/stats";
 
-// The 0 stop, then every power of ten, with each tick at its slider position (lib/guess.ts).
-const TICKS = ["0", "1", "10", "100", "1k", "10k", "100k", "1m", "10m", "100m"].map((t) => [t, toSlider(parseGuess(t)!) / SLIDER_MAX] as const);
+// A number's place along the slider, from 0 at the 0 stop to 1 at 100m (lib/guess.ts).
+const pos = (n: number) => Math.min(toSlider(n), SLIDER_MAX) / SLIDER_MAX;
+
+// The 0 stop, then every power of ten, each at its slider position.
+const TICKS = ["0", "1", "10", "100", "1k", "10k", "100k", "1m", "10m", "100m"].map((t) => [t, pos(parseGuess(t)!)] as const);
+
+// T43: every reveal timing, in ms, and the zoom. The fill sweeps to the guess over `charge`, and the view zooms in
+// over the last `zoomIn` of it until the guess sits `fill` of the way across, never past `maxZoom`. After `hold` it
+// zooms back out over `zoomOut`: the tier colour, the count's marker and the points arrive, and the tier sound plays
+// as it lands. The rest of the reveal and the button then fade in over `fade`.
+export const REVEAL = {
+  charge: 750,
+  zoomIn: 450,
+  hold: 200,
+  zoomOut: 650,
+  fade: 200,
+  fill: 0.85,
+  maxZoom: 6,
+  ease: "cubic-bezier(0.65, 0, 0.35, 1)",
+  easeOut: "cubic-bezier(0.22, 1, 0.36, 1)",
+};
 
 // What /api/guess returns (R14), plus the guess that was sent.
 type Result = { guess: number; count: number; score: number; tier: string; note: string };
-type Saved = Game & { results: Result[] };
+type Saved = Omit<Game, "results"> & { results: Result[] };
 
 // True once hydrated: the server can't see localStorage, so the first render must match a fresh game.
 const noop = () => () => {};
@@ -38,6 +57,9 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   const [guess, setGuess] = useState(0);
   const [text, setText] = useState("0");
   const [state, setState] = useState<"guessing" | "sending" | "error" | "rejected">("guessing");
+  // T43: the reveal locked in during this visit animates; `playing` hides its tier and the button until it lands.
+  const [fresh, setFresh] = useState(-1);
+  const [playing, setPlaying] = useState(false);
   const result = results[index];
   const invalid = parseGuess(text) === null;
   const last = index === passwords.length - 1;
@@ -57,9 +79,18 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     const body = res?.ok ? await res.json().catch(() => null) : null;
     if (!body) return setState("error");
     if (!results.length) track("puzzle-start", number, archive);
-    if (!isMuted()) playTier(body.tier);
+    // Reduced motion, or a browser without the Web Animations API, gets the end state and the sound at once.
+    if (typeof document.body.animate === "function" && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setFresh(index);
+      setPlaying(true);
+    } else if (!isMuted()) playTier(body.tier);
     update({ ...game, results: [...results, { guess, ...body }] });
     setState("guessing");
+  }
+
+  function land() {
+    setPlaying(false);
+    if (!isMuted()) playTier(result.tier);
   }
 
   function next() {
@@ -85,7 +116,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
           <p>
             password {index + 1} of {passwords.length}
           </p>
-          <Dots results={results} index={index} total={passwords.length} />
+          <Dots results={playing ? results.slice(0, index) : results} index={index} total={passwords.length} />
         </div>
         <p className="font-mono px-3 py-6 text-3xl break-all sm:text-4xl lg:px-5 lg:py-10 lg:text-6xl">{passwords[index]}</p>
       </div>
@@ -96,7 +127,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
           : `Password ${index + 1} of ${passwords.length}: ${passwords[index]}`}
       </p>
       {result ? (
-        <Reveal result={result} />
+        <Reveal result={result} play={fresh === index} onLand={land} />
       ) : (
         <>
           <div className="flex flex-col gap-2">
@@ -115,19 +146,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
               }}
               className="w-full"
             />
-            {/* One tick per stop, at the thumb's centre: it travels from 7px to 100% - 7px (14px thumb, globals.css). */}
-            <div className="relative h-7 font-mono text-xs text-ash" aria-hidden>
-              {TICKS.map(([t, f]) => (
-                <span
-                  key={t}
-                  className="absolute flex -translate-x-1/2 flex-col items-center gap-1"
-                  style={{ left: `calc(7px + (100% - 14px) * ${f})` }}
-                >
-                  <span className="h-1.5 w-px bg-ash" />
-                  {t}
-                </span>
-              ))}
-            </div>
+            <Ticks />
           </div>
           {/* From lg the slider takes the extra width; the typed guess stays about as wide as on a phone (T40). */}
           <label className="flex flex-col gap-1 lg:max-w-md">
@@ -158,7 +177,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
         onClick={result ? (last ? finish : next) : lockIn}
         // Not disabled while sending: a disabled button drops keyboard focus to the page.
         disabled={!result && invalid}
-        className="mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash"
+        className={`${playing ? "opacity-0" : "animate-enter"} mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash`}
       >
         {result ? (last ? "See results" : "Next password") : state === "sending" ? "Locking in…" : "Lock in"}
       </button>
@@ -173,31 +192,157 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   );
 }
 
-// R9: everything the API sent back, with the tier in its colour and always named (R25).
-export function Reveal({ result }: { result: Result }) {
+// A point at `at` along the bar, inside a full-width layer. The reveal zooms by moving that layer, so the point keeps
+// pace with the stretched track without stretching itself.
+function Pin({ at, className, ...props }: { at: number } & ComponentProps<"div">) {
   return (
-    <div className="flex animate-enter flex-col gap-5">
+    <div data-at={at} className="absolute inset-0">
+      <div {...props} className={`absolute -translate-x-1/2 ${className}`} style={{ left: `${at * 100}%` }} />
+    </div>
+  );
+}
+
+// One tick per stop. The 7px margins match the slider thumb's centre, which travels from 7px to 100% - 7px
+// (14px thumb, globals.css).
+function Ticks() {
+  return (
+    <div className="relative mx-[7px] h-7 font-mono text-xs text-ash" aria-hidden>
+      {TICKS.map(([t, f]) => (
+        <Pin key={t} at={f} className="flex flex-col items-center gap-1">
+          <span className="h-1.5 w-px bg-ash" />
+          {t}
+        </Pin>
+      ))}
+    </div>
+  );
+}
+
+// R9: everything the API sent back, with the tier in its colour and always named (R25). The read-only slider shows
+// the guess filled in the tier colour and a line at the count. Rendered as is, this is the end state; with `play`,
+// the T43 animations run first and call `onLand` as the zoom out ends.
+export function Reveal({ result, play, onLand }: { result: Result; play?: boolean; onLand?: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const guess = pos(result.guess);
+  const land = useEffectEvent(() => onLand?.());
+
+  // Before paint, so the end state never flashes before the animations take over.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!play || !el) return;
+    const { charge, zoomIn, hold, zoomOut, fade, fill, maxZoom, ease, easeOut } = REVEAL;
+    const out = charge + hold;
+    const end = out + zoomOut;
+    // A guess of 0 has nothing to fill, so it gets the full zoom.
+    const zoom = Math.min(Math.max(fill / guess, 1), maxZoom);
+    const all = (selector: string) => [...el.querySelectorAll<HTMLElement>(selector)];
+    // Keyframes timed in ms from the start. Each animation ends at its last keyframe and leaves the element in its
+    // CSS end state.
+    const run = (e: Element, frames: (Keyframe & { at: number })[]) => {
+      const duration = frames.at(-1)!.at;
+      return e.animate(frames.map(({ at, ...k }) => ({ ...k, offset: at / duration })), duration);
+    };
+    const zoomed = (transform: (scale: number) => string) => [
+      { at: 0, transform: transform(1) },
+      { at: Math.max(charge - zoomIn, 0), transform: transform(1), easing: ease },
+      { at: charge, transform: transform(zoom) },
+      { at: out, transform: transform(zoom), easing: easeOut },
+      { at: end, transform: transform(1) },
+    ];
+    const anims = [
+      run(el.querySelector("[data-track]")!, zoomed((s) => `scaleX(${s})`)),
+      ...all("[data-at]").map((e) => run(e, zoomed((s) => `translateX(${Number(e.dataset.at) * (s - 1) * 100}%)`))),
+      run(el.querySelector("[data-fill]")!, [{ at: 0, transform: "scaleX(0)", easing: ease }, { at: charge, transform: `scaleX(${guess})` }]),
+      // Off-white until the zoom out, then the tier colour from the CSS.
+      ...all("[data-tint]").map((e) => run(e, [{ at: 0, color: "var(--color-bone)" }, { at: out, color: "var(--color-bone)" }])),
+      ...all("[data-count-marker]").map((e) => run(e, [{ at: 0, opacity: 0 }, { at: out, opacity: 0 }, { at: out + zoomOut / 2, opacity: 1 }])),
+      ...all("[data-points]").map((e) => run(e, [{ at: 0, opacity: 0 }, { at: out, opacity: 0 }, { at: out + fade, opacity: 1 }])),
+      ...all("[data-later]").map((e) =>
+        run(e, [
+          { at: 0, opacity: 0, transform: "translateY(4px)" },
+          { at: end, opacity: 0, transform: "translateY(4px)", easing: "ease-out" },
+          { at: end + fade, opacity: 1, transform: "none" },
+        ]),
+      ),
+    ];
+
+    // The points climb during the zoom out, easing like it.
+    const score = el.querySelector("[data-score]")!;
+    const start = performance.now();
+    let frame = 0;
+    const count = (now: number) => {
+      const p = Math.min(Math.max((now - start - out) / zoomOut, 0), 1);
+      score.textContent = String(Math.round(result.score * (1 - (1 - p) ** 3)));
+      if (p < 1) frame = requestAnimationFrame(count);
+    };
+    frame = requestAnimationFrame(count);
+
+    // A click or key press skips to the end and is then swallowed, so it can't also follow a link or press the hidden
+    // button.
+    const skip = (e: Event) => {
+      if (e.type === "click" || ["Enter", " "].includes((e as KeyboardEvent).key)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      anims.forEach((a) => a.finish());
+    };
+    addEventListener("click", skip, true);
+    addEventListener("keydown", skip, true);
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      score.textContent = String(result.score);
+      removeEventListener("click", skip, true);
+      removeEventListener("keydown", skip, true);
+    };
+    anims[0].finished.then(() => {
+      stop();
+      land();
+    }, () => {});
+    return () => {
+      stop();
+      anims.forEach((a) => a.cancel());
+    };
+  }, [play, guess, result.score]);
+
+  return (
+    <div ref={ref} className="flex flex-col gap-5">
+      {/* Decorative: the numbers below and the live region carry the values. The clip box runs 16px past the bar so
+          the end labels and the zoomed track aren't cut at its edge. */}
+      <div className="-mx-4 flex flex-col gap-2 overflow-hidden px-4" aria-hidden>
+        <div className="relative mx-[7px] h-11" style={{ color: tierColor(result.tier) }}>
+          <div data-track className="track absolute inset-0 origin-left">
+            <div
+              data-fill
+              data-tint
+              className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 origin-left bg-current"
+              style={{ transform: `scaleX(${guess})` }}
+            />
+          </div>
+          <Pin at={guess} data-tint className="inset-y-[11px] w-[14px] bg-current" />
+          <Pin at={pos(result.count)} data-count-marker className="inset-y-0 w-px bg-bone" />
+        </div>
+        <Ticks />
+      </div>
       <dl className="grid grid-cols-2 gap-x-6 gap-y-4 font-mono">
-        <div className="col-span-2">
+        <div data-later className="col-span-2">
           <dt className="text-xs text-ash">times seen in breaches</dt>
           <dd className="text-4xl lg:text-6xl">{formatGuess(result.count)}</dd>
         </div>
-        <div>
+        <div data-later>
           <dt className="text-xs text-ash">your guess</dt>
           <dd className="text-xl lg:text-3xl">{formatGuess(result.guess)}</dd>
         </div>
-        <div>
+        <div data-points>
           <dt className="text-xs text-ash">points</dt>
           <dd className="text-xl lg:text-3xl">
-            {result.score} <span className="text-ash">/ 100</span>
+            <span data-score>{result.score}</span> <span className="text-ash">/ 100</span>
           </dd>
         </div>
       </dl>
-      <p className="flex items-center gap-2 font-mono" style={{ color: tierColor(result.tier) }}>
+      <p data-later className="flex items-center gap-2 font-mono" style={{ color: tierColor(result.tier) }}>
         <span className="size-3 bg-current" />
         {result.tier.toLowerCase()}
       </p>
-      <p className="border-l border-line pl-3 leading-relaxed text-ash">{result.note}</p>
+      <p data-later className="border-l border-line pl-3 leading-relaxed text-ash">{result.note}</p>
     </div>
   );
 }

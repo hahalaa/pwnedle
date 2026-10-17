@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
-import { Dots, End, Reveal, Round } from "./round";
+import { Dots, End, REVEAL, Reveal, Round } from "./round";
 import Template from "./template";
 
 test("round shows the R7 prompt, the password in monospace, a slider at the 0 stop and a number box", () => {
@@ -14,15 +14,32 @@ test("round shows the R7 prompt, the password in monospace, a slider at the 0 st
   expect(html).toMatch(/type="text" inputMode="decimal"[^>]*value="0"/);
   expect(html).toContain(">Lock in</button>");
   // A tick at the 0 stop and at every power of ten up to 100m.
-  for (const t of ["0", "1", "10", "100", "1k", "10k", "100k", "1m", "10m", "100m"]) expect(html).toContain(`</span>${t}</span>`);
+  for (const t of ["0", "1", "10", "100", "1k", "10k", "100k", "1m", "10m", "100m"]) expect(html).toContain(`</span>${t}</div>`);
 });
 
 test("reveal shows the count, the guess, the points, the tier label in its colour and the note (R9)", () => {
   const html = renderToStaticMarkup(
     <Reveal result={{ guess: 40_000, count: 12_500_000, score: 3, tier: "Pwned", note: "Seen everywhere." }} />,
   );
-  for (const t of ["12,500,000", "40,000", "3 <span", "pwned", "Seen everywhere."]) expect(html).toContain(t);
+  for (const t of ["12,500,000", "40,000", ">3</span> <span", "pwned", "Seen everywhere."]) expect(html).toContain(t);
   expect(html).toContain("color:var(--color-pwned)");
+});
+
+test("the reveal's end state keeps the slider, filled to the guess in the tier colour, with a line at the count (T43)", () => {
+  const html = renderToStaticMarkup(<Reveal result={{ guess: 1, count: 100_000_000, score: 0, tier: "Pwned", note: "" }} />);
+  // A guess of 1 sits 50 of 850 steps along; 100m is the far end.
+  expect(html).toMatch(/style="color:var\(--color-pwned\)"><div data-track/);
+  expect(html).toContain(`data-fill="true" data-tint="true"`);
+  expect(html).toContain(`transform:scaleX(${50 / 850})`);
+  expect(html).toMatch(/data-count-marker="true"[^>]*style="left:100%"/);
+  for (const t of ["0", "1", "100m"]) expect(html).toContain(`</span>${t}</div>`);
+});
+
+test("the reveal sequence lasts 1.5 to 2 seconds, from the charge to the last fade (T43)", () => {
+  const total = REVEAL.charge + REVEAL.hold + REVEAL.zoomOut + REVEAL.fade;
+  expect(total).toBeGreaterThanOrEqual(1500);
+  expect(total).toBeLessThanOrEqual(2000);
+  expect(REVEAL.zoomIn).toBeLessThanOrEqual(REVEAL.charge);
 });
 
 test("dots colour revealed passwords by tier and outline the current one", () => {
@@ -40,10 +57,9 @@ test("every tier colour is always emitted, since the reveal only builds its name
   for (const t of ["pwned", "weak", "mid", "strong", "uncrackable"]) expect(block).toContain(`--color-${t}:`);
 });
 
-test("the reveal, end screen and pages fade in briefly, and reduced motion turns every animation off (T35)", () => {
+test("the end screen and pages fade in briefly, and reduced motion turns every CSS animation off (T35)", () => {
   const result = { guess: 1, count: 1, score: 100, tier: "Uncrackable", note: "n" };
   for (const html of [
-    renderToStaticMarkup(<Reveal result={result} />),
     renderToStaticMarkup(<End number={1} passwords={["a"]} results={[result]} />),
     renderToStaticMarkup(<Template>page</Template>),
   ])

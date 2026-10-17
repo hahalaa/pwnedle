@@ -121,6 +121,13 @@ input[type="range"] {
     repeating-linear-gradient(to right, var(--color-ash) 0 1px, transparent 1px 4px) left 7px center /
       calc((100% - 14px) / 17) 1px no-repeat;
 }
+/* The same track for the reveal's read-only slider (T43), drawn on a box that already leaves out the thumb's 7px. */
+.track {
+  background:
+    linear-gradient(var(--color-ash), var(--color-ash)) right center / calc(100% * 16 / 17) 1px no-repeat,
+    repeating-linear-gradient(to right, var(--color-ash) 0 1px, transparent 1px 4px) left center / calc(100% / 17) 1px
+      no-repeat;
+}
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 14px;
