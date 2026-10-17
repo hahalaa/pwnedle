@@ -28,6 +28,7 @@ export function Stats() {
         </NavLabel>
       </button>
       <dialog
+        closedby="any"
         ref={ref}
         aria-labelledby="stats-title"
         className="m-auto w-[calc(100%-2rem)] max-w-md border border-line bg-void p-6 text-bone backdrop:bg-void/80"
@@ -36,7 +37,7 @@ export function Stats() {
         <form method="dialog" className="mt-6">
           <button
             type="submit"
-            className="bg-signal px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
+            className="bg-signal px-6 py-3 font-semibold text-void enabled:hover:brightness-110 enabled:active:brightness-90 focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
           >
             Close
           </button>

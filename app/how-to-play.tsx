@@ -51,6 +51,7 @@ export function HowToPlay() {
         </NavLabel>
       </button>
       <dialog
+        closedby="any"
         ref={ref}
         aria-labelledby="help-title"
         className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md border border-line bg-void p-6 text-bone backdrop:bg-void/80"
@@ -92,7 +93,7 @@ export function HowToPlay() {
             type="submit"
             // Read at click time: usePathname would stop dynamic routes prerendering under cacheComponents.
             onClick={() => hasGame(location.pathname) || router.push("/")}
-            className="bg-signal px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
+            className="bg-signal px-6 py-3 font-semibold text-void enabled:hover:brightness-110 enabled:active:brightness-90 focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
           >
             Play
           </button>

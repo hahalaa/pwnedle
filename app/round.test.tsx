@@ -64,6 +64,17 @@ test("every colour token has a light and a dark value (T44)", () => {
   for (const t of tokens) expect(t).toMatch(/: light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\);$/);
 });
 
+test("the slider thumb, its ticks and the bracket corners scale with the root font size (T45)", () => {
+  const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
+  expect(css).toMatch(/--thumb: [\d.]+rem;/);
+  expect(css).toMatch(/--bracket: [\d.]+rem;/);
+  // No pixel sizes left for the thumb, its track offsets or the corners; 1px lines stay.
+  expect(css).not.toMatch(/\b(5|7|10|14|22)px/);
+  const html = renderToStaticMarkup(<Round date="2026-10-24" number={1} passwords={["a"]} />);
+  expect(html).toContain("mx-[calc(var(--thumb)/2)]");
+  expect(html).toContain("brackets relative mx-(--bracket)");
+});
+
 test("the end screen and pages fade in briefly, and reduced motion turns every CSS animation off (T35)", () => {
   const result = { guess: 1, count: 1, score: 100, tier: "Uncrackable", note: "n" };
   for (const html of [

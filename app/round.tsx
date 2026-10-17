@@ -109,17 +109,17 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   if (done) return <End number={number} passwords={passwords} results={results} autoFocus={played !== null} />;
 
   return (
-    <section className="flex flex-1 flex-col gap-6 sm:flex-none">
+    <section className="flex flex-1 flex-col gap-6 sm:flex-none short:gap-4">
       <h2 className="text-lg leading-snug lg:text-xl">How many times has this password appeared in data breaches?</h2>
       {/* The password sits in a bracketed 1px window; its title bar carries the progress (D25). */}
-      <div className="brackets relative mx-[5px] border border-line">
+      <div className="brackets relative mx-(--bracket) border border-line">
         <div className="flex items-center justify-between border-b border-line px-3 py-1.5 font-mono text-xs text-ash">
           <p>
             password {index + 1} of {passwords.length}
           </p>
           <Dots results={playing ? results.slice(0, index) : results} index={index} total={passwords.length} />
         </div>
-        <p className="font-mono px-3 py-6 text-3xl break-all sm:text-4xl lg:px-5 lg:py-10 lg:text-6xl">{passwords[index]}</p>
+        <p className="font-mono px-3 py-6 text-3xl break-all sm:text-4xl lg:px-5 lg:py-10 lg:text-6xl short:py-6 short:text-5xl">{passwords[index]}</p>
       </div>
       {/* Stays mounted so screen readers announce each reveal and each new password when the text changes. */}
       <p className="sr-only" aria-live="polite">
@@ -203,11 +203,11 @@ function Pin({ at, className, ...props }: { at: number } & ComponentProps<"div">
   );
 }
 
-// One tick per stop. The 7px margins match the slider thumb's centre, which travels from 7px to 100% - 7px
-// (14px thumb, globals.css).
+// One tick per stop. The margins match the slider thumb's centre, which travels from half the thumb's width in from
+// each end (--thumb, globals.css).
 function Ticks() {
   return (
-    <div className="relative mx-[7px] h-7 font-mono text-xs text-ash" aria-hidden>
+    <div className="relative mx-[calc(var(--thumb)/2)] h-7 font-mono text-xs text-ash" aria-hidden>
       {TICKS.map(([t, f]) => (
         <Pin key={t} at={f} className="flex flex-col items-center gap-1">
           <span className="h-1.5 w-px bg-ash" />
@@ -304,11 +304,11 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
   }, [play, guess, result.score]);
 
   return (
-    <div ref={ref} className="flex flex-col gap-5">
+    <div ref={ref} className="flex flex-col gap-5 short:gap-3">
       {/* Decorative: the numbers below and the live region carry the values. The clip box runs 16px past the bar so
           the end labels and the zoomed track aren't cut at its edge. */}
       <div className="-mx-4 flex flex-col gap-2 overflow-hidden px-4" aria-hidden>
-        <div className="relative mx-[7px] h-11" style={{ color: tierColor(result.tier) }}>
+        <div className="relative mx-[calc(var(--thumb)/2)] h-11" style={{ color: tierColor(result.tier) }}>
           <div data-track className="track absolute inset-0 origin-left">
             <div
               data-fill
@@ -317,13 +317,14 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
               style={{ transform: `scaleX(${guess})` }}
             />
           </div>
-          <Pin at={guess} data-tint className="inset-y-[11px] w-[14px] bg-current" />
+          <Pin at={guess} data-tint className="inset-y-[0.6875rem] w-(--thumb) bg-current" />
           <Pin at={pos(result.count)} data-count-marker className="inset-y-0 w-px bg-bone" />
         </div>
         <Ticks />
       </div>
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-4 font-mono">
-        <div data-later className="col-span-2">
+      {/* On short screens the count, guess and points share one row. */}
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-4 font-mono short:grid-cols-3 short:items-end">
+        <div data-later className="col-span-2 short:col-span-1">
           <dt className="text-xs text-ash">times seen in breaches</dt>
           <dd className="text-4xl lg:text-6xl">{formatGuess(result.count)}</dd>
         </div>
@@ -379,32 +380,31 @@ export function End({ number, passwords, results, autoFocus }: { number: number;
   }
 
   return (
-    <section className="flex flex-1 animate-enter flex-col gap-6 sm:flex-none">
-      <div className="flex items-end justify-between gap-4">
-        <div className="flex items-end gap-4">
-          {/* Decorative; the tier label beside it carries the meaning (R25, D41). */}
-          <span
-            aria-hidden="true"
-            className="size-15 shrink-0 bg-current [mask:center/contain_no-repeat]"
-            style={{ maskImage: `url(/art/${daily.toLowerCase()}.svg)` }}
-          />
-          <p id="end-total" className="font-mono">
-            <span className="text-6xl">{total}</span> <span className="text-xl text-ash">/ 500</span>
-          </p>
-        </div>
+    <section className="flex flex-1 animate-enter flex-col gap-6 sm:flex-none short:gap-4">
+      {/* The daily tier sits with the total it describes, and wraps under it on narrow phones. */}
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
+        {/* Decorative; the tier label beside it carries the meaning (R25, D41). */}
+        <span
+          aria-hidden="true"
+          className="size-15 shrink-0 bg-current [mask:center/contain_no-repeat]"
+          style={{ maskImage: `url(/art/${daily.toLowerCase()}.svg)` }}
+        />
+        <p id="end-total" className="font-mono">
+          <span className="text-6xl">{total}</span> <span className="text-xl text-ash">/ 500</span>
+        </p>
         <p id="end-tier" className="flex items-center gap-2 pb-2 font-mono text-lg" style={{ color: tierColor(daily) }}>
           <span className="size-3 bg-current" />
           {daily.toLowerCase()}
         </p>
       </div>
-      <div className="brackets relative mx-[5px] border border-line">
+      <div className="brackets relative mx-(--bracket) border border-line">
         <div className="flex items-center justify-between border-b border-line px-3 py-1.5 font-mono text-xs text-ash">
           <p>puzzle #{number}</p>
           <p>points</p>
         </div>
         <ol className="divide-y divide-line">
           {results.map((r, i) => (
-            <li key={i} className="flex items-start gap-3 px-3 py-3 font-mono">
+            <li key={i} className="flex items-start gap-3 px-3 py-3 font-mono short:py-2">
               <div className="min-w-0 flex-1">
                 <p className="break-all text-lg">{passwords[i]}</p>
                 <p className="text-xs text-ash">
@@ -429,7 +429,7 @@ export function End({ number, passwords, results, autoFocus }: { number: number;
           onClick={share}
           autoFocus={autoFocus}
           aria-describedby="end-total end-tier"
-          className="bg-signal px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
+          className="bg-signal px-6 py-3 font-semibold text-void enabled:hover:brightness-110 enabled:active:brightness-90 focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
         >
           Share result
         </button>

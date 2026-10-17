@@ -17,4 +17,6 @@ test("the stats button opens a closed modal", () => {
   const html = renderToStaticMarkup(<Stats />);
   expect(html).toMatch(/<button [^>]*aria-label="stats"/);
   expect(html).toMatch(/<dialog(?![^>]*open)/);
+  // T45: a click on the backdrop closes it too.
+  expect(html).toContain('<dialog closedby="any"');
 });

@@ -29,6 +29,10 @@
   --color-uncrackable: light-dark(#074c13, #56ee66);
 }
 
+/* T45: desktop screens no taller than 900px, such as 1280×800 and 1366×768, get tighter spacing so the round, reveal and
+   end screen fit without scrolling. */
+@custom-variant short (@media (min-width: 64rem) and (max-height: 900px));
+
 /* Follows the system theme; the header toggle overrides it with data-theme. */
 html {
   color-scheme: dark light;
@@ -84,22 +88,28 @@ body {
   color: var(--color-bone);
 }
 
-/* Square brackets at each side of a 1px frame; the element needs `relative`. */
+/* T45: the thumb and bracket corners are in rem, so they grow with the T40a root size. Lines stay 1px. */
+:root {
+  --thumb: 0.875rem;
+  --bracket: 0.3125rem;
+}
+
+/* Square brackets at each side of a 1px frame; the element needs `relative` and a --bracket margin. */
 .brackets::before,
 .brackets::after {
   content: "";
   position: absolute;
-  top: -5px;
-  bottom: -5px;
-  width: 10px;
+  top: calc(-1 * var(--bracket));
+  bottom: calc(-1 * var(--bracket));
+  width: calc(2 * var(--bracket));
   border: 1px solid var(--color-bone);
 }
 .brackets::before {
-  left: -5px;
+  left: calc(-1 * var(--bracket));
   border-right: 0;
 }
 .brackets::after {
-  right: -5px;
+  right: calc(-1 * var(--bracket));
   border-left: 0;
 }
 
@@ -122,13 +132,14 @@ body {
 input[type="range"] {
   appearance: none;
   /* 44px tall to tap. */
-  height: 44px;
+  height: 2.75rem;
   background:
-    linear-gradient(var(--color-ash), var(--color-ash)) right 7px center / calc((100% - 14px) * 16 / 17) 1px no-repeat,
-    repeating-linear-gradient(to right, var(--color-ash) 0 1px, transparent 1px 4px) left 7px center /
-      calc((100% - 14px) / 17) 1px no-repeat;
+    linear-gradient(var(--color-ash), var(--color-ash)) right calc(var(--thumb) / 2) center /
+      calc((100% - var(--thumb)) * 16 / 17) 1px no-repeat,
+    repeating-linear-gradient(to right, var(--color-ash) 0 1px, transparent 1px 4px) left calc(var(--thumb) / 2) center /
+      calc((100% - var(--thumb)) / 17) 1px no-repeat;
 }
-/* The same track for the reveal's read-only slider (T43), drawn on a box that already leaves out the thumb's 7px. */
+/* The same track for the reveal's read-only slider (T43), drawn on a box that already leaves out half the thumb. */
 .track {
   background:
     linear-gradient(var(--color-ash), var(--color-ash)) right center / calc(100% * 16 / 17) 1px no-repeat,
@@ -137,13 +148,13 @@ input[type="range"] {
 }
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
-  width: 14px;
-  height: 22px;
+  width: var(--thumb);
+  height: 1.375rem;
   background: var(--color-signal);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 22px;
+  width: var(--thumb);
+  height: 1.375rem;
   border: 0;
   border-radius: 0;
   background: var(--color-signal);
