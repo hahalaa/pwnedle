@@ -75,3 +75,13 @@ test("end screen shows the total, the daily tier, each password's breakdown and 
   // Notes stay on the reveal; the end screen doesn't repeat them.
   expect(html).not.toContain(">n<");
 });
+
+test("end screen shows one drawing, for the daily tier, hidden from screen readers (T42, D41)", () => {
+  const end = (score: number, tier: string) =>
+    renderToStaticMarkup(<End number={1} passwords={["a", "b", "c", "d", "e"]} results={Array(5).fill({ guess: 1, count: 1, score, tier, note: "" })} />);
+  for (const [score, name] of [[100, "uncrackable"], [0, "pwned"]] as const) {
+    const html = end(score, name);
+    expect(html.match(/\/art\//g)).toHaveLength(1);
+    expect(html).toMatch(new RegExp(`<span aria-hidden="true"[^>]*mask-image:url\\(/art/${name}\\.svg\\)`));
+  }
+});

@@ -236,9 +236,17 @@ export function End({ number, passwords, results, autoFocus }: { number: number;
   return (
     <section className="flex flex-1 animate-enter flex-col gap-6 sm:flex-none">
       <div className="flex items-end justify-between gap-4">
-        <p id="end-total" className="font-mono">
-          <span className="text-6xl">{total}</span> <span className="text-xl text-ash">/ 500</span>
-        </p>
+        <div className="flex items-end gap-4">
+          {/* Decorative; the tier label beside it carries the meaning (R25, D41). */}
+          <span
+            aria-hidden="true"
+            className="size-15 shrink-0 bg-current [mask:center/contain_no-repeat]"
+            style={{ maskImage: `url(/art/${daily.toLowerCase()}.svg)` }}
+          />
+          <p id="end-total" className="font-mono">
+            <span className="text-6xl">{total}</span> <span className="text-xl text-ash">/ 500</span>
+          </p>
+        </div>
         <p id="end-tier" className="flex items-center gap-2 pb-2 font-mono text-lg" style={{ color: tierColor(daily) }}>
           <span className="size-3 bg-current" />
           {daily.toLowerCase()}
