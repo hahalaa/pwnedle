@@ -57,6 +57,13 @@ test("every tier colour is always emitted, since the reveal only builds its name
   for (const t of ["pwned", "weak", "mid", "strong", "uncrackable"]) expect(block).toContain(`--color-${t}:`);
 });
 
+test("every colour token has a light and a dark value (T44)", () => {
+  const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
+  const tokens = css.match(/--color-[a-z]+: [^;]+;/g)!;
+  expect(tokens).toHaveLength(10);
+  for (const t of tokens) expect(t).toMatch(/: light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\);$/);
+});
+
 test("the end screen and pages fade in briefly, and reduced motion turns every CSS animation off (T35)", () => {
   const result = { guess: 1, count: 1, score: 100, tier: "Uncrackable", note: "n" };
   for (const html of [

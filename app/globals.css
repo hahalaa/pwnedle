@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
-/* D25: visual direction tokens. */
+/* D25 tokens as light-dark(light, dark); D43 has the light values. */
 @theme {
-  --color-void: #0b0b0c;
-  --color-bone: #e8e5df;
-  --color-ash: #8d8a84;
-  --color-line: #2a2a2d;
-  --color-signal: #e5322d;
+  --color-void: light-dark(#f1ece1, #0b0b0c);
+  --color-bone: light-dark(#1d1b18, #e8e5df);
+  --color-ash: light-dark(#6b665d, #8d8a84);
+  --color-line: light-dark(#d9d2c4, #2a2a2d);
+  --color-signal: light-dark(#ce2422, #e5322d);
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
   --font-dot: var(--font-doto), var(--font-plex-mono), monospace;
@@ -22,15 +22,22 @@
 
 /* D26 tier colours. Built at runtime as var(--color-<tier>), which Tailwind can't see, so `static` always emits them. */
 @theme static {
-  --color-pwned: #e5322d;
-  --color-weak: #e76d04;
-  --color-mid: #e19906;
-  --color-strong: #a7cc0a;
-  --color-uncrackable: #56ee66;
+  --color-pwned: light-dark(#ce2422, #e5322d);
+  --color-weak: light-dark(#9b4a0e, #e76d04);
+  --color-mid: light-dark(#754f0b, #e19906);
+  --color-strong: light-dark(#425209, #a7cc0a);
+  --color-uncrackable: light-dark(#074c13, #56ee66);
 }
 
+/* Follows the system theme; the header toggle overrides it with data-theme. */
 html {
+  color-scheme: dark light;
+}
+html[data-theme="dark"] {
   color-scheme: dark;
+}
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 /* T40a: from lg (1024px) the root size grows from 16px to 20px at 1920px, so rem-based type, spacing and the column

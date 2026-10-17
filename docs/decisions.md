@@ -154,3 +154,15 @@ The end screen shows the drawing for the daily tier beside the total, at the tot
 
 ## D42. Reveal animation (T43, amends D37)
 The reveal is one sequence of under 2 seconds; D37's 150 to 250 ms limit still holds for everything else. After Lock in the slider stays on screen, read-only. A fill sweeps from 0 to the guess while the view zooms in until the guess sits most of the way across, then the view zooms back out to the full bar. As it zooms out, the fill and thumb switch to the tier colour, a line marks the actual count, the points climb, and the tier sound plays as it lands. The count, guess, tier, note and button fade in last. Only transform and opacity animate, the colour switches in one step, and nothing bounces. A click or key press skips to the end without also pressing a button or following a link. Players with reduced motion, resumed reveals and finished archive games get the end state at once. Every timing is in `REVEAL` in `app/round.tsx`.
+
+## D43. Light theme (T44, amends D25 and D26)
+A warm paper theme sits alongside the dark one. It follows the system setting. A toggle after sound in the header nav overrides it and saves the choice in localStorage under `pwnedle-theme`. Like the sound toggle, it shows the current state: "dark" or "light" on desktop, and a moon or sun on phones in the D36 style, with aria-labels "dark theme" and "light theme". An inline script in the page head applies a saved choice before first paint. Each colour token in `app/globals.css` is a `light-dark(light, dark)` pair, so the dark values are unchanged. The share squares, link preview image and tab icon stay as they are.
+
+Light values, with contrast on `void`:
+- `void` #f1ece1: background
+- `bone` #1d1b18: 14.6:1
+- `ash` #6b665d: 4.84:1
+- `line` #d9d2c4: 1.28:1, close to the dark theme's 1.37:1
+- `signal` #ce2422: 4.57:1, which also covers the background-coloured text on Lock in
+
+Tier colours: Pwned #ce2422 (the light `signal`), Weak #9b4a0e, Mid #754f0b, Strong #425209, Uncrackable #074c13. Contrast runs from 4.57:1 for Pwned to 8.69:1 for Uncrackable. On the light background the ramp is reversed, with better tiers darker. To pass 4.5:1 on paper, a green can't be lighter than about OKLab L 0.51, while a red can reach about 0.55, so red has to sit at the light end. Under the D26 deuteranopia simulation the tiers keep their order, with OKLab lightness 0.567, 0.514, 0.466, 0.415 and 0.366. Each step is about 0.05, more than the smallest D26 step. At this lightness Weak, Mid and Strong come out as burnt orange, ochre and olive. The tier label still appears next to every colour (R25).

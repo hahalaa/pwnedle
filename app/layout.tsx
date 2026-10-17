@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { Archivo, Doto, IBM_Plex_Mono } from "next/font/google";
 import Link from "next/link";
 import Script from "next/script";
-import { COFFEE_URL, SITE_URL, UMAMI_WEBSITE_ID } from "../lib/config";
+import { COFFEE_URL, SITE_URL, THEME_KEY, UMAMI_WEBSITE_ID } from "../lib/config";
 import "./globals.css";
 import { HowToPlay } from "./how-to-play";
 import { NavLabel } from "./nav-label";
 import { Sound } from "./sound";
 import { Stats } from "./stats";
+import { Theme } from "./theme";
 import { TimeZone } from "./time-zone";
 
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
@@ -27,7 +28,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${archivo.variable} ${plexMono.variable} ${doto.variable}`}>
+    // The script below sets data-theme before hydration, so React must not flag the difference.
+    <html lang="en" className={`${archivo.variable} ${plexMono.variable} ${doto.variable}`} suppressHydrationWarning>
+      <head>
+        {/* T44: apply a saved theme before first paint, so the page doesn't flash the system theme first. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)});if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="font-sans antialiased">
         <TimeZone />
         {/* R27/D32: Umami sets no cookies. data-domains keeps dev and preview visits out of the counts. */}
@@ -51,6 +61,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 </Link>
                 <Stats />
                 <Sound />
+                <Theme />
               </nav>
             </header>
             {children}
