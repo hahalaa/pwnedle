@@ -148,7 +148,7 @@ The drawings show a hooded figure at a laptop. The sources are in `docs/art/`. T
 
 The tab icon (`app/icon.svg`) is the white-on-black favicon drawing, cropped square on a `void` rounded square. Its lines were thickened before tracing so it reads at 16px on light and dark tab bars. `apple-icon.png` and the link preview image are unchanged.
 
-The coffee drawing sits inside the footer's Buy Me a Coffee link, before the words, at the link's height of 20px. It is decorative and hidden from screen readers.
+The coffee drawing sits inside the footer's Buy Me a Coffee link, after the words, at the link's height of 20px. It is decorative and hidden from screen readers.
 
 The end screen shows the drawing for the daily tier beside the total, at the total's height, so it adds no height. It is decorative and hidden from screen readers; the tier label still names the tier in its colour (R25). Reveals show no drawing. T42 compared the traced line art with a 40-cell dot-matrix version and kept the line art, which keeps the facial expressions the dot grid lost.
 
