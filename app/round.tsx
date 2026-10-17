@@ -78,7 +78,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
 
   return (
     <section className="flex flex-1 flex-col gap-6 sm:flex-none">
-      <h2 className="text-lg leading-snug">How many times has this password appeared in data breaches?</h2>
+      <h2 className="text-lg leading-snug lg:text-xl">How many times has this password appeared in data breaches?</h2>
       {/* The password sits in a bracketed 1px window; its title bar carries the progress (D25). */}
       <div className="brackets relative mx-[5px] border border-line">
         <div className="flex items-center justify-between border-b border-line px-3 py-1.5 font-mono text-xs text-ash">
@@ -87,7 +87,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
           </p>
           <Dots results={results} index={index} total={passwords.length} />
         </div>
-        <p className="font-mono px-3 py-6 text-3xl break-all sm:text-4xl">{passwords[index]}</p>
+        <p className="font-mono px-3 py-6 text-3xl break-all sm:text-4xl lg:px-5 lg:py-10 lg:text-6xl">{passwords[index]}</p>
       </div>
       {/* Stays mounted so screen readers announce each reveal and each new password when the text changes. */}
       <p className="sr-only" aria-live="polite">
@@ -129,7 +129,8 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
               ))}
             </div>
           </div>
-          <label className="flex flex-col gap-1">
+          {/* From lg the slider takes the extra width; the typed guess stays about as wide as on a phone (T40). */}
+          <label className="flex flex-col gap-1 lg:max-w-md">
             <span className="font-mono text-xs text-ash">your guess</span>
             <input
               type="text"
@@ -179,15 +180,15 @@ export function Reveal({ result }: { result: Result }) {
       <dl className="grid grid-cols-2 gap-x-6 gap-y-4 font-mono">
         <div className="col-span-2">
           <dt className="text-xs text-ash">times seen in breaches</dt>
-          <dd className="text-4xl">{formatGuess(result.count)}</dd>
+          <dd className="text-4xl lg:text-6xl">{formatGuess(result.count)}</dd>
         </div>
         <div>
           <dt className="text-xs text-ash">your guess</dt>
-          <dd className="text-xl">{formatGuess(result.guess)}</dd>
+          <dd className="text-xl lg:text-3xl">{formatGuess(result.guess)}</dd>
         </div>
         <div>
           <dt className="text-xs text-ash">points</dt>
-          <dd className="text-xl">
+          <dd className="text-xl lg:text-3xl">
             {result.score} <span className="text-ash">/ 100</span>
           </dd>
         </div>

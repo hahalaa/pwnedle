@@ -33,3 +33,11 @@ test("link previews get a title, description and large image card from the live 
   expect(metadata.openGraph).toMatchObject({ title: "Pwnedle", description: metadata.description });
   expect(metadata.twitter).toMatchObject({ card: "summary_large_image" });
 });
+
+test("from lg the column widens, with the header and footer inside it so they line up (T40)", () => {
+  const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
+  const column = html.slice(html.indexOf("lg:max-w-4xl"));
+  expect(html).toMatch(/class="[^"]*max-w-xl[^"]*lg:max-w-4xl/);
+  expect(column).toContain("<header");
+  expect(column).toContain("<footer");
+});
