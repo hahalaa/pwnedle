@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import { playTier } from "../lib/sound";
-import { Round } from "./round";
+import { REVEAL, Round } from "./round";
 
 vi.mock("../lib/sound", () => ({ isMuted: () => false, playTier: vi.fn() }));
 
@@ -17,14 +17,25 @@ afterEach(() => {
 const props = { date: "2026-10-24", number: 1, passwords: ["a", "b", "c", "d", "e"] };
 const body = { count: 4_200, score: 94, tier: "Uncrackable", note: "Seen a few thousand times." };
 
-// jsdom has no Web Animations API, so each fake animation only finishes when asked.
+// jsdom has no Web Animations API, so each fake animation only finishes when it's seeked to its end.
 function stubMotion(reduced: boolean) {
   vi.stubGlobal("matchMedia", (q: string) => ({ matches: reduced && q === "(prefers-reduced-motion: reduce)" }));
   vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, status: 200, json: async () => body })));
-  const anims: { finish: () => void; cancel: () => void }[] = [];
-  Element.prototype.animate = vi.fn(() => {
+  const anims: { seeked?: number }[] = [];
+  Element.prototype.animate = vi.fn((_, o) => {
+    const t = o as KeyframeAnimationOptions | number;
+    const end = typeof t === "number" ? t : (t.delay ?? 0) + Number(t.duration);
     let done = () => {};
-    const a = { finished: new Promise<void>((r) => (done = r)), finish: vi.fn(() => done()), cancel: vi.fn() };
+    const a = {
+      seeked: undefined as number | undefined,
+      finished: new Promise<void>((r) => (done = r)),
+      cancel: vi.fn(),
+      effect: { getComputedTiming: () => ({ progress: 0 }) },
+      set currentTime(ms: number) {
+        a.seeked = ms;
+        if (ms >= end) done();
+      },
+    };
     anims.push(a);
     return a as unknown as Animation;
   });
@@ -42,9 +53,9 @@ test("a fresh reveal holds back the tier and the button until it lands, and a cl
   expect(playTier).not.toHaveBeenCalled();
   // The live region doesn't wait for the animation.
   expect(document.querySelector("[aria-live=polite]")!.textContent).toContain("Seen 4,200 times.");
-  // The skipping click never reaches the hidden button.
+  // The skipping click seeks everything to the landing and never reaches the hidden button.
   fireEvent.click(next);
-  expect(anims.every((a) => vi.mocked(a.finish).mock.calls.length === 1)).toBe(true);
+  expect(anims.every((a) => a.seeked === REVEAL.charge + REVEAL.hold + REVEAL.zoomOut)).toBe(true);
   await vi.waitFor(() => expect(playTier).toHaveBeenCalledWith("Uncrackable"));
   expect(next.className).not.toContain("opacity-0");
   expect(screen.getByLabelText("1 of 5 revealed")).toBeDefined();

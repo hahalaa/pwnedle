@@ -16,17 +16,18 @@ const TICKS = ["0", "1", "10", "100", "1k", "10k", "100k", "1m", "10m", "100m"].
 // T43: every reveal timing, in ms, and the zoom. The fill sweeps to the guess over `charge`, and the view zooms in
 // over the last `zoomIn` of it until the guess sits `fill` of the way across, never past `maxZoom`. After `hold` it
 // zooms back out over `zoomOut`: the tier colour, the count's marker and the points arrive, and the tier sound plays
-// as it lands. The rest of the reveal and the button then fade in over `fade`.
+// as it lands. The rest of the reveal and the button then fade in over `fade`. The zooms and the climbing points use
+// `ease`; the fill and the fades for the marker and points use `easeOut`.
 export const REVEAL = {
   charge: 750,
   zoomIn: 450,
-  hold: 200,
-  zoomOut: 650,
+  hold: 100,
+  zoomOut: 600,
   fade: 200,
   fill: 0.85,
-  maxZoom: 6,
+  maxZoom: 4,
   ease: "cubic-bezier(0.65, 0, 0.35, 1)",
-  easeOut: "cubic-bezier(0.22, 1, 0.36, 1)",
+  easeOut: "cubic-bezier(0.23, 1, 0.32, 1)",
 };
 
 // What /api/guess returns (R14), plus the guess that was sent.
@@ -245,17 +246,17 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
       { at: 0, transform: transform(1) },
       { at: Math.max(charge - zoomIn, 0), transform: transform(1), easing: ease },
       { at: charge, transform: transform(zoom) },
-      { at: out, transform: transform(zoom), easing: easeOut },
+      { at: out, transform: transform(zoom), easing: ease },
       { at: end, transform: transform(1) },
     ];
     const anims = [
       run(el.querySelector("[data-track]")!, zoomed((s) => `scaleX(${s})`)),
       ...all("[data-at]").map((e) => run(e, zoomed((s) => `translateX(${Number(e.dataset.at) * (s - 1) * 100}%)`))),
-      run(el.querySelector("[data-fill]")!, [{ at: 0, transform: "scaleX(0)", easing: ease }, { at: charge, transform: `scaleX(${guess})` }]),
+      run(el.querySelector("[data-fill]")!, [{ at: 0, transform: "scaleX(0)", easing: easeOut }, { at: charge, transform: `scaleX(${guess})` }]),
       // Off-white until the zoom out, then the tier colour from the CSS.
       ...all("[data-tint]").map((e) => run(e, [{ at: 0, color: "var(--color-bone)" }, { at: out, color: "var(--color-bone)" }])),
-      ...all("[data-count-marker]").map((e) => run(e, [{ at: 0, opacity: 0 }, { at: out, opacity: 0 }, { at: out + zoomOut / 2, opacity: 1 }])),
-      ...all("[data-points]").map((e) => run(e, [{ at: 0, opacity: 0 }, { at: out, opacity: 0 }, { at: out + fade, opacity: 1 }])),
+      ...all("[data-count-marker]").map((e) => run(e, [{ at: 0, opacity: 0 }, { at: out, opacity: 0, easing: easeOut }, { at: out + zoomOut / 2, opacity: 1 }])),
+      ...all("[data-points]").map((e) => run(e, [{ at: 0, opacity: 0 }, { at: out, opacity: 0, easing: easeOut }, { at: out + fade, opacity: 1 }])),
       ...all("[data-later]").map((e) =>
         run(e, [
           { at: 0, opacity: 0, transform: "translateY(4px)" },
@@ -263,27 +264,26 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
           { at: end + fade, opacity: 1, transform: "none" },
         ]),
       ),
+      // An animation with no keyframes. The points read its eased progress, so they climb in step with the zoom out.
+      el.animate([], { delay: out, duration: zoomOut, easing: ease, fill: "both" }),
     ];
 
-    // The points climb during the zoom out, easing like it.
     const score = el.querySelector("[data-score]")!;
-    const start = performance.now();
     let frame = 0;
-    const count = (now: number) => {
-      const p = Math.min(Math.max((now - start - out) / zoomOut, 0), 1);
-      score.textContent = String(Math.round(result.score * (1 - (1 - p) ** 3)));
-      if (p < 1) frame = requestAnimationFrame(count);
+    const count = () => {
+      score.textContent = String(Math.round(result.score * (anims.at(-1)!.effect!.getComputedTiming().progress ?? 0)));
+      frame = requestAnimationFrame(count);
     };
-    frame = requestAnimationFrame(count);
+    count();
 
-    // A click or key press skips to the end and is then swallowed, so it can't also follow a link or press the hidden
-    // button.
+    // A click or key press skips to the landing, so the details still fade in with the button. It's then swallowed,
+    // so it can't also follow a link or press the hidden button.
     const skip = (e: Event) => {
       if (e.type === "click" || ["Enter", " "].includes((e as KeyboardEvent).key)) {
         e.preventDefault();
         e.stopPropagation();
       }
-      anims.forEach((a) => a.finish());
+      anims.forEach((a) => (a.currentTime = end));
     };
     addEventListener("click", skip, true);
     addEventListener("keydown", skip, true);
