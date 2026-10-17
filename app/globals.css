@@ -33,6 +33,14 @@ html {
   color-scheme: dark;
 }
 
+/* T40a: from lg (1024px) the root size grows from 16px to 20px at 1920px, so rem-based type, spacing and the column
+   scale together. Borders stay 1px. */
+@media (min-width: 64rem) {
+  html {
+    font-size: clamp(16px, 16px + 4 * (100vw - 1024px) / 896, 20px);
+  }
+}
+
 /* Dialogs and their backdrops fade in and out. */
 dialog,
 dialog::backdrop {

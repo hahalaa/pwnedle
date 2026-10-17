@@ -37,7 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             Desktop: spacers split the free height 2:3, so content sits just above centre, with the top gap capped.
             From lg the column widens; header and footer sit inside it, so they line up (T40). */}
         <main className="flex min-h-dvh w-full flex-col items-center px-4 py-6 sm:py-8 sm:before:max-h-24 sm:before:flex-[2] sm:before:content-[''] sm:after:flex-[3] sm:after:content-['']">
-          <div className="flex w-full max-w-xl flex-1 lg:max-w-4xl flex-col sm:flex-none">
+          <div className="flex w-full max-w-xl flex-1 lg:max-w-240 flex-col sm:flex-none">
             <header className="mb-8 flex items-center sm:items-baseline justify-between border-b border-line pb-3">
               <h1 className="font-dot text-4xl">
                 <Link href="/" className="tap focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">Pwnedle</Link>
