@@ -60,7 +60,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <Link href="/about" className="tap underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
                   about
                 </Link>
-                <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer" className="tap underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
+                <a href={COFFEE_URL} target="_blank" rel="noopener noreferrer" className="tap inline-flex items-center gap-1.5 underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
+                  {/* Decorative; a mask so the drawing takes the link colour (D41). */}
+                  <span aria-hidden="true" className="size-5 bg-current [mask:url(/art/coffee.svg)_center/contain_no-repeat]" />
                   buy me a coffee
                 </a>
               </p>

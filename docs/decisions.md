@@ -142,3 +142,10 @@ Bought through Vercel on 2026-10-11. The site lives at https://pwnedle.com, stor
 
 ## D40. Mid replaces Medium (supersedes the D6 label)
 The tiers are now Uncrackable, Strong, Mid, Weak and Pwned, with the same score bands (R11). The colour token `--color-medium` is now `--color-mid`, with the same D26 colour. Saved games store each result's tier, so `loadGame` reads an old "Medium" as Mid. Stats work from scores and need no change.
+
+## D41. Drawings (T41)
+The drawings show a hooded figure at a laptop. The sources are in `docs/art/`. The six on white (coffee and one per tier) were traced once with potrace and live in `public/art/` as filled paths in `currentColor` on a transparent background. Pages show them through a CSS mask filled with the text colour, so they follow the theme and need no runtime package. On the dark background, filled parts such as the coffee cup turn light and still read as a cup.
+
+The tab icon (`app/icon.svg`) is the white-on-black favicon drawing, cropped square on a `void` rounded square. Its lines were thickened before tracing so it reads at 16px on light and dark tab bars. `apple-icon.png` and the link preview image are unchanged.
+
+The coffee drawing sits inside the footer's Buy Me a Coffee link, before the words, at the link's height of 20px. It is decorative and hidden from screen readers.

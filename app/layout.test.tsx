@@ -41,3 +41,8 @@ test("from lg the column widens, with the header and footer inside it so they li
   expect(column).toContain("<header");
   expect(column).toContain("<footer");
 });
+
+test("the coffee link carries the coffee drawing as decoration, hidden from screen readers (T41)", () => {
+  const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
+  expect(html).toMatch(/<a [^>]*buymeacoffee[^>]*><span aria-hidden="true" class="[^"]*url\(\/art\/coffee.svg\)[^"]*"><\/span>buy me a coffee<\/a>/);
+});
