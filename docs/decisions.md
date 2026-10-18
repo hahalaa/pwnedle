@@ -178,3 +178,6 @@ All text uses IBM Plex Mono, which replaces Archivo for prose, buttons and dialo
 
 ## D45. Phones can play the dev server (T50)
 `next.config.ts` lists this Mac's address on the local network in `allowedDevOrigins`, so a phone on the same Wi-Fi can play `npm run dev`. Without it Next 16 blocks the dev scripts and the page never hydrates. If the Mac's address changes, update the entry.
+
+## D46. Enter plays the round (T51)
+Enter in the guess box locks in and moves focus to the button. While the reveal plays, the first Enter only skips to its end (T43); Enter after the button shows moves to the next password. A Next pressed from the keyboard puts focus in the next guess box. A tapped Next doesn't, so the phone keyboard stays closed.

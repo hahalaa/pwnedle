@@ -83,6 +83,10 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   // T43: the reveal locked in during this visit animates; `playing` hides its tier and the button until it lands.
   const [fresh, setFresh] = useState(-1);
   const [playing, setPlaying] = useState(false);
+  // T51: Enter in the box focuses the button, so Enter goes on to the next password. A keyboard Next focuses the next
+  // box; a tap leaves it alone, so a phone keyboard doesn't pop up.
+  const button = useRef<HTMLButtonElement>(null);
+  const [typing, setTyping] = useState(false);
   const result = results[index];
   const invalid = parseGuess(text) === null;
   const last = index === passwords.length - 1;
@@ -116,7 +120,9 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     if (!isMuted()) playTier(result.tier);
   }
 
-  function next() {
+  // A click from the keyboard has a `detail` of 0.
+  function next(e: { detail: number }) {
+    setTyping(e.detail === 0);
     update({ ...game, index: index + 1 });
     setGuess(0);
     setText("0");
@@ -183,9 +189,17 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
               disabled={state === "sending"}
               aria-invalid={invalid}
               aria-describedby="guess-help"
+              autoFocus={typing}
               onChange={(e) => {
                 setText(e.target.value);
                 setGuess(parseGuess(e.target.value) ?? guess);
+              }}
+              onKeyDown={(e) => {
+                if (e.key !== "Enter" || invalid) return;
+                // Without this the keypress follows focus to the button and locks in a second time.
+                e.preventDefault();
+                button.current?.focus();
+                lockIn();
               }}
               className="border border-line bg-void px-3 py-2 text-xl focus:border-bone focus:outline-none aria-invalid:border-signal"
             />
@@ -196,6 +210,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
         </>
       )}
       <button
+        ref={button}
         type="button"
         onClick={result ? (last ? finish : next) : lockIn}
         // Not disabled while sending: a disabled button drops keyboard focus to the page.

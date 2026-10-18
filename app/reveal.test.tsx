@@ -81,3 +81,38 @@ test("a reveal resumed after a refresh doesn't replay (T43)", async () => {
   expect(Element.prototype.animate).not.toHaveBeenCalled();
   expect(playTier).not.toHaveBeenCalled();
 });
+
+test("Enter in the box locks in and focuses the button; Enter only moves on once the reveal lands (T51)", async () => {
+  const anims = stubMotion(false);
+  render(<Round {...props} />);
+  const box = screen.getByRole("textbox");
+  fireEvent.change(box, { target: { value: "2.5m" } });
+  fireEvent.keyDown(box, { key: "Enter" });
+  const next = await screen.findByRole("button", { name: "Next password" });
+  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string).guess).toBe(2_500_000);
+  expect(document.activeElement).toBe(next);
+  // The first Enter only skips to the landing.
+  fireEvent.keyDown(next, { key: "Enter" });
+  expect(anims.every((a) => a.seeked === REVEAL.hold + REVEAL.zoom + REVEAL.meter)).toBe(true);
+  expect(screen.getByText("a")).toBeDefined();
+  await vi.waitFor(() => expect(next.className).not.toContain("opacity-0"));
+  // A keyboard Next focuses the next box.
+  fireEvent.click(next, { detail: 0 });
+  expect(screen.getByText("b")).toBeDefined();
+  expect(document.activeElement).toBe(screen.getByRole("textbox"));
+});
+
+test("Enter in the box does nothing while the guess is invalid, and a tapped Next leaves the box unfocused (T51)", async () => {
+  stubMotion(true);
+  render(<Round {...props} />);
+  const box = screen.getByRole("textbox");
+  fireEvent.change(box, { target: { value: "abc" } });
+  fireEvent.keyDown(box, { key: "Enter" });
+  expect(fetch).not.toHaveBeenCalled();
+  fireEvent.change(box, { target: { value: "40k" } });
+  fireEvent.keyDown(box, { key: "Enter" });
+  fireEvent.click(await screen.findByRole("button", { name: "Next password" }), { detail: 1 });
+  expect(screen.getByText("b")).toBeDefined();
+  expect(document.activeElement).not.toBe(screen.getByRole("textbox"));
+});
