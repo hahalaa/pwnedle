@@ -21,7 +21,7 @@ export function Sound() {
         setMuted(!muted);
         setToggled(!muted);
       }}
-      className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
+      className="tap text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
     >
       <NavLabel text={muted ? "muted" : "sound"} label={label}>
         <path d="M3.5 9.5h4l6-6h1v17h-1l-6-6h-4z" />

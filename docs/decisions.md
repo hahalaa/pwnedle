@@ -166,3 +166,6 @@ Light values, with contrast on `void`:
 - `signal` #ce2422: 4.57:1, which also covers the background-coloured text on Lock in
 
 Tier colours: Pwned #ce2422 (the light `signal`), Weak #9b4a0e, Mid #754f0b, Strong #425209, Uncrackable #074c13. Contrast runs from 4.57:1 for Pwned to 8.69:1 for Uncrackable. On the light background the ramp is reversed, with better tiers darker. To pass 4.5:1 on paper, a green can't be lighter than about OKLab L 0.51, while a red can reach about 0.55, so red has to sit at the light end. Under the D26 deuteranopia simulation the tiers keep their order, with OKLab lightness 0.567, 0.514, 0.466, 0.415 and 0.366. Each step is about 0.05, more than the smallest D26 step. At this lightness Weak, Mid and Strong come out as burnt orange, ochre and olive. The tier label still appears next to every colour (R25).
+
+## D44. One type family (T47, amends D25)
+All text uses IBM Plex Mono, which replaces Archivo for prose, buttons and dialogs. The body sets it once, so elements don't repeat `font-mono`. Doto stays on the Pwnedle wordmark only. Plex Mono loads at weights 400 and 600; buttons use 600. Mono runs wider than Archivo, so the about page and the reveal note are capped at 65 characters a line (`max-w-prose`). The how-to-play dialog is already narrower than that.

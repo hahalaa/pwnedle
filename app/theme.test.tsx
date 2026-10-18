@@ -7,7 +7,7 @@ import RootLayout from "./layout";
 import { Theme } from "./theme";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({}) }));
-vi.mock("next/font/google", () => ({ Archivo: () => ({}), Doto: () => ({}), IBM_Plex_Mono: () => ({}) }));
+vi.mock("next/font/google", () => ({ Doto: () => ({}), IBM_Plex_Mono: () => ({}) }));
 
 afterEach(() => {
   cleanup();

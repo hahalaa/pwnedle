@@ -7,7 +7,6 @@
   --color-ash: light-dark(#6b665d, #8d8a84);
   --color-line: light-dark(#d9d2c4, #2a2a2d);
   --color-signal: light-dark(#ce2422, #e5322d);
-  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
   --font-dot: var(--font-doto), var(--font-plex-mono), monospace;
   /* T35: reveals, the end screen and each new page fade in with a 4px rise. */

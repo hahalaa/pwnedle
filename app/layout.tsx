@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Doto, IBM_Plex_Mono } from "next/font/google";
+import { Doto, IBM_Plex_Mono } from "next/font/google";
 import Link from "next/link";
 import Script from "next/script";
 import { COFFEE_URL, SITE_URL, THEME_KEY, UMAMI_WEBSITE_ID } from "../lib/config";
@@ -11,8 +11,7 @@ import { Stats } from "./stats";
 import { Theme } from "./theme";
 import { TimeZone } from "./time-zone";
 
-const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
-const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono" });
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "600"], variable: "--font-plex-mono" });
 const doto = Doto({ subsets: ["latin"], weight: "900", variable: "--font-doto" });
 
 const description = "Five passwords a day. Guess how many times each one has turned up in data breaches.";
@@ -29,7 +28,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // The script below sets data-theme before hydration, so React must not flag the difference.
-    <html lang="en" className={`${archivo.variable} ${plexMono.variable} ${doto.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${plexMono.variable} ${doto.variable}`} suppressHydrationWarning>
       <head>
         {/* T44: apply a saved theme before first paint, so the page doesn't flash the system theme first. */}
         <script
@@ -38,7 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="font-sans antialiased">
+      <body className="font-mono antialiased">
         <TimeZone />
         {/* R27/D32: Umami sets no cookies. data-domains keeps dev and preview visits out of the counts. */}
         <Script src="https://cloud.umami.is/script.js" data-website-id={UMAMI_WEBSITE_ID} data-domains={new URL(SITE_URL).host} />
@@ -54,7 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </h1>
               <nav className="flex gap-5 sm:gap-4">
                 <HowToPlay />
-                <Link href="/archive" aria-label="archive" className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
+                <Link href="/archive" aria-label="archive" className="tap text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
                   <NavLabel text="archive">
                     <path d="M3.5 5.5h17v15h-17zM3.5 9.5h17M8.5 3.5v4M15.5 3.5v4" />
                   </NavLabel>
@@ -67,7 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {children}
             {/* R23, R24 */}
             <footer className="mt-10 short:mt-6 border-t border-line pt-4 text-sm text-ash">
-              <p className="flex gap-4 font-mono">
+              <p className="flex gap-4">
                 <Link href="/about" className="tap underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">
                   about
                 </Link>

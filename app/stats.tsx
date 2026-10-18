@@ -21,7 +21,7 @@ export function Stats() {
           ref.current?.showModal();
         }}
         aria-label="stats"
-        className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
+        className="tap text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
       >
         <NavLabel text="stats">
           <path d="M3.5 20.5h17M5.5 20.5v-9h3v9M10.5 20.5v-17h3v17M15.5 20.5v-6h3v6" />
@@ -50,7 +50,7 @@ export function Stats() {
 export function StatsBody({ s }: { s: ReturnType<typeof stats> }) {
   const most = Math.max(1, ...s.tiers.map(([, n]) => n));
   return (
-    <div className="flex flex-col gap-6 font-mono">
+    <div className="flex flex-col gap-6">
       <h2 id="stats-title" className="border-b border-line pb-3 text-lg">
         stats
       </h2>

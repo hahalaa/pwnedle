@@ -43,7 +43,7 @@ export function HowToPlay() {
         type="button"
         onClick={() => ref.current?.showModal()}
         aria-label="help"
-        className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
+        className="tap text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
       >
         <NavLabel text="help">
           <circle cx="12" cy="12" r="8.5" />
@@ -57,14 +57,14 @@ export function HowToPlay() {
         className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md border border-line bg-void p-6 text-bone backdrop:bg-void/80"
       >
         <div className="flex flex-col gap-4">
-          <h2 id="help-title" className="border-b border-line pb-3 font-mono text-lg">
+          <h2 id="help-title" className="border-b border-line pb-3 text-lg">
             how to play
           </h2>
           <p>Every day there are 5 passwords. Guess how many times each one has turned up in data breaches, from 0 to 100 million.</p>
           <p>Lock in a guess to see the real count. The closer you are, the more points you get.</p>
           <div className="flex flex-col gap-2">
             <p className="text-sm text-ash">Say a password has turned up 50,000 times:</p>
-            <table className="w-full font-mono text-sm">
+            <table className="w-full text-sm">
               <thead className="text-left text-xs text-ash">
                 <tr>
                   <th className="pb-1 font-normal">guess</th>

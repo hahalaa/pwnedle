@@ -7,7 +7,7 @@ import Template from "./template";
 test("round shows the R7 prompt, the password in monospace, a slider at the 0 stop and a number box", () => {
   const html = renderToStaticMarkup(<Round date="2026-10-24" number={1} passwords={["hunter2", "b", "c", "d", "e"]} />);
   expect(html).toContain("How many times has this password appeared in data breaches?");
-  expect(html).toMatch(/<p class="font-mono[^"]*">hunter2<\/p>/);
+  expect(html).toMatch(/<p class="[^"]*">hunter2<\/p>/);
   expect(html).toMatch(/type="range"[^>]*min="0"[^>]*max="850"[^>]*value="0"/);
   // D4: the only text box takes numbers, never a password.
   expect(html.match(/<input/g)).toHaveLength(2);

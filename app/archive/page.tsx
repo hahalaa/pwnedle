@@ -5,9 +5,9 @@ import { pastPuzzles, playerToday } from "../../lib/puzzles";
 // R20: every past puzzle by number and date. Read per request so yesterday appears after the player's local midnight (R2).
 async function List() {
   const puzzles = await pastPuzzles(await playerToday());
-  if (!puzzles.length) return <p className="font-mono text-ash">No past puzzles yet.</p>;
+  if (!puzzles.length) return <p className="text-ash">No past puzzles yet.</p>;
   return (
-    <ol className="divide-y divide-line border-y border-line font-mono">
+    <ol className="divide-y divide-line border-y border-line">
       {puzzles.map(({ date, number }) => (
         <li key={date}>
           <Link href={`/archive/${number}`} className="group flex justify-between px-3 py-3 hover:bg-line focus-visible:outline-1 focus-visible:outline-bone">

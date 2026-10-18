@@ -4,7 +4,7 @@ import { COFFEE_URL, SITE_URL } from "../lib/config";
 import RootLayout from "./layout";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({}) }));
-vi.mock("next/font/google", () => ({ Archivo: () => ({}), Doto: () => ({}), IBM_Plex_Mono: () => ({}) }));
+vi.mock("next/font/google", () => ({ Doto: () => ({}), IBM_Plex_Mono: () => ({}) }));
 
 test("every page has the title linking home, an archive link and stats, as words on desktop and icons on phones (T37)", () => {
   const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
@@ -45,4 +45,11 @@ test("from lg the column widens, with the header and footer inside it so they li
 test("the coffee link carries the coffee drawing as decoration, hidden from screen readers (T41)", () => {
   const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
   expect(html).toMatch(/<a [^>]*buymeacoffee[^>]*>buy me a coffee<span aria-hidden="true" class="[^"]*url\(\/art\/coffee.svg\)[^"]*"><\/span><\/a>/);
+});
+
+test("all text uses IBM Plex Mono and only the wordmark uses Doto (T47)", () => {
+  const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
+  expect(html).toMatch(/<body class="font-mono[ "]/);
+  expect(html).toMatch(/<h1 class="font-dot[ "]/);
+  expect(html.match(/font-dot/g)).toHaveLength(1);
 });

@@ -35,7 +35,7 @@ export function Theme() {
         } catch {}
         setToggled(next);
       }}
-      className="tap font-mono text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
+      className="tap text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
     >
       <NavLabel text={theme} label={`${theme} theme`}>
         {theme === "dark" ? (
