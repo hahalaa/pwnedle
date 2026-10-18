@@ -75,5 +75,7 @@ Status: `todo`, `doing`, `done`, `superseded`. Update in the same commit that fi
 - [done] **T31** Missing tests: a Round test that a refresh resumes mid-puzzle with reveals intact and never re-sends a locked-in guess (R15, R16); a test that a generated puzzle's display order is kept as written (R4).
 - [todo] **T53** A background picker in settings, with a short curated list that includes "none". (R25)
 - [todo] **T54** Keep all text at 4.5:1 over the background on phones without the glyphs flickering around it. Red text (the Pwned tier, the ratio, errors) dips to about 4.0:1 when a glyph passes behind it (D47). (R25, D26)
+- [todo] **T55** The pipeline skips candidate passwords longer than 20 characters, so a long password can't make the end screen scroll on phones. (R28, R31)
+- [todo] **T56** On the end screen, tapping a password in the breakdown reopens its reveal: the guess locked in, the chart animation replayed, the note shown, with a "back to results" button. Works in archive games too and changes no stats. (R9, R12)
 - [todo] **T32** Remove the tinyglobby override in package.json once eslint-config-next no longer pulls in fast-glob/braces; check on each Next.js upgrade.
 - [done] **T38** CI rejects any modification or deletion of a puzzle file in data/puzzles/ dated before today+2 UTC, the pipeline:replace cut-off; new files for any date are allowed. (D11, D21, R37)
