@@ -4,6 +4,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { COFFEE_URL, SITE_URL, THEME_KEY, UMAMI_WEBSITE_ID } from "../lib/config";
 import "./globals.css";
+import { Backdrop } from "./backdrop";
 import { HowToPlay } from "./how-to-play";
 import { NavLabel } from "./nav-label";
 import { Sound } from "./sound";
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="font-mono antialiased">
         <TimeZone />
+        <Backdrop />
         {/* R27/D32: Umami sets no cookies. data-domains keeps dev and preview visits out of the counts. */}
         <Script src="https://cloud.umami.is/script.js" data-website-id={UMAMI_WEBSITE_ID} data-domains={new URL(SITE_URL).host} />
         {/* main spans the viewport; the inner column holds the content at a readable width.

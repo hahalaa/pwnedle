@@ -13,7 +13,7 @@ function subscribe(onChange: () => void) {
 }
 
 // The saved choice, which app/layout.tsx puts on <html> before first paint, or else the system theme.
-const current = () => document.documentElement.dataset.theme ?? (matchMedia(LIGHT).matches ? "light" : "dark");
+export const current = () => document.documentElement.dataset.theme ?? (matchMedia(LIGHT).matches ? "light" : "dark");
 
 // T44: header toggle between the dark and light themes, remembered in localStorage.
 export function Theme() {
