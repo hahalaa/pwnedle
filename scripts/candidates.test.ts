@@ -1,3 +1,6 @@
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { expect, test } from "vitest";
 import { candidates, variations } from "./candidates";
 
@@ -27,4 +30,16 @@ test("combines expanded seeds with SecLists entries, deduped", async () => {
   expect(all).toContain("123456"); // SecLists
   expect(new Set(all).size).toBe(all.length);
   expect(all.every((p) => p.length > 0 && p === p.trim())).toBe(true);
+});
+
+test("drops candidates longer than 20 characters", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "seeds-"));
+  await mkdir(join(dir, "seclists"));
+  await writeFile(join(dir, "words.txt"), "abcdefghijklmnopq\n"); // 17 characters
+  await writeFile(join(dir, "seclists/10k-most-common.txt"), "abcdefghijklmnopqrst\nabcdefghijklmnopqrstu\n");
+  const all = await candidates(dir);
+  expect(all).toContain("abcdefghijklmnopq123"); // 20
+  expect(all).not.toContain("abcdefghijklmnopq1234"); // 21
+  expect(all).toContain("abcdefghijklmnopqrst"); // 20
+  expect(all).not.toContain("abcdefghijklmnopqrstu"); // 21
 });

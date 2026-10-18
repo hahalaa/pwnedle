@@ -23,11 +23,12 @@ async function lines(file: string): Promise<string[]> {
 }
 
 // Candidates from both R28 sources: expanded seed lists, plus SecLists entries as-is.
+// Anything over 20 characters is dropped so it can't make the end screen scroll on phones.
 export async function candidates(dir = "scripts/seeds"): Promise<string[]> {
   const out = new Set<string>();
   for (const name of (await readdir(dir)).filter((n) => n.endsWith(".txt"))) {
     for (const seed of await lines(join(dir, name))) variations(seed).forEach((v) => out.add(v));
   }
   for (const pw of await lines(join(dir, "seclists/10k-most-common.txt"))) out.add(pw);
-  return [...out];
+  return [...out].filter((pw) => pw.length <= 20);
 }

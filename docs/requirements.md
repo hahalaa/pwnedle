@@ -57,6 +57,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
 - **R28 (v1)** Candidate generation from two sources:
   - seed lists kept in the repo (words, first names, sports teams, keyboard patterns, phrases), expanded with variations: capitalisation, appended digits and years, a trailing "!", and common letter swaps (a→@, o→0, e→3, s→$);
   - public common-password lists (SecLists).
+  Candidates longer than 20 characters are dropped, so a long password can't make the end screen scroll on phones.
 - **R29 (v1)** Counts are looked up through the Pwned Passwords range API: only the first 5 characters of each SHA-1 hash are sent, with the padding header enabled. Results are cached locally to avoid repeat lookups.
 - **R30 (v1)** Content filter, applied before selection:
   - drop anything matching a blocklist of profanity, slurs, sexual terms and drug terms;
