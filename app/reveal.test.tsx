@@ -52,10 +52,10 @@ test("a fresh reveal holds back the tier and the button until it lands, and a cl
   expect(screen.getByLabelText("0 of 5 revealed")).toBeDefined();
   expect(playTier).not.toHaveBeenCalled();
   // The live region doesn't wait for the animation.
-  expect(document.querySelector("[aria-live=polite]")!.textContent).toContain("Seen 4,200 times.");
+  expect(document.querySelector("[aria-live=polite]")!.textContent).toContain("Seen 4,200 times. You guessed 0: 4.2k× too low. 94 points");
   // The skipping click seeks everything to the landing and never reaches the hidden button.
   fireEvent.click(next);
-  expect(anims.every((a) => a.seeked === REVEAL.charge + REVEAL.hold + REVEAL.zoomOut)).toBe(true);
+  expect(anims.every((a) => a.seeked === REVEAL.hold + REVEAL.zoom + REVEAL.meter)).toBe(true);
   await vi.waitFor(() => expect(playTier).toHaveBeenCalledWith("Uncrackable"));
   expect(next.className).not.toContain("opacity-0");
   expect(screen.getByLabelText("1 of 5 revealed")).toBeDefined();

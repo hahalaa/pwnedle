@@ -1,7 +1,7 @@
 "use client";
 
 import { type ComponentProps, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
-import { formatGuess, fromSlider, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
+import { DECADE, formatGuess, fromSlider, missRatio, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
 import { isMuted, playTier } from "../lib/sound";
@@ -13,22 +13,44 @@ const pos = (n: number) => Math.min(toSlider(n), SLIDER_MAX) / SLIDER_MAX;
 // The 0 stop, then every power of ten, each at its slider position.
 const TICKS = ["0", "1", "10", "100", "1k", "10k", "100k", "1m", "10m", "100m"].map((t) => [t, pos(parseGuess(t)!)] as const);
 
-// T43: every reveal timing, in ms, and the zoom. The fill sweeps to the guess over `charge`, and the view zooms in
-// over the last `zoomIn` of it until the guess sits `fill` of the way across, never past `maxZoom`. After `hold` it
-// zooms back out over `zoomOut`: the tier colour, the count's marker and the points arrive, and the tier sound plays
-// as it lands. The rest of the reveal and the button then fade in over `fade`. The zooms and the climbing points use
-// `ease`; the fill and the fades for the marker and points use `easeOut`.
+// T48: every reveal timing, in ms, and the chart's zoom. The chart fades in around the guess over `hold`, then eases out
+// over `zoom` until it fits the guess and the count. The points climb as the meter fills, from `overlap` before the zoom
+// ends until `meter` after it, so the motion never stalls, and the tier sound plays as it lands. The tier, note and button fade in
+// over `fade`, `stagger` apart, the button last as it lands. The chart never shows less than `view` of the axis (two
+// decades), and leaves `margin` of the gap between guess and count on each side.
 export const REVEAL = {
-  charge: 750,
-  zoomIn: 450,
-  hold: 100,
-  zoomOut: 600,
+  hold: 150,
+  zoom: 800,
+  meter: 600,
+  overlap: 150,
   fade: 200,
-  fill: 0.85,
-  maxZoom: 4,
+  stagger: 40,
+  view: (2 * DECADE) / SLIDER_MAX,
+  margin: 0.2,
   ease: "cubic-bezier(0.65, 0, 0.35, 1)",
   easeOut: "cubic-bezier(0.23, 1, 0.32, 1)",
 };
+
+// A stretch of the axis as [from, to], each a place along it like `pos`.
+type View = readonly [number, number];
+
+// A view `width` wide around `mid`, at least REVEAL.view wide and moved as needed to stay on the axis.
+const fit = (mid: number, width: number): View => {
+  const w = Math.min(Math.max(width, REVEAL.view), 1);
+  const from = Math.min(Math.max(mid - w / 2, 0), 1 - w);
+  return [from, from + w];
+};
+
+// T48: where the chart starts, zoomed in around the guess, and where it ends, fitting both.
+export function chartViews(guess: number, count: number): [View, View] {
+  return [fit(guess, 0), fit((guess + count) / 2, Math.abs(count - guess) * (1 + 2 * REVEAL.margin))];
+}
+
+// Transforms that show `view` across the chart: `stretch` for the axis, `place` for a full-width layer holding a point
+// at `at`, which moves without stretching.
+const scale = ([from, to]: View) => 1 / (to - from);
+const stretch = (view: View) => `translateX(${-view[0] * scale(view) * 100}%) scaleX(${scale(view)})`;
+const place = (view: View, at: number) => `translateX(${(at * (scale(view) - 1) - view[0] * scale(view)) * 100}%)`;
 
 // What /api/guess returns (R14), plus the guess that was sent.
 type Result = { guess: number; count: number; score: number; tier: string; note: string };
@@ -124,7 +146,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
       {/* Stays mounted so screen readers announce each reveal and each new password when the text changes. */}
       <p className="sr-only" aria-live="polite">
         {result
-          ? `Seen ${formatGuess(result.count)} times. You guessed ${formatGuess(result.guess)}. ${result.score} points, ${result.tier.toLowerCase()}. ${result.note}`
+          ? `Seen ${formatGuess(result.count)} times. You guessed ${formatGuess(result.guess)}: ${missRatio(result.guess, result.count).toLowerCase()}. ${result.score} points, ${result.tier.toLowerCase()}. ${result.note}`
           : `Password ${index + 1} of ${passwords.length}: ${passwords[index]}`}
       </p>
       {result ? (
@@ -193,11 +215,11 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   );
 }
 
-// A point at `at` along the bar, inside a full-width layer. The reveal zooms by moving that layer, so the point keeps
-// pace with the stretched track without stretching itself.
-function Pin({ at, className, ...props }: { at: number } & ComponentProps<"div">) {
+// A point at `at` along the axis, inside a full-width layer. With `view`, the layer moves so the point lands where that
+// stretch of the axis puts it; the reveal's chart zooms by animating that move.
+function Pin({ at, view, className, ...props }: { at: number; view?: View } & ComponentProps<"div">) {
   return (
-    <div data-at={at} className="absolute inset-0">
+    <div data-at={at} className="absolute inset-0" style={view && { transform: place(view, at) }}>
       <div {...props} className={`absolute -translate-x-1/2 ${className}`} style={{ left: `${at * 100}%` }} />
     </div>
   );
@@ -205,11 +227,11 @@ function Pin({ at, className, ...props }: { at: number } & ComponentProps<"div">
 
 // One tick per stop. The margins match the slider thumb's centre, which travels from half the thumb's width in from
 // each end (--thumb, globals.css).
-function Ticks() {
+function Ticks({ view }: { view?: View }) {
   return (
     <div className="relative mx-[calc(var(--thumb)/2)] h-7 text-xs text-ash" aria-hidden>
       {TICKS.map(([t, f]) => (
-        <Pin key={t} at={f} className="flex flex-col items-center gap-1">
+        <Pin key={t} at={f} view={view} className="flex flex-col items-center gap-1">
           <span className="h-1.5 w-px bg-ash" />
           {t}
         </Pin>
@@ -218,23 +240,25 @@ function Ticks() {
   );
 }
 
-// R9: everything the API sent back, with the tier in its colour and always named (R25). The read-only slider shows
-// the guess filled in the tier colour and a line at the count. Rendered as is, this is the end state; with `play`,
-// the T43 animations run first and call `onLand` as the zoom out ends.
+// R9: everything the API sent back, with the tier in its colour and always named (R25), laid out as in T48: a chart of
+// the guess and the count on the log axis, labelled with both, then how far off the guess was, the points and a meter.
+// Rendered as is, this is the end state; with `play`, the animations run first and call `onLand` as the points finish
+// climbing.
 export function Reveal({ result, play, onLand }: { result: Result; play?: boolean; onLand?: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const guess = pos(result.guess);
+  const count = pos(result.count);
+  const end = chartViews(guess, count)[1];
   const land = useEffectEvent(() => onLand?.());
 
   // Before paint, so the end state never flashes before the animations take over.
   useLayoutEffect(() => {
     const el = ref.current;
     if (!play || !el) return;
-    const { charge, zoomIn, hold, zoomOut, fade, fill, maxZoom, ease, easeOut } = REVEAL;
-    const out = charge + hold;
-    const end = out + zoomOut;
-    // A guess of 0 has nothing to fill, so it gets the full zoom.
-    const zoom = Math.min(Math.max(fill / guess, 1), maxZoom);
+    const { hold, zoom, meter, overlap, fade, stagger, ease, easeOut } = REVEAL;
+    const [from, to] = chartViews(guess, count);
+    const done = hold + zoom + meter;
+    const climbs = done - meter - overlap;
     const all = (selector: string) => [...el.querySelectorAll<HTMLElement>(selector)];
     // Keyframes timed in ms from the start. Each animation ends at its last keyframe and leaves the element in its
     // CSS end state.
@@ -242,39 +266,44 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
       const duration = frames.at(-1)!.at;
       return e.animate(frames.map(({ at, ...k }) => ({ ...k, offset: at / duration })), duration);
     };
-    const zoomed = (transform: (scale: number) => string) => [
-      { at: 0, transform: transform(1) },
-      { at: Math.max(charge - zoomIn, 0), transform: transform(1), easing: ease },
-      { at: charge, transform: transform(zoom) },
-      { at: out, transform: transform(zoom), easing: ease },
-      { at: end, transform: transform(1) },
-    ];
+    // Views along the zoom. The width changes by the same factor at each step, so the sweep moves evenly across decades;
+    // `ease` then runs across the whole zoom.
+    const views = Array.from({ length: 9 }, (_, i): View => {
+      const t = i / 8;
+      return fit(((from[0] + from[1]) * (1 - t) + (to[0] + to[1]) * t) / 2, (from[1] - from[0]) ** (1 - t) * (to[1] - to[0]) ** t);
+    });
+    const zooms = (e: Element, transform: (view: View) => string) =>
+      e.animate(views.map((view) => ({ transform: transform(view) })), { delay: hold, duration: zoom, easing: ease, fill: "both" });
+    const rise = (e: Element, at: number) =>
+      run(e, [
+        { at: 0, opacity: 0, transform: "translateY(4px)" },
+        { at, opacity: 0, transform: "translateY(4px)", easing: easeOut },
+        { at: at + fade, opacity: 1, transform: "none" },
+      ]);
+    const later = all("[data-later]");
     const anims = [
-      run(el.querySelector("[data-track]")!, zoomed((s) => `scaleX(${s})`)),
-      ...all("[data-at]").map((e) => run(e, zoomed((s) => `translateX(${Number(e.dataset.at) * (s - 1) * 100}%)`))),
-      run(el.querySelector("[data-fill]")!, [{ at: 0, transform: "scaleX(0)", easing: easeOut }, { at: charge, transform: `scaleX(${guess})` }]),
-      // Off-white until the zoom out, then the tier colour from the CSS.
-      ...all("[data-tint]").map((e) => run(e, [{ at: 0, color: "var(--color-bone)" }, { at: out, color: "var(--color-bone)" }])),
-      ...all("[data-count-marker]").map((e) => run(e, [{ at: 0, opacity: 0 }, { at: out, opacity: 0, easing: easeOut }, { at: out + zoomOut / 2, opacity: 1 }])),
-      ...all("[data-points]").map((e) => run(e, [{ at: 0, opacity: 0 }, { at: out, opacity: 0, easing: easeOut }, { at: out + fade, opacity: 1 }])),
-      ...all("[data-later]").map((e) =>
-        run(e, [
-          { at: 0, opacity: 0, transform: "translateY(4px)" },
-          { at: end, opacity: 0, transform: "translateY(4px)", easing: "ease-out" },
-          { at: end + fade, opacity: 1, transform: "none" },
-        ]),
-      ),
-      // An animation with no keyframes. The points read its eased progress, so they climb in step with the zoom out.
-      el.animate([], { delay: out, duration: zoomOut, easing: ease, fill: "both" }),
+      run(el.querySelector("[data-chart]")!, [{ at: 0, opacity: 0, easing: easeOut }, { at: hold, opacity: 1 }]),
+      zooms(el.querySelector("[data-axis]")!, stretch),
+      ...all("[data-at]").map((e) => zooms(e, (view) => place(view, Number(e.dataset.at)))),
+      rise(el.querySelector("[data-points]")!, climbs),
+      run(el.querySelector("[data-meter]")!, [
+        { at: 0, transform: "scaleX(0)" },
+        { at: climbs, transform: "scaleX(0)", easing: ease },
+        { at: done, transform: `scaleX(${result.score / 100})` },
+      ]),
+      // The tier and the note lead the button, which fades in as it lands.
+      ...later.map((e, i) => rise(e, done - (later.length - i) * stagger)),
+      // An animation with no keyframes. The points read its eased progress, so they climb in step with the meter.
+      el.animate([], { delay: climbs, duration: done - climbs, easing: ease, fill: "both" }),
     ];
 
     const score = el.querySelector("[data-score]")!;
     let frame = 0;
-    const count = () => {
+    const tick = () => {
       score.textContent = String(Math.round(result.score * (anims.at(-1)!.effect!.getComputedTiming().progress ?? 0)));
-      frame = requestAnimationFrame(count);
+      frame = requestAnimationFrame(tick);
     };
-    count();
+    tick();
 
     // A click or key press skips to the landing, so the details still fade in with the button. It's then swallowed,
     // so it can't also follow a link or press the hidden button.
@@ -283,7 +312,7 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
         e.preventDefault();
         e.stopPropagation();
       }
-      anims.forEach((a) => (a.currentTime = end));
+      anims.forEach((a) => (a.currentTime = done));
     };
     addEventListener("click", skip, true);
     addEventListener("keydown", skip, true);
@@ -293,7 +322,7 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
       removeEventListener("click", skip, true);
       removeEventListener("keydown", skip, true);
     };
-    anims[0].finished.then(() => {
+    anims.at(-1)!.finished.then(() => {
       stop();
       land();
     }, () => {});
@@ -301,49 +330,54 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
       stop();
       anims.forEach((a) => a.cancel());
     };
-  }, [play, guess, result.score]);
+  }, [play, guess, count, result.score]);
+
+  // A chart label's place along the chart once it has zoomed out, from 0 at the left edge to 1 at the right. The label
+  // shifts left by that share of its own width, so it stays inside the chart at either end.
+  const label = (at: number) => ({ translate: `${-Math.min(Math.max((at - end[0]) * scale(end), 0), 1) * 100}%` });
 
   return (
-    <div ref={ref} className="flex flex-col gap-5 short:gap-3">
-      {/* Decorative: the numbers below and the live region carry the values. The clip box runs 16px past the bar so
-          the end labels and the zoomed track aren't cut at its edge. */}
-      <div className="-mx-4 flex flex-col gap-2 overflow-hidden px-4" aria-hidden>
-        <div className="relative mx-[calc(var(--thumb)/2)] h-11" style={{ color: tierColor(result.tier) }}>
-          <div data-track className="track absolute inset-0 origin-left">
-            <div
-              data-fill
-              data-tint
-              className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 origin-left bg-current"
-              style={{ transform: `scaleX(${guess})` }}
-            />
-          </div>
-          <Pin at={guess} data-tint className="inset-y-[0.6875rem] w-(--thumb) bg-current" />
-          <Pin at={pos(result.count)} data-count-marker className="inset-y-0 w-px bg-bone" />
+    <div ref={ref} className="flex flex-col gap-6 short:gap-4" style={{ color: tierColor(result.tier) }}>
+      {/* The labels carry the numbers on two rows, so they never collide. The chart is inset from the clip box so the
+          end labels aren't cut once it has zoomed out. */}
+      <div data-chart className="overflow-hidden px-3">
+        <div className="relative mx-[calc(var(--thumb)/2)] h-20 text-xs">
+          <div data-axis className="track absolute inset-x-0 bottom-0 h-px origin-left" style={{ transform: stretch(end) }} />
+          <Pin at={count} view={end} className="top-5 bottom-0 border-l border-dashed border-bone">
+            <span className="absolute bottom-full left-1/2 mb-1 whitespace-nowrap text-ash" style={label(count)}>
+              answer <span className="font-semibold text-bone">{formatGuess(result.count)}</span>
+            </span>
+          </Pin>
+          <Pin at={guess} view={end} className="top-11 bottom-0 w-0.5 bg-current">
+            <span className="absolute bottom-full left-1/2 mb-1 whitespace-nowrap text-ash" style={label(guess)}>
+              you <span className="font-semibold" style={{ color: tierColor(result.tier) }}>{formatGuess(result.guess)}</span>
+            </span>
+          </Pin>
         </div>
-        <Ticks />
+        <Ticks view={end} />
       </div>
-      {/* On short screens the count, guess and points share one row. */}
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-4 short:grid-cols-3 short:items-end">
-        <div data-later className="col-span-2 short:col-span-1">
-          <dt className="text-xs text-ash">times seen in breaches</dt>
-          <dd className="text-4xl lg:text-6xl">{formatGuess(result.count)}</dd>
+      {/* The ratio is the one large figure; the points and tier sit small beside it, with the meter underneath. */}
+      <div data-points>
+        <div className="flex items-end justify-between gap-4">
+          <p className="text-2xl tracking-tight sm:text-4xl lg:text-5xl short:text-4xl">{missRatio(result.guess, result.count)}</p>
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            <p className="text-ash">
+              <span data-score className="text-xl font-semibold text-bone lg:text-2xl">
+                {result.score}
+              </span>
+              <span className="text-xs">/100</span>
+            </p>
+            <p data-later className="flex items-center gap-1.5 text-xs">
+              <span className="size-2 bg-current" />
+              {result.tier.toLowerCase()}
+            </p>
+          </div>
         </div>
-        <div data-later>
-          <dt className="text-xs text-ash">your guess</dt>
-          <dd className="text-xl lg:text-3xl">{formatGuess(result.guess)}</dd>
+        <div className="mt-3 h-0.5 bg-line" aria-hidden>
+          <div data-meter className="h-full origin-left bg-current" style={{ transform: `scaleX(${result.score / 100})` }} />
         </div>
-        <div data-points>
-          <dt className="text-xs text-ash">points</dt>
-          <dd className="text-xl lg:text-3xl">
-            <span data-score>{result.score}</span> <span className="text-ash">/ 100</span>
-          </dd>
-        </div>
-      </dl>
-      <p data-later className="flex items-center gap-2" style={{ color: tierColor(result.tier) }}>
-        <span className="size-3 bg-current" />
-        {result.tier.toLowerCase()}
-      </p>
-      <p data-later className="max-w-prose border-l border-line pl-3 leading-relaxed text-ash">{result.note}</p>
+      </div>
+      <p data-later className="max-w-prose leading-relaxed text-ash">{result.note}</p>
     </div>
   );
 }

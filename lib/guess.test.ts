@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { DECADE, fromSlider, MAX_GUESS, parseGuess, SLIDER_MAX, toSlider } from "./guess";
+import { DECADE, fromSlider, MAX_GUESS, missRatio, parseGuess, SLIDER_MAX, toSlider } from "./guess";
 
 test("parses plain numbers, commas and k/m shorthand", () => {
   expect(["0", "1,234", " 42 ", "2.5m", "2.5M", "10k", ".5k", "1.5", "100,000,000"].map(parseGuess)).toEqual([
@@ -40,4 +40,19 @@ test("every arrow key press moves the thumb, end to end in both directions", () 
       guess = next;
     }
   }
+});
+
+test("the miss ratio adds 1 to both sides, with one decimal below 10 and k and m from 1,000 (T48)", () => {
+  expect(missRatio(1_000, 4_200)).toBe("4.2× too low");
+  expect(missRatio(494, 10)).toBe("45× too high");
+  expect(missRatio(0, 998)).toBe("999× too low");
+  expect(missRatio(0, 12_499)).toBe("12.5k× too low");
+  expect(missRatio(10, 12_500_000)).toBe("1.1m× too low");
+  expect(missRatio(MAX_GUESS, 0)).toBe("100m× too high");
+  expect(missRatio(9, 98)).toBe("9.9× too low");
+  // Rounding never prints 10.0× or 1000k×.
+  expect(missRatio(0, 8.96)).toBe("10× too low");
+  expect(missRatio(0, 999.6)).toBe("1k× too low");
+  expect(missRatio(0, 999_960)).toBe("1m× too low");
+  expect(missRatio(37, 37)).toBe("Exact");
 });

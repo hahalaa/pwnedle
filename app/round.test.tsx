@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
-import { Dots, End, REVEAL, Reveal, Round } from "./round";
+import { DECADE, SLIDER_MAX } from "../lib/guess";
+import { chartViews, Dots, End, REVEAL, Reveal, Round } from "./round";
 import Template from "./template";
 
 test("round shows the R7 prompt, the password in monospace, a slider at the 0 stop and a number box", () => {
@@ -21,25 +22,48 @@ test("reveal shows the count, the guess, the points, the tier label in its colou
   const html = renderToStaticMarkup(
     <Reveal result={{ guess: 40_000, count: 12_500_000, score: 3, tier: "Pwned", note: "Seen everywhere." }} />,
   );
-  for (const t of ["12,500,000", "40,000", ">3</span> <span", "pwned", "Seen everywhere."]) expect(html).toContain(t);
+  for (const t of ["12,500,000", "40,000", ">3</span><span class=\"text-xs\">/100</span>", "pwned", "Seen everywhere."]) expect(html).toContain(t);
   expect(html).toContain("color:var(--color-pwned)");
 });
 
-test("the reveal's end state keeps the slider, filled to the guess in the tier colour, with a line at the count (T43)", () => {
-  const html = renderToStaticMarkup(<Reveal result={{ guess: 1, count: 100_000_000, score: 0, tier: "Pwned", note: "" }} />);
-  // A guess of 1 sits 50 of 850 steps along; 100m is the far end.
-  expect(html).toMatch(/style="color:var\(--color-pwned\)"><div data-track/);
-  expect(html).toContain(`data-fill="true" data-tint="true"`);
-  expect(html).toContain(`transform:scaleX(${50 / 850})`);
-  expect(html).toMatch(/data-count-marker="true"[^>]*style="left:100%"/);
+test("the reveal labels the chart lines with both numbers on two rows and puts the ratio in one result row (T48)", () => {
+  const html = renderToStaticMarkup(<Reveal result={{ guess: 40_000, count: 12_500_000, score: 3, tier: "Pwned", note: "" }} />);
+  // The answer's label sits on the higher line, the guess's on the lower one.
+  expect(html).toMatch(/top-5 bottom-0 border-l border-dashed[^>]*><span[^>]*>answer <span class="font-semibold text-bone">12,500,000</);
+  expect(html).toMatch(/top-11 bottom-0 w-0.5 bg-current[^>]*><span[^>]*>you <span class="font-semibold" style="color:var\(--color-pwned\)">40,000</);
+  expect(html).toContain(">312× too low</p>");
+  expect(html).not.toContain("<dl");
+});
+
+test("the reveal's chart ends fitting the guess and the count, with labels inside its edges and the meter at the points (T48)", () => {
+  const html = renderToStaticMarkup(<Reveal result={{ guess: 0, count: 100_000_000, score: 3, tier: "Pwned", note: "" }} />);
+  // A guess of 0 and a count of 100m need the whole axis, so nothing moves.
+  expect(html).toContain('data-axis="true" class="track absolute inset-x-0 bottom-0 h-px origin-left" style="transform:translateX(0%) scaleX(1)"');
+  // Labels at the ends shift by all or none of their width, so they stay inside the chart.
+  expect(html).toMatch(/border-dashed border-bone" style="left:100%"><span[^>]*style="translate:-100%">answer/);
+  expect(html).toMatch(/w-0.5 bg-current" style="left:0%"><span[^>]*style="translate:0%">you/);
+  expect(html).toContain('<div data-meter="true" class="h-full origin-left bg-current" style="transform:scaleX(0.03)">');
   for (const t of ["0", "1", "100m"]) expect(html).toContain(`</span>${t}</div>`);
 });
 
-test("the reveal sequence lasts 1.5 to 2 seconds, from the charge to the last fade (T43)", () => {
-  const total = REVEAL.charge + REVEAL.hold + REVEAL.zoomOut + REVEAL.fade;
-  expect(total).toBeGreaterThanOrEqual(1500);
-  expect(total).toBeLessThanOrEqual(2000);
-  expect(REVEAL.zoomIn).toBeLessThanOrEqual(REVEAL.charge);
+test("the chart starts at two decades around the guess and zooms out to fit both with a margin, inside the axis (T48)", () => {
+  const decade = DECADE / SLIDER_MAX;
+  // A near miss barely moves: both views are the narrowest, a third of a decade apart.
+  const [from, to] = chartViews(4 * decade, 4.6 * decade);
+  expect(from[0]).toBeCloseTo(3 * decade);
+  expect(to[0]).toBeCloseTo(3.3 * decade);
+  expect(to[1] - to[0]).toBeCloseTo(2 * decade);
+  // A wild miss ends wide enough for the gap plus 20% each side, and a guess at the 0 stop starts at the left edge.
+  expect(chartViews(0, 0.5)).toEqual([[0, REVEAL.view], [0, 0.7]]);
+  expect(chartViews(1, 0)[1]).toEqual([0, 1]);
+});
+
+test("the reveal lasts under 2 seconds, and the meter and the staggered fades fit inside it (T48)", () => {
+  const { hold, zoom, meter, overlap, fade, stagger } = REVEAL;
+  expect(hold + zoom + meter + fade).toBeLessThan(2000);
+  // The meter starts inside the zoom, and the tier and note fade in before the landing, not after it.
+  expect(overlap).toBeLessThan(zoom);
+  expect(2 * stagger).toBeLessThan(meter);
 });
 
 test("dots colour revealed passwords by tier and outline the current one", () => {

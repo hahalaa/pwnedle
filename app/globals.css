@@ -138,7 +138,7 @@ input[type="range"] {
     repeating-linear-gradient(to right, var(--color-ash) 0 1px, transparent 1px 4px) left calc(var(--thumb) / 2) center /
       calc((100% - var(--thumb)) / 17) 1px no-repeat;
 }
-/* The same track for the reveal's read-only slider (T43), drawn on a box that already leaves out half the thumb. */
+/* The same track for the reveal's chart axis (T48), drawn on a box that already leaves out half the thumb. */
 .track {
   background:
     linear-gradient(var(--color-ash), var(--color-ash)) right center / calc(100% * 16 / 17) 1px no-repeat,

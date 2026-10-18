@@ -35,3 +35,13 @@ export function parseGuess(text: string): number | null {
 }
 
 export const formatGuess = (n: number) => n.toLocaleString("en-US");
+
+// T48: how far off a guess was, as "4.2× too low" or "12.5k× too high". Like the score (R10) it adds 1 to both, so a
+// count of 0 works. One decimal below 10, whole numbers to 999, then k and m with at most one decimal, like the axis.
+export function missRatio(guess: number, count: number) {
+  if (guess === count) return "Exact";
+  const n = (Math.max(guess, count) + 1) / (Math.min(guess, count) + 1);
+  const [d, unit] = n < 999_950 ? [1e3, "k"] : [1e6, "m"];
+  const x = n < 9.95 ? n.toFixed(1) : Math.round(n) < 1000 ? Math.round(n) : `${Number((n / d).toFixed(1))}${unit}`;
+  return `${x}× too ${guess < count ? "low" : "high"}`;
+}

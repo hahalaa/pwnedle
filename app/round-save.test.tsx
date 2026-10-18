@@ -60,7 +60,7 @@ test("Lock in keeps focus through the reveal, the reveal is announced, and finis
   expect(screen.getByRole("button", { name: "Locking in…" })).toHaveProperty("disabled", false);
   await screen.findByRole("button", { name: "See results" });
   expect(document.activeElement).toBe(button);
-  expect(live.textContent).toBe("Seen 12,500,000 times. You guessed 0. 3 points, pwned. Seen everywhere.");
+  expect(live.textContent).toBe("Seen 12,500,000 times. You guessed 0: 12.5m× too low. 3 points, pwned. Seen everywhere.");
   fireEvent.click(button);
   expect(document.activeElement).toBe(screen.getByRole("button", { name: "Share result" }));
 });
