@@ -54,9 +54,10 @@ export function HowToPlay() {
         closedby="any"
         ref={ref}
         aria-labelledby="help-title"
-        className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md border border-line bg-void p-6 text-bone backdrop:bg-void/80"
+        className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md flex-col border border-line bg-void p-4 text-bone backdrop:bg-void/80 open:flex sm:p-6"
       >
-        <div className="flex flex-col gap-4">
+        {/* Only the text scrolls when the dialog is taller than the screen, so Play stays in view. */}
+        <div className="flex min-h-0 flex-col gap-2.5 overflow-y-auto leading-snug focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone sm:gap-4 sm:leading-normal">
           <h2 id="help-title" className="border-b border-line pb-3 text-lg">
             how to play
           </h2>
@@ -88,7 +89,7 @@ export function HowToPlay() {
           <p>Past puzzles are in the archive.</p>
           <p className="border-l-2 border-signal pl-3 text-sm">{SAFETY_NOTE}</p>
         </div>
-        <form method="dialog" className="mt-6">
+        <form method="dialog" className="mt-4 sm:mt-6">
           <button
             type="submit"
             // Read at click time: usePathname would stop dynamic routes prerendering under cacheComponents.

@@ -31,10 +31,11 @@ export function Stats() {
         closedby="any"
         ref={ref}
         aria-labelledby="stats-title"
-        className="m-auto w-[calc(100%-2rem)] max-w-md border border-line bg-void p-6 text-bone backdrop:bg-void/80"
+        className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md flex-col border border-line bg-void p-4 text-bone backdrop:bg-void/80 open:flex sm:p-6"
       >
-        {s && <StatsBody s={s} />}
-        <form method="dialog" className="mt-6">
+        {/* Only the stats scroll when the dialog is taller than the screen, so Close stays in view. */}
+        <div className="min-h-0 overflow-y-auto focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">{s && <StatsBody s={s} />}</div>
+        <form method="dialog" className="mt-4 sm:mt-6">
           <button
             type="submit"
             className="bg-signal px-6 py-3 font-semibold text-void enabled:hover:brightness-110 enabled:active:brightness-90 focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
