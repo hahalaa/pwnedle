@@ -83,10 +83,13 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   // T43: the reveal locked in during this visit animates; `playing` hides its tier and the button until it lands.
   const [fresh, setFresh] = useState(-1);
   const [playing, setPlaying] = useState(false);
-  // T51: Enter in the box focuses the button, so Enter goes on to the next password. A keyboard Next focuses the next
-  // box; a tap leaves it alone, so a phone keyboard doesn't pop up.
+  // T51: Enter in the box focuses the button, so Enter goes on to the next password. A Next from the keyboard or a mouse
+  // focuses the next box; a touch or pen tap leaves it alone, so a phone keyboard doesn't pop up. Enter never locks in
+  // the default 0 before the player has touched the slider or the box, so a held or repeated Enter can't guess for them.
   const button = useRef<HTMLButtonElement>(null);
+  const box = useRef<HTMLInputElement>(null);
   const [typing, setTyping] = useState(false);
+  const [touched, setTouched] = useState(false);
   const result = results[index];
   const invalid = parseGuess(text) === null;
   const last = index === passwords.length - 1;
@@ -120,9 +123,10 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     if (!isMuted()) playTier(result.tier);
   }
 
-  // A click from the keyboard has a `detail` of 0.
-  function next(e: { detail: number }) {
-    setTyping(e.detail === 0);
+  // A click from the keyboard has an empty pointerType, or none in browsers that fire a plain MouseEvent.
+  function next(e: { nativeEvent: Event }) {
+    setTyping(!["touch", "pen"].includes((e.nativeEvent as PointerEvent).pointerType));
+    setTouched(false);
     update({ ...game, index: index + 1 });
     setGuess(0);
     setText("0");
@@ -172,6 +176,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
                 const n = fromSlider(Number(e.target.value), guess);
                 setGuess(n);
                 setText(formatGuess(n));
+                setTouched(true);
               }}
               className="w-full"
             />
@@ -189,13 +194,15 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
               disabled={state === "sending"}
               aria-invalid={invalid}
               aria-describedby="guess-help"
+              ref={box}
               autoFocus={typing}
               onChange={(e) => {
                 setText(e.target.value);
                 setGuess(parseGuess(e.target.value) ?? guess);
+                setTouched(true);
               }}
               onKeyDown={(e) => {
-                if (e.key !== "Enter" || invalid) return;
+                if (e.key !== "Enter" || invalid || !touched) return;
                 // Without this the keypress follows focus to the button and locks in a second time.
                 e.preventDefault();
                 button.current?.focus();
@@ -212,7 +219,8 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
       <button
         ref={button}
         type="button"
-        onClick={result ? (last ? finish : next) : lockIn}
+        // A keyboard press (`detail` 0) on an untouched Lock in goes to the box instead of sending 0.
+        onClick={result ? (last ? finish : next) : (e) => (touched || e.detail ? lockIn() : box.current?.focus())}
         // Not disabled while sending: a disabled button drops keyboard focus to the page.
         disabled={!result && invalid}
         className={`${playing ? "opacity-0" : "animate-enter"} mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash`}

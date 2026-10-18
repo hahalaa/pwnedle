@@ -45,7 +45,7 @@ function stubMotion(reduced: boolean) {
 test("a fresh reveal holds back the tier and the button until it lands, and a click skips to the end (T43)", async () => {
   const anims = stubMotion(false);
   render(<Round {...props} />);
-  fireEvent.click(screen.getByRole("button", { name: "Lock in" }));
+  fireEvent.click(screen.getByRole("button", { name: "Lock in" }), { detail: 1 });
   const next = await screen.findByRole("button", { name: "Next password" });
   expect(anims.length).toBeGreaterThan(5);
   expect(next.className).toContain("opacity-0");
@@ -66,7 +66,7 @@ test("a fresh reveal holds back the tier and the button until it lands, and a cl
 test("with reduced motion the reveal shows its end state and plays the sound at once (T43)", async () => {
   stubMotion(true);
   render(<Round {...props} />);
-  fireEvent.click(screen.getByRole("button", { name: "Lock in" }));
+  fireEvent.click(screen.getByRole("button", { name: "Lock in" }), { detail: 1 });
   const next = await screen.findByRole("button", { name: "Next password" });
   expect(Element.prototype.animate).not.toHaveBeenCalled();
   expect(next.className).not.toContain("opacity-0");
@@ -112,7 +112,28 @@ test("Enter in the box does nothing while the guess is invalid, and a tapped Nex
   expect(fetch).not.toHaveBeenCalled();
   fireEvent.change(box, { target: { value: "40k" } });
   fireEvent.keyDown(box, { key: "Enter" });
-  fireEvent.click(await screen.findByRole("button", { name: "Next password" }), { detail: 1 });
+  fireEvent(await screen.findByRole("button", { name: "Next password" }), tap("touch"));
   expect(screen.getByText("b")).toBeDefined();
   expect(document.activeElement).not.toBe(screen.getByRole("textbox"));
 });
+
+test("a mouse click on Next focuses the next box, and Enter never locks in an untouched 0 (T51)", async () => {
+  stubMotion(true);
+  render(<Round {...props} />);
+  const lock = screen.getByRole("button", { name: "Lock in" });
+  // Enter in the box or a keyboard press on Lock in, before the player moves the guess, sends nothing.
+  fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
+  fireEvent.click(lock, { detail: 0 });
+  expect(fetch).not.toHaveBeenCalled();
+  expect(document.activeElement).toBe(screen.getByRole("textbox"));
+  // A mouse click still locks in 0 on purpose.
+  fireEvent.click(lock, { detail: 1 });
+  fireEvent(await screen.findByRole("button", { name: "Next password" }), tap("mouse"));
+  expect(screen.getByText("b")).toBeDefined();
+  expect(document.activeElement).toBe(screen.getByRole("textbox"));
+  fireEvent.click(screen.getByRole("button", { name: "Lock in" }), { detail: 0 });
+  expect(fetch).toHaveBeenCalledTimes(1);
+});
+
+// A click carrying a pointerType, which jsdom's MouseEvent lacks.
+const tap = (pointerType: string) => Object.assign(new MouseEvent("click", { bubbles: true, detail: 1 }), { pointerType });

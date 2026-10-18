@@ -59,7 +59,7 @@ test.each([
   const body = { count: 1, score: 20, tier: "Weak", note: "" };
   vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, status: 200, json: async () => body })));
   render(<Round date="2026-10-24" number={1} passwords={["a", "b", "c", "d", "e"]} />);
-  fireEvent.click(screen.getByRole("button", { name: "Lock in" }));
+  fireEvent.click(screen.getByRole("button", { name: "Lock in" }), { detail: 1 });
   await screen.findByRole("button", { name: "Next password" });
   expect(played).toEqual(expected);
 });

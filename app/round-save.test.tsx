@@ -55,7 +55,7 @@ test("Lock in keeps focus through the reveal, the reveal is announced, and finis
   const live = document.querySelector("[aria-live=polite]")!;
   expect(live.textContent).toBe("Password 5 of 5: e");
   button.focus();
-  fireEvent.click(button);
+  fireEvent.click(button, { detail: 1 });
   // Still enabled while sending, so focus can't drop to the page.
   expect(screen.getByRole("button", { name: "Locking in…" })).toHaveProperty("disabled", false);
   await screen.findByRole("button", { name: "See results" });
@@ -78,7 +78,7 @@ test("the first lock-in sends puzzle-start once and See results sends puzzle-com
   vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, json: async () => r })));
   render(<Round {...props} archive />);
   for (const next of ["Next password", "Next password", "Next password", "Next password", "See results"]) {
-    fireEvent.click(await screen.findByRole("button", { name: "Lock in" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Lock in" }), { detail: 1 });
     fireEvent.click(await screen.findByRole("button", { name: next }));
   }
   expect(track.mock.calls).toEqual([
@@ -93,6 +93,6 @@ test.each([
 ])("%s", async (_, res, message) => {
   vi.stubGlobal("fetch", vi.fn(async () => res));
   render(<Round {...props} />);
-  fireEvent.click(await screen.findByRole("button", { name: "Lock in" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Lock in" }), { detail: 1 });
   expect((await screen.findByRole("alert")).textContent).toContain(message);
 });
