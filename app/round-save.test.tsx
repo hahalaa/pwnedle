@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { Round } from "./round";
+
+// Next asks whether the screen is touch first (T51); jsdom has no matchMedia.
+beforeEach(() => vi.stubGlobal("matchMedia", () => ({ matches: false })));
 
 afterEach(() => {
   cleanup();

@@ -84,3 +84,4 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-18 [tooling] A Tailwind `open:` class puts the word "open" inside the `<dialog>` tag, so a test regex like `/<dialog(?![^>]*open)/` reads it as the open attribute -> match ` open[\s=>]` instead.
 2026-10-18 [ui] Moving focus to a button in an input's Enter `keydown` sends the keypress to the button, which clicks it and locks in twice -> call `preventDefault()` in the keydown before moving focus.
 2026-10-18 [ui] `onClick` fires the same way for a keyboard press and a tap -> read the event's `detail`: Enter and Space give 0, a mouse or tap 1 or more. Testing Library's `fireEvent.click` defaults to 0, so pass `{ detail: 1 }` for a tap.
+2026-10-18 [ui] iOS can send a tap's click with an empty `pointerType`, the same as a keyboard click, so Next focused the guess box and opened the phone keyboard -> on `(pointer: coarse)` screens the round never focuses the box itself.

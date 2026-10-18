@@ -18,8 +18,10 @@ const props = { date: "2026-10-24", number: 1, passwords: ["a", "b", "c", "d", "
 const body = { count: 4_200, score: 94, tier: "Uncrackable", note: "Seen a few thousand times." };
 
 // jsdom has no Web Animations API, so each fake animation only finishes when it's seeked to its end.
-function stubMotion(reduced: boolean) {
-  vi.stubGlobal("matchMedia", (q: string) => ({ matches: reduced && q === "(prefers-reduced-motion: reduce)" }));
+function stubMotion(reduced: boolean, coarse = false) {
+  vi.stubGlobal("matchMedia", (q: string) => ({
+    matches: (reduced && q === "(prefers-reduced-motion: reduce)") || (coarse && q === "(pointer: coarse)"),
+  }));
   vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, status: 200, json: async () => body })));
   const anims: { seeked?: number }[] = [];
   Element.prototype.animate = vi.fn((_, o) => {
@@ -153,6 +155,23 @@ test("Enter on the page with an untouched guess sends nothing and focuses the bo
   fireEvent.keyDown(document.body, { key: "Enter" });
   expect(fetch).not.toHaveBeenCalled();
   expect(document.activeElement).toBe(screen.getByRole("textbox"));
+});
+
+test("on a touch screen nothing focuses the box for the player, whatever the click reports (T51)", async () => {
+  stubMotion(true, true);
+  render(<Round {...props} />);
+  const box = screen.getByRole("textbox");
+  // Enter on the page or a keyboard press on an untouched Lock in sends nothing and leaves the box alone.
+  fireEvent.keyDown(document.body, { key: "Enter" });
+  fireEvent.click(screen.getByRole("button", { name: "Lock in" }), { detail: 0 });
+  expect(fetch).not.toHaveBeenCalled();
+  expect(document.activeElement).not.toBe(box);
+  fireEvent.change(box, { target: { value: "40k" } });
+  fireEvent.keyDown(document.body, { key: "Enter" });
+  // An iOS tap can arrive with an empty pointerType, which reads like a mouse or keyboard.
+  fireEvent(await screen.findByRole("button", { name: "Next password" }), tap(""));
+  expect(screen.getByText("b")).toBeDefined();
+  expect(document.activeElement).not.toBe(screen.getByRole("textbox"));
 });
 
 // A click carrying a pointerType, which jsdom's MouseEvent lacks.
