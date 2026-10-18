@@ -135,5 +135,25 @@ test("a mouse click on Next focuses the next box, and Enter never locks in an un
   expect(fetch).toHaveBeenCalledTimes(1);
 });
 
+test("after the slider moves, Enter on the page locks in, then moves on once the button shows (T51)", async () => {
+  stubMotion(true);
+  render(<Round {...props} />);
+  fireEvent.change(screen.getByRole("slider"), { target: { value: "300" } });
+  fireEvent.keyDown(document.body, { key: "Enter" });
+  const next = await screen.findByRole("button", { name: "Next password" });
+  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(document.activeElement).toBe(next);
+  fireEvent.keyDown(document.body, { key: "Enter" });
+  expect(screen.getByText("b")).toBeDefined();
+});
+
+test("Enter on the page with an untouched guess sends nothing and focuses the box (T51)", async () => {
+  stubMotion(true);
+  render(<Round {...props} />);
+  fireEvent.keyDown(document.body, { key: "Enter" });
+  expect(fetch).not.toHaveBeenCalled();
+  expect(document.activeElement).toBe(screen.getByRole("textbox"));
+});
+
 // A click carrying a pointerType, which jsdom's MouseEvent lacks.
 const tap = (pointerType: string) => Object.assign(new MouseEvent("click", { bubbles: true, detail: 1 }), { pointerType });

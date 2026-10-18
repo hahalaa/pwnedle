@@ -1,6 +1,6 @@
 "use client";
 
-import { type ComponentProps, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { type ComponentProps, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { DECADE, formatGuess, fromSlider, missRatio, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
@@ -83,7 +83,8 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   // T43: the reveal locked in during this visit animates; `playing` hides its tier and the button until it lands.
   const [fresh, setFresh] = useState(-1);
   const [playing, setPlaying] = useState(false);
-  // T51: Enter in the box focuses the button, so Enter goes on to the next password. A Next from the keyboard or a mouse
+  // T51: Enter anywhere on the round locks in and focuses the button, so Enter goes on to the next password. A Next from
+  // the keyboard or a mouse
   // focuses the next box; a touch or pen tap leaves it alone, so a phone keyboard doesn't pop up. Enter never locks in
   // the default 0 before the player has touched the slider or the box, so a held or repeated Enter can't guess for them.
   const button = useRef<HTMLButtonElement>(null);
@@ -136,6 +137,23 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     update({ ...game, done: true });
     track("puzzle-complete", number, archive);
   }
+
+  // Links, buttons and open dialogs keep their own Enter. While the reveal plays, the T43 skip swallows Enter first.
+  const onEnter = useEffectEvent((e: KeyboardEvent) => {
+    if (e.key !== "Enter" || document.querySelector("dialog[open]") || (e.target as Element).closest("a, button")) return;
+    // Without this the keypress follows focus to the button and locks in a second time.
+    e.preventDefault();
+    if (result) button.current?.click();
+    else if (touched && !invalid) {
+      button.current?.focus();
+      lockIn();
+    } else box.current?.focus();
+  });
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => onEnter(e);
+    addEventListener("keydown", listener);
+    return () => removeEventListener("keydown", listener);
+  }, []);
 
   // Focus moves to Share when the game ends during this visit; a finished game loaded from storage leaves focus alone.
   if (done) return <End number={number} passwords={passwords} results={results} autoFocus={played !== null} />;
@@ -200,13 +218,6 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
                 setText(e.target.value);
                 setGuess(parseGuess(e.target.value) ?? guess);
                 setTouched(true);
-              }}
-              onKeyDown={(e) => {
-                if (e.key !== "Enter" || invalid || !touched) return;
-                // Without this the keypress follows focus to the button and locks in a second time.
-                e.preventDefault();
-                button.current?.focus();
-                lockIn();
               }}
               className="border border-line bg-void px-3 py-2 text-xl focus:border-bone focus:outline-none aria-invalid:border-signal"
             />
