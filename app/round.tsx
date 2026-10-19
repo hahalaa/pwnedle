@@ -75,7 +75,12 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   const [played, setPlayed] = useState<Saved | null>(null);
   const hydrated = useHydrated();
   const game = played ?? (hydrated ? (loadGame(date) as Saved | null) : null) ?? { index: 0, done: false, results: [] };
-  const { index, done, results } = game;
+  const { done, results } = game;
+  // T56: a password reopened from the end screen shows its saved reveal again. It lives only in this state, so nothing
+  // is saved, sent or tracked, and a refresh lands back on the end screen. `back` is the row to focus on return.
+  const [reopened, setReopened] = useState<number | null>(null);
+  const [back, setBack] = useState<number>();
+  const index = reopened ?? game.index;
   // guess is the last valid number, so the slider stays put while the box holds a typo.
   const [guess, setGuess] = useState(0);
   const [text, setText] = useState("0");
@@ -113,13 +118,27 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     const body = res?.ok ? await res.json().catch(() => null) : null;
     if (!body) return setState("error");
     if (!results.length) track("puzzle-start", number, archive);
-    // Reduced motion, or a browser without the Web Animations API, gets the end state and the sound at once.
-    if (typeof document.body.animate === "function" && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setFresh(index);
-      setPlaying(true);
-    } else if (!isMuted()) playTier(body.tier);
+    play(index, body.tier);
     update({ ...game, results: [...results, { guess, ...body }] });
     setState("guessing");
+  }
+
+  // Reduced motion, or a browser without the Web Animations API, gets the end state and the sound at once.
+  function play(i: number, tier: string) {
+    const motion = typeof document.body.animate === "function" && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setFresh(motion ? i : -1);
+    setPlaying(motion);
+    if (!motion && !isMuted()) playTier(tier);
+  }
+
+  function reopen(i: number) {
+    setReopened(i);
+    play(i, results[i].tier);
+  }
+
+  function leave() {
+    setBack(reopened!);
+    setReopened(null);
   }
 
   function land() {
@@ -142,8 +161,11 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   }
 
   // Links, buttons and open dialogs keep their own Enter. While the reveal plays, the T43 skip swallows Enter first.
-  const onEnter = useEffectEvent((e: KeyboardEvent) => {
-    if (e.key !== "Enter" || document.querySelector("dialog[open]") || (e.target as Element).closest("a, button")) return;
+  // Escape leaves a reopened reveal; while it plays, the skip swallows Escape too.
+  const onKey = useEffectEvent((e: KeyboardEvent) => {
+    if (document.querySelector("dialog[open]")) return;
+    if (e.key === "Escape" && reopened !== null) return leave();
+    if (e.key !== "Enter" || (e.target as Element).closest("a, button")) return;
     // Without this the keypress follows focus to the button and locks in a second time.
     e.preventDefault();
     if (result) button.current?.click();
@@ -153,102 +175,114 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
     } else focusBox();
   });
   useEffect(() => {
-    const listener = (e: KeyboardEvent) => onEnter(e);
+    const listener = (e: KeyboardEvent) => onKey(e);
     addEventListener("keydown", listener);
     return () => removeEventListener("keydown", listener);
   }, []);
 
-  // Focus moves to Share when the game ends during this visit; a finished game loaded from storage leaves focus alone.
-  if (done) return <End number={number} passwords={passwords} results={results} autoFocus={played !== null} />;
+  const ended = done && reopened === null;
 
   return (
-    <section className="flex flex-1 flex-col gap-6 sm:flex-none short:gap-4">
-      <h2 className="text-lg leading-snug lg:text-xl">How many times has this password appeared in data breaches?</h2>
-      {/* The password sits in a bracketed 1px window; its title bar carries the progress (D25). */}
-      <div className="brackets relative mx-(--bracket) border border-line">
-        <div className="flex items-center justify-between border-b border-line px-3 py-1.5 text-xs text-ash">
-          <p>
-            password {index + 1} of {passwords.length}
-          </p>
-          <Dots results={playing ? results.slice(0, index) : results} index={index} total={passwords.length} />
-        </div>
-        <p className="px-3 py-6 text-3xl break-all sm:text-4xl lg:px-5 lg:py-10 lg:text-6xl short:py-6 short:text-5xl">{passwords[index]}</p>
-      </div>
-      {/* Stays mounted so screen readers announce each reveal and each new password when the text changes. */}
+    <>
+      {/* Stays mounted, and empty on the end screen, so screen readers announce each reveal, reopened ones included, and
+          each new password when the text changes. */}
       <p className="sr-only" aria-live="polite">
-        {result
-          ? `Seen ${formatGuess(result.count)} times. You guessed ${formatGuess(result.guess)}: ${missRatio(result.guess, result.count).toLowerCase()}. ${result.score} points, ${result.tier.toLowerCase()}. ${result.note}`
-          : `Password ${index + 1} of ${passwords.length}: ${passwords[index]}`}
+        {ended
+          ? ""
+          : result
+            ? `Seen ${formatGuess(result.count)} times. You guessed ${formatGuess(result.guess)}: ${missRatio(result.guess, result.count).toLowerCase()}. ${result.score} points, ${result.tier.toLowerCase()}. ${result.note}`
+            : `Password ${index + 1} of ${passwords.length}: ${passwords[index]}`}
       </p>
-      {result ? (
-        <Reveal result={result} play={fresh === index} onLand={land} />
+      {/* Focus moves to Share when the game ends during this visit; a finished game loaded from storage leaves focus alone. */}
+      {ended ? (
+        <End number={number} passwords={passwords} results={results} autoFocus={played !== null} back={back} onOpen={reopen} />
       ) : (
-        <>
-          <div className="flex flex-col gap-2">
-            <input
-              type="range"
-              aria-label="Guess on a log scale"
-              aria-valuetext={formatGuess(guess)}
-              min={0}
-              max={SLIDER_MAX}
-              value={toSlider(guess)}
-              disabled={state === "sending"}
-              onChange={(e) => {
-                const n = fromSlider(Number(e.target.value), guess);
-                setGuess(n);
-                setText(formatGuess(n));
-                setTouched(true);
-              }}
-              className="w-full"
-            />
-            <Ticks />
+        <section className="flex flex-1 flex-col gap-6 sm:flex-none short:gap-4">
+          <h2 className="text-lg leading-snug lg:text-xl">How many times has this password appeared in data breaches?</h2>
+          {/* The password sits in a bracketed 1px window; its title bar carries the progress (D25). */}
+          <div className="brackets relative mx-(--bracket) border border-line">
+            <div className="flex items-center justify-between border-b border-line px-3 py-1.5 text-xs text-ash">
+              <p>
+                password {index + 1} of {passwords.length}
+              </p>
+              {/* A fresh reveal's dot fills as it lands; a reopened one keeps every dot filled. */}
+              <Dots results={playing && reopened === null ? results.slice(0, index) : results} index={index} total={passwords.length} />
+            </div>
+            <p className="px-3 py-6 text-3xl break-all sm:text-4xl lg:px-5 lg:py-10 lg:text-6xl short:py-6 short:text-5xl">{passwords[index]}</p>
           </div>
-          {/* From lg the slider takes the extra width; the typed guess stays about as wide as on a phone (T40). */}
-          <label className="flex flex-col gap-1 lg:max-w-md">
-            <span className="text-xs text-ash">your guess</span>
-            <input
-              type="text"
-              inputMode="decimal"
-              autoComplete="off"
-              spellCheck={false}
-              value={text}
-              disabled={state === "sending"}
-              aria-invalid={invalid}
-              aria-describedby="guess-help"
-              ref={box}
-              autoFocus={typing}
-              onChange={(e) => {
-                setText(e.target.value);
-                setGuess(parseGuess(e.target.value) ?? guess);
-                setTouched(true);
-              }}
-              className="border border-line bg-void px-3 py-2 text-xl focus:border-bone focus:outline-none aria-invalid:border-signal"
-            />
-            <span id="guess-help" className="text-sm text-ash">
-              {invalid ? "Enter a whole number from 0 to 100m, like 2,500 or 2.5m." : "Type a number, or use k and m: 40k, 2.5m."}
-            </span>
-          </label>
-        </>
+          {result ? (
+            <Reveal result={result} play={fresh === index} onLand={land} />
+          ) : (
+            <>
+              <div className="flex flex-col gap-2">
+                <input
+                  type="range"
+                  aria-label="Guess on a log scale"
+                  aria-valuetext={formatGuess(guess)}
+                  min={0}
+                  max={SLIDER_MAX}
+                  value={toSlider(guess)}
+                  disabled={state === "sending"}
+                  onChange={(e) => {
+                    const n = fromSlider(Number(e.target.value), guess);
+                    setGuess(n);
+                    setText(formatGuess(n));
+                    setTouched(true);
+                  }}
+                  className="w-full"
+                />
+                <Ticks />
+              </div>
+              {/* From lg the slider takes the extra width; the typed guess stays about as wide as on a phone (T40). */}
+              <label className="flex flex-col gap-1 lg:max-w-md">
+                <span className="text-xs text-ash">your guess</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={text}
+                  disabled={state === "sending"}
+                  aria-invalid={invalid}
+                  aria-describedby="guess-help"
+                  ref={box}
+                  autoFocus={typing}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                    setGuess(parseGuess(e.target.value) ?? guess);
+                    setTouched(true);
+                  }}
+                  className="border border-line bg-void px-3 py-2 text-xl focus:border-bone focus:outline-none aria-invalid:border-signal"
+                />
+                <span id="guess-help" className="text-sm text-ash">
+                  {invalid ? "Enter a whole number from 0 to 100m, like 2,500 or 2.5m." : "Type a number, or use k and m: 40k, 2.5m."}
+                </span>
+              </label>
+            </>
+          )}
+          <button
+            ref={button}
+            type="button"
+            // A keyboard press (`detail` 0) on an untouched Lock in goes to the box instead of sending 0.
+            onClick={reopened !== null ? leave : result ? (last ? finish : next) : (e) => (touched || e.detail ? lockIn() : focusBox())}
+            // A reopened reveal takes focus from the row that opened it, which is gone.
+            autoFocus={reopened !== null}
+            // Not disabled while sending: a disabled button drops keyboard focus to the page.
+            disabled={!result && invalid}
+            className={`${playing ? "opacity-0" : "animate-enter"} mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash`}
+          >
+            {reopened !== null ? "Back to results" : result ? (last ? "See results" : "Next password") : state === "sending" ? "Locking in…" : "Lock in"}
+          </button>
+          {(state === "error" || state === "rejected") && (
+            <p role="alert" className="text-sm text-signal">
+              {state === "rejected"
+                ? "That guess wasn't accepted. Enter a whole number from 0 to 100m and press Lock in again."
+                : "Your guess didn't go through. Check your connection and press Lock in again."}
+            </p>
+          )}
+        </section>
       )}
-      <button
-        ref={button}
-        type="button"
-        // A keyboard press (`detail` 0) on an untouched Lock in goes to the box instead of sending 0.
-        onClick={result ? (last ? finish : next) : (e) => (touched || e.detail ? lockIn() : focusBox())}
-        // Not disabled while sending: a disabled button drops keyboard focus to the page.
-        disabled={!result && invalid}
-        className={`${playing ? "opacity-0" : "animate-enter"} mt-auto bg-signal sm:mt-0 sm:self-start px-6 py-3 font-semibold text-void focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone disabled:bg-line disabled:text-ash`}
-      >
-        {result ? (last ? "See results" : "Next password") : state === "sending" ? "Locking in…" : "Lock in"}
-      </button>
-      {(state === "error" || state === "rejected") && (
-        <p role="alert" className="text-sm text-signal">
-          {state === "rejected"
-            ? "That guess wasn't accepted. Enter a whole number from 0 to 100m and press Lock in again."
-            : "Your guess didn't go through. Check your connection and press Lock in again."}
-        </p>
-      )}
-    </section>
+    </>
   );
 }
 
@@ -343,9 +377,9 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
     tick();
 
     // A click or key press skips to the landing, so the details still fade in with the button. It's then swallowed,
-    // so it can't also follow a link or press the hidden button.
+    // so it can't also follow a link, press the hidden button or leave a reopened reveal (T56).
     const skip = (e: Event) => {
-      if (e.type === "click" || ["Enter", " "].includes((e as KeyboardEvent).key)) {
+      if (e.type === "click" || ["Enter", " ", "Escape"].includes((e as KeyboardEvent).key)) {
         e.preventDefault();
         e.stopPropagation();
       }
@@ -434,8 +468,9 @@ export function Dots({ results, index, total }: { results: Result[]; index: numb
   );
 }
 
-// R12: total, daily tier, per-password breakdown and share (R19). The coffee link is only in the footer (D31).
-export function End({ number, passwords, results, autoFocus }: { number: number; passwords: string[]; results: Result[]; autoFocus?: boolean }) {
+// R12: total, daily tier, per-password breakdown and share (R19). The coffee link is only in the footer (D31). Each row
+// reopens its reveal (T56). Coming `back` from one, the screen doesn't fade in again and focus returns to that row.
+export function End({ number, passwords, results, autoFocus, back, onOpen }: { number: number; passwords: string[]; results: Result[]; autoFocus?: boolean; back?: number; onOpen?: (i: number) => void }) {
   const [status, setStatus] = useState("");
   const total = results.reduce((a, r) => a + r.score, 0);
   const daily = tier(total / results.length);
@@ -451,7 +486,7 @@ export function End({ number, passwords, results, autoFocus }: { number: number;
   }
 
   return (
-    <section className="flex flex-1 animate-enter flex-col gap-6 sm:flex-none short:gap-4">
+    <section className={`flex flex-1 ${back === undefined ? "animate-enter" : ""} flex-col gap-6 sm:flex-none short:gap-4`}>
       {/* The daily tier sits with the total it describes, and wraps under it on narrow phones. */}
       <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
         {/* Decorative; the tier label beside it carries the meaning (R25, D41). */}
@@ -475,21 +510,29 @@ export function End({ number, passwords, results, autoFocus }: { number: number;
         </div>
         <ol className="divide-y divide-line">
           {results.map((r, i) => (
-            <li key={i} className="flex items-start gap-3 px-3 py-3 short:py-2">
-              <div className="min-w-0 flex-1">
-                <p className="break-all text-lg">{passwords[i]}</p>
-                <p className="text-xs text-ash">
-                  seen {formatGuess(r.count)}, you guessed {formatGuess(r.guess)}
-                </p>
-              </div>
-              {/* R25: the tier colour always sits next to its name. */}
-              <div className="flex flex-col items-end">
-                <p className="text-lg">{r.score}</p>
-                <p className="flex items-center gap-1.5 text-xs" style={{ color: tierColor(r.tier) }}>
-                  <span className="size-2 bg-current" />
-                  {r.tier.toLowerCase()}
-                </p>
-              </div>
+            <li key={i}>
+              {/* A button holds only phrasing content, so the rows are spans. The outline sits inside the window's frame. */}
+              <button
+                type="button"
+                onClick={() => onOpen?.(i)}
+                autoFocus={i === back}
+                className="flex w-full items-start gap-3 px-3 py-3 text-left hover:bg-line/40 focus-visible:outline-1 focus-visible:-outline-offset-1 focus-visible:outline-bone short:py-2"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block break-all text-lg">{passwords[i]}</span>
+                  <span className="block text-xs text-ash">
+                    seen {formatGuess(r.count)}, you guessed {formatGuess(r.guess)}
+                  </span>
+                </span>
+                {/* R25: the tier colour always sits next to its name. */}
+                <span className="flex flex-col items-end">
+                  <span className="text-lg">{r.score}</span>
+                  <span className="flex items-center gap-1.5 text-xs" style={{ color: tierColor(r.tier) }}>
+                    <span className="size-2 bg-current" />
+                    {r.tier.toLowerCase()}
+                  </span>
+                </span>
+              </button>
             </li>
           ))}
         </ol>
@@ -498,7 +541,7 @@ export function End({ number, passwords, results, autoFocus }: { number: number;
         <button
           type="button"
           onClick={share}
-          autoFocus={autoFocus}
+          autoFocus={autoFocus && back === undefined}
           aria-describedby="end-total end-tier"
           className="bg-signal px-6 py-3 font-semibold text-void enabled:hover:brightness-110 enabled:active:brightness-90 focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone"
         >

@@ -106,6 +106,8 @@ test("the end screen and pages fade in briefly, and reduced motion turns every C
     renderToStaticMarkup(<Template>page</Template>),
   ])
     expect(html).toMatch(/^<[^>]*animate-enter/);
+  // Coming back from a reopened reveal (T56), the end screen doesn't fade in again.
+  expect(renderToStaticMarkup(<End number={1} passwords={["a"]} results={[result]} back={0} />)).not.toContain("animate-enter");
   const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
   expect(css).toContain("--animate-enter: enter 200ms ease-out;");
   const reduced = /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
@@ -125,9 +127,11 @@ test("end screen shows the total, the daily tier, each password's breakdown and 
   expect(html).toMatch(/<span[^>]*><\/span>strong<\/p>/);
   expect(html).toContain("puzzle #12");
   expect(html.match(/<li/g)).toHaveLength(5);
-  for (const t of ["hunter2", "seen 12,500,000, you guessed 40,000", ">65</p>"]) expect(html).toContain(t);
+  for (const t of ["hunter2", "seen 12,500,000, you guessed 40,000", ">65</span>"]) expect(html).toContain(t);
   // Each row names its tier next to the colour (R25).
-  expect(html).toMatch(/color:var\(--color-mid\)"><span[^>]*><\/span>mid<\/p>/);
+  expect(html).toMatch(/color:var\(--color-mid\)"><span[^>]*><\/span>mid<\/span>/);
+  // Each row is a button that reopens its reveal (T56), with a visible focus outline.
+  expect(html.match(/<li><button type="button" class="[^"]*focus-visible:outline-bone/g)).toHaveLength(5);
   expect(html).toContain(">Share result</button>");
   expect(html).not.toContain("buymeacoffee.com");
   // Notes stay on the reveal; the end screen doesn't repeat them.

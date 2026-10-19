@@ -174,5 +174,94 @@ test("on a touch screen nothing focuses the box for the player, whatever the cli
   expect(document.activeElement).not.toBe(screen.getByRole("textbox"));
 });
 
+// T56: a finished game, with the umami script stubbed so any event would show.
+function finished(extra: object = {}) {
+  const saved = JSON.stringify({ index: 4, done: true, results: ["a", "b", "c", "d", "e"].map((p, i) => ({ guess: 10 ** i, ...body, score: 50 + i, tier: i ? "Mid" : "Pwned", note: `About ${p}.` })), ...extra });
+  localStorage.setItem("pwnedle:2026-10-24", saved);
+  const track = vi.fn();
+  vi.stubGlobal("umami", { track });
+  return { saved, track };
+}
+
+test.each([
+  ["the home page", {}],
+  ["the archive", { archive: true }],
+])("on %s, a row on the end screen replays its saved reveal, and Back returns with focus on that row (T56)", async (_, extra) => {
+  const anims = stubMotion(false);
+  const { saved, track } = finished(extra);
+  render(<Round {...props} {...extra} />);
+  const live = document.querySelector("[aria-live=polite]")!;
+  expect(live.textContent).toBe("");
+  fireEvent.click(await row("b"), { detail: 1 });
+  // The second password's reveal, replayed and announced at once, with Back focused but hidden until it lands.
+  const back = screen.getByRole("button", { name: "Back to results" });
+  expect(screen.getByText("b")).toBeDefined();
+  expect(screen.getByText("password 2 of 5")).toBeDefined();
+  expect(document.activeElement).toBe(back);
+  expect(back.className).toContain("opacity-0");
+  expect(anims.length).toBeGreaterThan(5);
+  expect(live.textContent).toBe("Seen 4,200 times. You guessed 10: 382× too low. 51 points, mid. About b.");
+  // Enter on the page only skips; the tier sound plays as it lands.
+  fireEvent.keyDown(document.body, { key: "Enter" });
+  await vi.waitFor(() => expect(playTier).toHaveBeenCalledWith("Mid"));
+  expect(back.className).not.toContain("opacity-0");
+  fireEvent.click(back);
+  const b = row("b");
+  expect(document.activeElement).toBe(b);
+  expect(b.closest("section")!.className).not.toContain("animate-enter");
+  expect(live.textContent).toBe("");
+  // Nothing was sent, saved or tracked.
+  expect(fetch).not.toHaveBeenCalled();
+  expect(localStorage.getItem("pwnedle:2026-10-24")).toBe(saved);
+  expect(track).not.toHaveBeenCalled();
+});
+
+test("with reduced motion a reopened reveal shows its end state, and Escape goes back once it has landed (T56)", async () => {
+  stubMotion(true);
+  finished();
+  render(<Round {...props} />);
+  fireEvent.click(await row("a"), { detail: 1 });
+  expect(Element.prototype.animate).not.toHaveBeenCalled();
+  expect(playTier).toHaveBeenCalledWith("Pwned");
+  expect(screen.getByRole("button", { name: "Back to results" }).className).not.toContain("opacity-0");
+  // Escape inside an open dialog is the dialog's own.
+  const dialog = document.body.appendChild(document.createElement("dialog"));
+  dialog.setAttribute("open", "");
+  fireEvent.keyDown(document.body, { key: "Escape" });
+  expect(screen.getByRole("button", { name: "Back to results" })).toBeDefined();
+  dialog.remove();
+  fireEvent.keyDown(document.body, { key: "Escape" });
+  expect(document.activeElement).toBe(row("a"));
+});
+
+test("Escape while a reopened reveal plays only skips it (T56)", async () => {
+  const anims = stubMotion(false);
+  finished();
+  render(<Round {...props} />);
+  fireEvent.click(await row("c"), { detail: 1 });
+  fireEvent.keyDown(document.body, { key: "Escape" });
+  expect(anims.every((a) => a.seeked === REVEAL.hold + REVEAL.zoom + REVEAL.meter)).toBe(true);
+  expect(screen.getByRole("button", { name: "Back to results" })).toBeDefined();
+  await vi.waitFor(() => expect(playTier).toHaveBeenCalled());
+  fireEvent.keyDown(document.body, { key: "Escape" });
+  expect(screen.getByRole("button", { name: "Share result" })).toBeDefined();
+});
+
+test("Enter on the end screen page sends, opens and skips nothing (T51, T56)", async () => {
+  stubMotion(false, true);
+  const { saved } = finished();
+  render(<Round {...props} />);
+  await screen.findByRole("button", { name: "Share result" });
+  fireEvent.keyDown(document.body, { key: "Enter" });
+  fireEvent.keyDown(document.body, { key: "Escape" });
+  expect(screen.getByRole("button", { name: "Share result" })).toBeDefined();
+  expect(Element.prototype.animate).not.toHaveBeenCalled();
+  expect(fetch).not.toHaveBeenCalled();
+  expect(localStorage.getItem("pwnedle:2026-10-24")).toBe(saved);
+});
+
+// An end screen row by its password. jsdom runs the row's lines together in its accessible name.
+const row = (password: string) => screen.getByText(password, { selector: "span" }).closest("button")!;
+
 // A click carrying a pointerType, which jsdom's MouseEvent lacks.
 const tap = (pointerType: string) => Object.assign(new MouseEvent("click", { bubbles: true, detail: 1 }), { pointerType });
