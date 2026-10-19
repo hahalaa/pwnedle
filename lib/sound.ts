@@ -28,6 +28,14 @@ export function setMuted(muted: boolean) {
 
 let ctx: AudioContext | undefined;
 
+// Chrome on iOS only lets Web Audio start inside a tap or key press, and a reveal's sound plays well after Lock in.
+// Handlers call this synchronously, so the later playTier() can sound. Muted players get no context at all.
+export function unlockAudio() {
+  if (isMuted() || typeof AudioContext === "undefined") return;
+  ctx ??= new AudioContext();
+  if (ctx.state !== "running") ctx.resume().catch(() => {});
+}
+
 // Callers check isMuted() first, so the dev preview below can play while muted.
 export function playTier(tier: string) {
   const tune = TUNES[tier];

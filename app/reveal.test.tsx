@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
-import { playTier } from "../lib/sound";
+import { playTier, unlockAudio } from "../lib/sound";
 import { REVEAL, Round } from "./round";
 
-vi.mock("../lib/sound", () => ({ isMuted: () => false, playTier: vi.fn() }));
+vi.mock("../lib/sound", () => ({ isMuted: () => false, playTier: vi.fn(), unlockAudio: vi.fn() }));
 
 afterEach(() => {
   cleanup();
@@ -193,6 +193,8 @@ test.each([
   const live = document.querySelector("[aria-live=polite]")!;
   expect(live.textContent).toBe("");
   fireEvent.click(await row("b"), { detail: 1 });
+  // The tap unlocks audio for the sound at the landing (lib/sound.ts).
+  expect(unlockAudio).toHaveBeenCalledTimes(1);
   // The second password's reveal, replayed and announced at once, with Back focused but hidden until it lands.
   const back = screen.getByRole("button", { name: "Back to results" });
   expect(screen.getByText("b")).toBeDefined();

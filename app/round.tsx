@@ -4,7 +4,7 @@ import { type ComponentProps, useEffect, useEffectEvent, useLayoutEffect, useRef
 import { DECADE, formatGuess, fromSlider, missRatio, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
-import { isMuted, playTier } from "../lib/sound";
+import { isMuted, playTier, unlockAudio } from "../lib/sound";
 import { type Game, loadGame, saveGame } from "../lib/stats";
 
 // A number's place along the slider, from 0 at the 0 stop to 1 at 100m (lib/guess.ts).
@@ -110,6 +110,8 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
 
   async function lockIn() {
     if (state === "sending") return;
+    // Still inside the click or Enter, before the fetch and the animation delay the sound.
+    unlockAudio();
     setState("sending");
     // R14: the count only comes back after the guess is sent (D7).
     const res = await fetch("/api/guess", { method: "POST", body: JSON.stringify({ date, index, guess }) }).catch(() => null);
@@ -132,6 +134,7 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   }
 
   function reopen(i: number) {
+    unlockAudio();
     setReopened(i);
     play(i, results[i].tier);
   }
