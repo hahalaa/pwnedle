@@ -1,6 +1,6 @@
 # Pwnedle
 
-How many other people picked "liverpool1" as their password? Pwnedle gives you five passwords a day, and you guess how many times each one has turned up in data breaches. Think Wordle, but instead of a five-letter word, you’re guessing how many times a password has leaked. The closer you get, the more you score.
+How many times has "iloveyou" been leaked? Each day you get five real passwords and guess how often each one turned up in data breaches. The closer you get, the more you score.
 
 **Play Pwnedle here → https://pwnedle.com/**
 
