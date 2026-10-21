@@ -146,7 +146,9 @@ The tiers are now Uncrackable, Strong, Mid, Weak and Pwned, with the same score 
 ## D41. Drawings (T41)
 The drawings show a hooded figure at a laptop. The sources are in `docs/art/`. The six on white (coffee and one per tier) were traced once with potrace and live in `public/art/` as filled paths in `currentColor` on a transparent background. Pages show them through a CSS mask filled with the text colour, so they follow the theme and need no runtime package. On the dark background, filled parts such as the coffee cup turn light and still read as a cup.
 
-The tab icon (`app/icon.svg`) is the white-on-black favicon drawing, cropped square on a `void` rounded square. Its lines were thickened before tracing so it reads at 16px on light and dark tab bars. `apple-icon.png` and the link preview image are unchanged.
+The tab icon (`app/icon.svg`) is the white-on-black favicon drawing, cropped square on a `void` rounded square. Its lines were thickened before tracing so it reads at 16px on light and dark tab bars. The link preview image is unchanged.
+
+Every other icon is rendered from `icon.svg` with the same crop and padding. `apple-icon.png` is 180×180 on a solid `void` square without rounded corners, because iOS rounds the corners itself and fills transparency with black. `icon1.png` (32×32) and `favicon.ico` (16 and 32) cover browsers without SVG favicons and keep the transparent corners. The site has no web manifest and nothing asks for one, so there are no 192 or 512 icons.
 
 The coffee drawing sits inside the footer's Buy Me a Coffee link, after the words, at the link's height of 20px. It is decorative and hidden from screen readers.
 
