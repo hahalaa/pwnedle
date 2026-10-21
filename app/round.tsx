@@ -102,6 +102,11 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
   const result = results[index];
   const invalid = parseGuess(text) === null;
   const last = index === passwords.length - 1;
+  // T57: the running total in the title bar. A fresh reveal leaves its points out until the Reveal climbs them in; a
+  // reopened one shows the total as it stood after that password.
+  const total = useRef<HTMLSpanElement>(null);
+  const before = results.slice(0, index).reduce((a, r) => a + r.score, 0);
+  const climbing = playing && reopened === null;
 
   function update(g: Saved) {
     setPlayed(g);
@@ -209,12 +214,23 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
                 password {index + 1} of {passwords.length}
               </p>
               {/* A fresh reveal's dot fills as it lands; a reopened one keeps every dot filled. */}
-              <Dots results={playing && reopened === null ? results.slice(0, index) : results} index={index} total={passwords.length} />
+              <div className="flex items-center gap-3 whitespace-nowrap">
+                {/* Only the number sits in its span, so the Reveal can write to it while React keeps it as text content. */}
+                <p className="tabular-nums">
+                  <span ref={total}>{before + (result && !climbing ? result.score : 0)}</span> / {passwords.length * 100}
+                </p>
+                <Dots results={climbing ? results.slice(0, index) : results} index={index} total={passwords.length} />
+              </div>
             </div>
             <p className="px-3 py-6 text-3xl break-all sm:text-4xl lg:px-5 lg:py-10 lg:text-6xl short:py-6 short:text-5xl">{passwords[index]}</p>
           </div>
           {result ? (
-            <Reveal result={result} play={fresh === index} onLand={land} />
+            <Reveal
+              result={result}
+              play={fresh === index}
+              onLand={land}
+              onClimb={reopened === null ? (n) => total.current && (total.current.textContent = String(before + n)) : undefined}
+            />
           ) : (
             <>
               <div className="flex flex-col gap-2">
@@ -317,13 +333,14 @@ function Ticks({ view }: { view?: View }) {
 // R9: everything the API sent back, with the tier in its colour and always named (R25), laid out as in T48: a chart of
 // the guess and the count on the log axis, labelled with both, then how far off the guess was, the points and a meter.
 // Rendered as is, this is the end state; with `play`, the animations run first and call `onLand` as the points finish
-// climbing.
-export function Reveal({ result, play, onLand }: { result: Result; play?: boolean; onLand?: () => void }) {
+// climbing, passing each step of the climb to `onClimb`.
+export function Reveal({ result, play, onLand, onClimb }: { result: Result; play?: boolean; onLand?: () => void; onClimb?: (points: number) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const guess = pos(result.guess);
   const count = pos(result.count);
   const end = chartViews(guess, count)[1];
   const land = useEffectEvent(() => onLand?.());
+  const climb = useEffectEvent((points: number) => onClimb?.(points));
 
   // Before paint, so the end state never flashes before the animations take over.
   useLayoutEffect(() => {
@@ -372,9 +389,12 @@ export function Reveal({ result, play, onLand }: { result: Result; play?: boolea
     ];
 
     const score = el.querySelector("[data-score]")!;
+    // Only the frame loop passes points on; the landing renders the full total.
     let frame = 0;
     const tick = () => {
-      score.textContent = String(Math.round(result.score * (anims.at(-1)!.effect!.getComputedTiming().progress ?? 0)));
+      const points = Math.round(result.score * (anims.at(-1)!.effect!.getComputedTiming().progress ?? 0));
+      score.textContent = String(points);
+      climb(points);
       frame = requestAnimationFrame(tick);
     };
     tick();

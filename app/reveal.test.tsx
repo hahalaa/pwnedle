@@ -11,13 +11,16 @@ afterEach(() => {
   localStorage.clear();
   vi.unstubAllGlobals();
   vi.clearAllMocks();
+  progress = 0;
   delete (Element.prototype as { animate?: unknown }).animate;
 });
 
 const props = { date: "2026-10-24", number: 1, passwords: ["a", "b", "c", "d", "e"] };
 const body = { count: 4_200, score: 94, tier: "Uncrackable", note: "Seen a few thousand times." };
 
-// jsdom has no Web Animations API, so each fake animation only finishes when it's seeked to its end.
+// jsdom has no Web Animations API, so each fake animation only finishes when it's seeked to its end. Every one reports
+// `progress`, which the points read as they climb.
+let progress = 0;
 function stubMotion(reduced: boolean, coarse = false) {
   vi.stubGlobal("matchMedia", (q: string) => ({
     matches: (reduced && q === "(prefers-reduced-motion: reduce)") || (coarse && q === "(pointer: coarse)"),
@@ -32,7 +35,7 @@ function stubMotion(reduced: boolean, coarse = false) {
       seeked: undefined as number | undefined,
       finished: new Promise<void>((r) => (done = r)),
       cancel: vi.fn(),
-      effect: { getComputedTiming: () => ({ progress: 0 }) },
+      effect: { getComputedTiming: () => ({ progress }) },
       set currentTime(ms: number) {
         a.seeked = ms;
         if (ms >= end) done();
@@ -65,6 +68,36 @@ test("a fresh reveal holds back the tier and the button until it lands, and a cl
   expect(playTier).toHaveBeenCalledTimes(1);
 });
 
+// The running total in the password window's title bar.
+const total = () => screen.getByText("/ 500", { exact: false }).textContent;
+
+test("the running total climbs with a fresh reveal's points and lands with it (T57)", async () => {
+  stubMotion(false);
+  localStorage.setItem("pwnedle:2026-10-24", JSON.stringify({ index: 1, done: false, results: [{ guess: 4_000, ...body, score: 80 }] }));
+  render(<Round {...props} />);
+  expect(total()).toBe("80 / 500");
+  fireEvent.click(screen.getByRole("button", { name: "Lock in" }), { detail: 1 });
+  const next = await screen.findByRole("button", { name: "Next password" });
+  expect(total()).toBe("80 / 500");
+  progress = 0.5;
+  await vi.waitFor(() => expect(total()).toBe("127 / 500"));
+  // The first click skips to the landing, the second moves on.
+  fireEvent.click(next);
+  await vi.waitFor(() => expect(playTier).toHaveBeenCalled());
+  expect(total()).toBe("174 / 500");
+  fireEvent.click(next);
+  expect(total()).toBe("174 / 500");
+});
+
+test("with reduced motion the running total takes the points at once (T57)", async () => {
+  stubMotion(true);
+  render(<Round {...props} />);
+  expect(total()).toBe("0 / 500");
+  fireEvent.click(screen.getByRole("button", { name: "Lock in" }), { detail: 1 });
+  await screen.findByRole("button", { name: "Next password" });
+  expect(total()).toBe("94 / 500");
+});
+
 test("with reduced motion the reveal shows its end state and plays the sound at once (T43)", async () => {
   stubMotion(true);
   render(<Round {...props} />);
@@ -82,6 +115,7 @@ test("a reveal resumed after a refresh doesn't replay (T43)", async () => {
   await screen.findByRole("button", { name: "Next password" });
   expect(Element.prototype.animate).not.toHaveBeenCalled();
   expect(playTier).not.toHaveBeenCalled();
+  expect(total()).toBe("94 / 500");
 });
 
 test("Enter in the box locks in and focuses the button; Enter only moves on once the reveal lands (T51)", async () => {
@@ -199,6 +233,10 @@ test.each([
   const back = screen.getByRole("button", { name: "Back to results" });
   expect(screen.getByText("b")).toBeDefined();
   expect(screen.getByText("password 2 of 5")).toBeDefined();
+  // T57: the total as it stood after b, without climbing.
+  progress = 0.5;
+  await new Promise(requestAnimationFrame);
+  expect(total()).toBe("101 / 500");
   expect(document.activeElement).toBe(back);
   expect(back.className).toContain("opacity-0");
   expect(anims.length).toBeGreaterThan(5);
@@ -207,6 +245,7 @@ test.each([
   fireEvent.keyDown(document.body, { key: "Enter" });
   await vi.waitFor(() => expect(playTier).toHaveBeenCalledWith("Mid"));
   expect(back.className).not.toContain("opacity-0");
+  expect(total()).toBe("101 / 500");
   fireEvent.click(back);
   const b = row("b");
   expect(document.activeElement).toBe(b);
