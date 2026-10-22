@@ -41,7 +41,7 @@ export async function playerToday() {
 // Puzzle number is days since launch, starting at #1 (R1, D22).
 export const puzzleNumber = (date: string) => (Date.parse(date) - Date.parse(LAUNCH_DATE)) / 86_400_000 + 1;
 
-// R20: every puzzle file from launch up to yesterday, newest first. Today and later are never listed.
+// R20: every puzzle file from launch up to yesterday, newest first, with its theme if it has one (D49). Today and later are never listed.
 export async function pastPuzzles(today: string, dir = join(process.cwd(), "data/puzzles")) {
   // No folder yet just means nothing is published. next.config.ts already traces the folder,
   // so the ignore comment stops Turbopack tracing the whole project for this dynamic path.
@@ -49,17 +49,23 @@ export async function pastPuzzles(today: string, dir = join(process.cwd(), "data
     if (e.code !== "ENOENT") throw e;
     return [];
   });
-  return files
+  const dates = files
     .map((f) => /^(\d{4}-\d{2}-\d{2})\.json$/.exec(f)?.[1])
     .filter((d): d is string => !!d && d >= LAUNCH_DATE && d < today)
     .sort()
-    .reverse()
-    .map((date) => ({ date, number: puzzleNumber(date) }));
+    .reverse();
+  return Promise.all(
+    dates.map(async (date) => {
+      const { theme }: Puzzle = JSON.parse(await readFile(join(dir, `${date}.json`), "utf8"));
+      return { date, number: puzzleNumber(date), theme };
+    }),
+  );
 }
 
 // The only puzzle shape the browser may receive: no counts or notes before a guess is locked in (R13, D7).
-export const clientPuzzle = ({ date, number, passwords }: Puzzle & { number: number }) => ({
+export const clientPuzzle = ({ date, number, theme, passwords }: Puzzle & { number: number }) => ({
   date,
   number,
+  theme,
   passwords: passwords.map((e) => e.password),
 });

@@ -147,3 +147,16 @@ test("end screen shows one drawing, for the daily tier, hidden from screen reade
     expect(html).toMatch(new RegExp(`<span aria-hidden="true"[^>]*mask-image:url\\(/art/${name}\\.svg\\)`));
   }
 });
+
+test("a Halloween puzzle perches hidden pumpkins on the password window in the round and the end screen; other days get none (D49)", () => {
+  const result = { guess: 1, count: 1, score: 100, tier: "Uncrackable", note: "n" };
+  const views = (theme?: string) => [
+    renderToStaticMarkup(<Round date="2026-10-24" number={1} passwords={["a"]} theme={theme} />),
+    renderToStaticMarkup(<End number={1} passwords={["a"]} results={[result]} theme={theme} />),
+  ];
+  for (const html of views("halloween")) {
+    expect(html).toMatch(/brackets relative[^>]*><svg aria-hidden="true"[^>]*viewBox="0 0 44 20" class="absolute[^"]*bottom-full/);
+    expect(html.match(/<ellipse/g)).toHaveLength(2);
+  }
+  for (const html of views()) expect(html).not.toContain("<ellipse");
+});

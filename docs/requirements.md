@@ -12,7 +12,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
   - at most one password with a count of 0.
 - **R4 (v1)** The 5 passwords appear in a random order, fixed per puzzle so everyone sees the same order.
 - **R5 (v1)** A password never appears in more than one puzzle.
-- **R6 (v1)** No themes in v1. Every puzzle is a random mix.
+- **R6 (v1)** Every puzzle is a random mix, except on theme days (R38, D49).
 
 ## 2. Gameplay
 - **R7 (v1)** Each password is shown in a monospace font under the prompt "How many times has this password appeared in data breaches?"

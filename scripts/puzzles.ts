@@ -1,16 +1,17 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { LAUNCH_DATE } from "../lib/config.ts";
+import { LAUNCH_DATE, THEMES } from "../lib/config.ts";
 import { addDays, utcToday } from "../lib/days.ts";
 import { isClean } from "./filter.ts";
 import { NoValidNoteError, draftNote, noteProblem } from "./notes.ts";
 import { pwnedCount } from "./pwned.ts";
 import { baseWord, meetsMix, selectPuzzle, selectReplacement } from "./select.ts";
 
-// D21: one file per date, entries in display order.
+// D21: one file per date, entries in display order. D49: a theme day also names its theme.
 export type Puzzle = {
   date: string;
   status: "draft" | "approved";
+  theme?: (typeof THEMES)[number];
   passwords: { password: string; count: number; note: string }[];
 };
 
@@ -109,7 +110,7 @@ export async function replace(dir: string, date: string, index: number, today: s
   await save(dir, p);
 }
 
-// Checks every puzzle file against R3, R5, R30, D33 and the note limits (R35).
+// Checks every puzzle file against R3, R5, R30, D33, D49's themes and the note limits (R35).
 // Errors should fail CI; warnings flag drafts dated today to today+6 as a review reminder.
 export async function validate(dir: string, today: string): Promise<{ errors: string[]; warnings: string[] }> {
   const errors: string[] = [];
@@ -128,6 +129,7 @@ export async function validate(dir: string, today: string): Promise<{ errors: st
     }
     if (`${p.date}.json` !== name) err(`date ${p.date} does not match the file name`);
     if (p.status !== "draft" && p.status !== "approved") err(`status must be draft or approved, got ${p.status}`);
+    if (p.theme !== undefined && !THEMES.includes(p.theme)) err(`theme must be one of ${THEMES.join(", ")}, got ${p.theme}`);
     if (!Array.isArray(p.passwords) || p.passwords.length !== 5) {
       err("needs exactly 5 passwords");
       continue;

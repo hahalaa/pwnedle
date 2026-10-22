@@ -49,16 +49,19 @@ test("the archive lists files from launch to yesterday, newest first, never toda
   const yesterday = addDays(TODAY, -1);
   const dir = await dirWith(addDays(LAUNCH_DATE, -1), LAUNCH_DATE, yesterday, TODAY, addDays(TODAY, 1));
   await writeFile(join(dir, "notes.txt"), "");
+  await writeFile(join(dir, `${yesterday}.json`), JSON.stringify({ date: yesterday, status: "draft", theme: "halloween", passwords: [] }));
   expect(await pastPuzzles(TODAY, dir)).toEqual([
-    { date: yesterday, number: 9 },
+    { date: yesterday, number: 9, theme: "halloween" },
     { date: LAUNCH_DATE, number: 1 },
   ]);
   expect(await pastPuzzles(TODAY, join(dir, "missing"))).toEqual([]);
 });
 
-test("client puzzle has only date, number and password text", () => {
+test("client puzzle has only date, number, theme and password text", () => {
   const p = { date: LAUNCH_DATE, status: "draft" as const, number: 1, passwords: [{ password: "dragon", count: 99, note: "A note." }] };
   expect(clientPuzzle(p)).toEqual({ date: LAUNCH_DATE, number: 1, passwords: ["dragon"] });
+  // D49: a theme day's theme goes with it, for the decoration.
+  expect(clientPuzzle({ ...p, theme: "halloween" })).toEqual({ date: LAUNCH_DATE, number: 1, theme: "halloween", passwords: ["dragon"] });
 });
 
 test("a generated puzzle reaches the client in the order it was written (R4)", async () => {

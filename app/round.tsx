@@ -6,6 +6,7 @@ import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
 import { isMuted, playTier, unlockAudio } from "../lib/sound";
 import { type Game, loadGame, saveGame } from "../lib/stats";
+import { Pumpkins } from "./pumpkin";
 
 // A number's place along the slider, from 0 at the 0 stop to 1 at 100m (lib/guess.ts).
 const pos = (n: number) => Math.min(toSlider(n), SLIDER_MAX) / SLIDER_MAX;
@@ -68,8 +69,8 @@ export const tierColor = (tier: string) => `var(--color-${tier.toLowerCase()})`;
 const track = (event: string, puzzle: number, archive = false) =>
   (window as { umami?: { track: (event: string, data: object) => void } }).umami?.track(event, { puzzle, archive });
 
-// `archive` is set when played from the archive, so the game stays out of stats (R18).
-export function Round({ date, number, passwords, archive }: { date: string; number: number; passwords: string[]; archive?: boolean }) {
+// `archive` is set when played from the archive, so the game stays out of stats (R18). `theme` decorates a theme day (D49).
+export function Round({ date, number, passwords, archive, theme }: { date: string; number: number; passwords: string[]; archive?: boolean; theme?: string }) {
   // R16: this browser's progress resumes after a refresh. Saved results also keep a locked-in password
   // from being sent again (R15).
   const [played, setPlayed] = useState<Saved | null>(null);
@@ -203,12 +204,13 @@ export function Round({ date, number, passwords, archive }: { date: string; numb
       </p>
       {/* Focus moves to Share when the game ends during this visit; a finished game loaded from storage leaves focus alone. */}
       {ended ? (
-        <End number={number} passwords={passwords} results={results} autoFocus={played !== null} back={back} onOpen={reopen} />
+        <End number={number} passwords={passwords} results={results} autoFocus={played !== null} back={back} onOpen={reopen} theme={theme} />
       ) : (
         <section className="flex flex-1 flex-col gap-6 sm:flex-none short:gap-4">
           <h2 className="text-lg leading-snug lg:text-xl">How many times has this password appeared in data breaches?</h2>
           {/* The password sits in a bracketed 1px window; its title bar carries the progress (D25). */}
           <div className="brackets relative mx-(--bracket) border border-line">
+            {theme === "halloween" && <Pumpkins />}
             <div className="flex items-center justify-between border-b border-line px-3 py-1.5 text-xs text-ash">
               <p>
                 password {index + 1} of {passwords.length}
@@ -493,7 +495,7 @@ export function Dots({ results, index, total }: { results: Result[]; index: numb
 
 // R12: total, daily tier, per-password breakdown and share (R19). The coffee link is only in the footer (D31). Each row
 // reopens its reveal (T56). Coming `back` from one, the screen doesn't fade in again and focus returns to that row.
-export function End({ number, passwords, results, autoFocus, back, onOpen }: { number: number; passwords: string[]; results: Result[]; autoFocus?: boolean; back?: number; onOpen?: (i: number) => void }) {
+export function End({ number, passwords, results, autoFocus, back, onOpen, theme }: { number: number; passwords: string[]; results: Result[]; autoFocus?: boolean; back?: number; onOpen?: (i: number) => void; theme?: string }) {
   const [status, setStatus] = useState("");
   const total = results.reduce((a, r) => a + r.score, 0);
   const daily = tier(total / results.length);
@@ -527,6 +529,7 @@ export function End({ number, passwords, results, autoFocus, back, onOpen }: { n
         </p>
       </div>
       <div className="brackets relative mx-(--bracket) border border-line">
+        {theme === "halloween" && <Pumpkins />}
         <div className="flex items-center justify-between border-b border-line px-3 py-1.5 text-xs text-ash">
           <p>puzzle #{number}</p>
           <p>points</p>
