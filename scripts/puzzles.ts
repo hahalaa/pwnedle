@@ -2,6 +2,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { LAUNCH_DATE, THEMES } from "../lib/config.ts";
 import { addDays, utcToday } from "../lib/days.ts";
+import { themeCandidates } from "./candidates.ts";
 import { isClean } from "./filter.ts";
 import { NoValidNoteError, draftNote, noteProblem } from "./notes.ts";
 import { pwnedCount } from "./pwned.ts";
@@ -20,6 +21,7 @@ export type Deps = {
   count?: (password: string) => Promise<number>;
   note?: (password: string, count: number) => Promise<string>;
   launch?: string;
+  themed?: (theme: string) => Promise<string[]>;
 };
 
 export const DIR = "data/puzzles";
@@ -109,9 +111,11 @@ async function loadDraft(dir: string, date: string, today: string) {
 }
 
 // Swaps the password at `index` in a draft for a new one that keeps R3 and R5 (R34).
-export async function replace(dir: string, date: string, index: number, today: string, { candidates, count = pwnedCount, note = draftNote }: Deps) {
+export async function replace(dir: string, date: string, index: number, today: string, { candidates, count = pwnedCount, note = draftNote, themed = themeCandidates }: Deps) {
   if (!Number.isInteger(index) || index < 0 || index > 4) throw new Error(`Index must be 0 to 4, got ${index}`);
   const { puzzles, p } = await loadDraft(dir, date, today);
+  // On a theme day the new password comes from that theme's seeds (D49).
+  if (p.theme) candidates = await themed(p.theme);
 
   const others = p.passwords.filter((_, i) => i !== index).map((e) => e.count);
   const e = await selectReplacement(candidates, usedSet(puzzles), others, count, nearBases(puzzles, date, p.passwords[index].password));

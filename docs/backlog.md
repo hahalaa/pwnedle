@@ -87,7 +87,7 @@ Status: `todo`, `doing`, `done`, `superseded`. Update in the same commit that fi
   5. Share text: "Pwnedle #N 🎃 · score · tier". Update R19 and its test.
   Keep the T58 pumpkins, a little larger if it helps. Pumpkin orange is a new decoration-only token, never used next to tier colours. Check both themes at 360, 390 and 1920. To test, set the theme on today's puzzle file temporarily and revert it before committing. (R19, R25, R38, D25, D47)
 - [done] **T59** Halloween puzzle for 2026-10-31: a Halloween seed list in scripts/seeds/, and pipeline:replace (or a new option) that refills a whole date from a theme's seeds while keeping R3, R5 and D33. Set theme "halloween" on that file. Must be committed before 2026-10-29 UTC (T38 freeze). (R33, R34, R38)
-- [todo] **T62** `pipeline:replace` on a theme day draws from the random pool, so one swap breaks the theme. It should draw from that theme's seeds instead. Fix before T60 (R34, D49).
+- [done] **T62** `pipeline:replace` on a theme day draws from the random pool, so one swap breaks the theme. It should draw from that theme's seeds instead. Fix before T60 (R34, D49).
 - [todo] **T60** Christmas puzzle for 2026-12-25 (commit before 2026-12-23 UTC). (R38)
 - [todo] **T61** New Year puzzle for 2027-01-01 (commit before 2026-12-30 UTC). (R38)
 - [todo] **Later** Idea from a player: a "recognisable vs random" split on themed days.

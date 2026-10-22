@@ -117,6 +117,23 @@ test("refill swaps a whole draft for theme passwords and sets its theme", async 
   await expect(refill(dir, addDays(TODAY, 1), "halloween", TODAY, deps)).rejects.toThrow("can already be served");
 });
 
+test("replace on a theme day draws from that theme's seeds (D49)", async () => {
+  const dir = await tmp();
+  await generate(dir, TODAY, deps);
+  const date = addDays(TODAY, 5);
+  const themePool = pool.slice(1000, 1100);
+  await refill(dir, date, "halloween", TODAY, { ...deps, candidates: themePool });
+  const themed = vi.fn(async () => themePool);
+
+  await replace(dir, date, 2, TODAY, { ...deps, themed });
+
+  const after = await read(dir, date);
+  expect(themed).toHaveBeenCalledWith("halloween");
+  expect(after.theme).toBe("halloween");
+  expect(after.passwords.every((e) => themePool.includes(e.password))).toBe(true);
+  expect((await validate(dir, TODAY)).errors).toEqual([]);
+});
+
 test("selectReplacement skips used and unclean passwords and candidates that break R3", async () => {
   const count = vi.fn(fakeCount);
   // Without a count of 100 or less, only pw0, pw1, pw2 (1, 10, 100) or pw8 (0) can fit.
