@@ -167,6 +167,12 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
   function finish() {
     update({ ...game, done: true });
     track("puzzle-complete", number, archive);
+    // T63: a finished daily game adds its total to the day's counts; archive games never do. `done` is saved above and
+    // a finished game never shows See results again, so this sends once, refreshes included. Nothing waits on it.
+    if (!archive) {
+      const body = JSON.stringify({ date, guesses: results.map((r) => r.guess) });
+      fetch("/api/scores", { method: "POST", body, keepalive: true }).catch(() => {});
+    }
   }
 
   // Links, buttons and open dialogs keep their own Enter. While the reveal plays, the T43 skip swallows Enter first.

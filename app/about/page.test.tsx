@@ -9,3 +9,7 @@ test("credits Pwned Passwords and SecLists and disclaims affiliation (R24)", () 
   expect(html).toContain("MIT");
   expect(html).toContain("not affiliated with or endorsed by Have I Been Pwned");
 });
+
+test("says daily score totals are counted anonymously (T63)", () => {
+  expect(renderToStaticMarkup(<About />)).toContain("anonymous count");
+});

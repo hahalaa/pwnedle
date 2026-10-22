@@ -29,6 +29,33 @@ test.each([
   expect(saved.archive).toBe(archive);
 });
 
+test.each([
+  ["the home page sends its guesses once", {}, 1],
+  ["the archive never sends", { archive: true }, 0],
+])("finishing a game from %s to the score counts (T63)", async (_, extra, calls) => {
+  const fetch = vi.fn(async () => new Response(null, { status: 204 }));
+  vi.stubGlobal("fetch", fetch);
+  localStorage.setItem(KEY, JSON.stringify(lastRound));
+  render(<Round {...props} {...extra} />);
+  fireEvent.click(await screen.findByRole("button", { name: "See results" }));
+  expect(fetch).toHaveBeenCalledTimes(calls);
+  if (calls) expect(fetch).toHaveBeenCalledWith("/api/scores", expect.objectContaining({ method: "POST", body: JSON.stringify({ date: props.date, guesses: [1, 1, 1, 1, 1] }) }));
+  // A refresh lands on the saved end screen and sends nothing more.
+  cleanup();
+  render(<Round {...props} {...extra} />);
+  await screen.findByRole("button", { name: "Share result" });
+  expect(fetch).toHaveBeenCalledTimes(calls);
+});
+
+test("a failed score submit leaves the end screen alone (T63)", async () => {
+  vi.stubGlobal("fetch", vi.fn(async () => Promise.reject(new TypeError("offline"))));
+  localStorage.setItem(KEY, JSON.stringify(lastRound));
+  render(<Round {...props} />);
+  fireEvent.click(await screen.findByRole("button", { name: "See results" }));
+  expect(await screen.findByRole("button", { name: "Share result" })).toBeDefined();
+  expect(JSON.parse(localStorage.getItem(KEY)!).done).toBe(true);
+});
+
 test("a refresh resumes mid-puzzle with reveals intact and never re-sends a locked-in guess (R15, R16)", async () => {
   const fetch = vi.fn();
   vi.stubGlobal("fetch", fetch);

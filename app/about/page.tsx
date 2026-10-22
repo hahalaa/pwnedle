@@ -30,6 +30,10 @@ export default function About() {
           common password list, MIT licensed, copyright (c) 2018 Daniel Miessler.
         </p>
       </div>
+      <p className="text-ash">
+        When you finish the daily puzzle, your total score is added to an anonymous count of how many players got each
+        total that day. Nothing else is stored: no name, IP address or cookie.
+      </p>
       <p className="text-ash">Pwnedle is not affiliated with or endorsed by Have I Been Pwned.</p>
     </section>
   );
