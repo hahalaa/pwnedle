@@ -47,8 +47,11 @@ test.each([
   expect(fetch).toHaveBeenCalledTimes(calls);
 });
 
-test("a failed score submit leaves the end screen alone (T63)", async () => {
-  vi.stubGlobal("fetch", vi.fn(async () => Promise.reject(new TypeError("offline"))));
+test.each([
+  ["a network error", async () => Promise.reject(new TypeError("offline"))],
+  ["the firewall's 429 (T65)", async () => new Response("Too Many Requests", { status: 429 })],
+])("a failed score submit from %s leaves the end screen alone (T63)", async (_, fetch) => {
+  vi.stubGlobal("fetch", vi.fn(fetch));
   localStorage.setItem(KEY, JSON.stringify(lastRound));
   render(<Round {...props} />);
   fireEvent.click(await screen.findByRole("button", { name: "See results" }));

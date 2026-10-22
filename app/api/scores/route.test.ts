@@ -78,6 +78,12 @@ test("uses Upstash with the write token for counts and the read-only token for r
   ]);
 });
 
+test("lets the CDN cache a day's counts but never a 404 (T65)", async () => {
+  const cache = async (url: string) => (await GET(new Request(url))).headers.get("Cache-Control");
+  expect(await cache("http://x/api/scores?date=2026-10-24")).toBe("public, s-maxage=60, stale-while-revalidate=300");
+  expect(await cache("http://x/api/scores?date=2026-10-26")).toBeNull();
+});
+
 test("a store failure returns a plain 503", async () => {
   upstashEnv();
   vi.stubGlobal("fetch", async () => Response.json({ error: "WRONGPASS invalid password" }, { status: 401 }));
@@ -85,6 +91,7 @@ test("a store failure returns a plain 503", async () => {
   for (const res of [await post({ date: "2026-10-24", guesses: exact }), await GET(new Request("http://x/api/scores?date=2026-10-24"))]) {
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({ error: "Unavailable" });
+    expect(res.headers.get("Cache-Control")).toBeNull();
   }
   expect(error).toHaveBeenCalledTimes(2);
 });

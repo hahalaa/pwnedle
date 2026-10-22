@@ -67,12 +67,13 @@ export async function POST(req: Request) {
   return new Response(null, { status: 204 });
 }
 
-// That date's counts, as { counts: { "<total>": players } }. Archive dates too, for T64.
+// That date's counts, as { counts: { "<total>": players } }. Archive dates too, for T64. The CDN serves repeat reads
+// for a minute so they don't use Upstash's monthly commands (T65); errors aren't cached.
 export async function GET(req: Request) {
   const date = new URL(req.url).searchParams.get("date") ?? "";
   if (!(await loadPuzzle(date))) return Response.json({ error: "Not found" }, { status: 404 });
   try {
-    return Response.json({ counts: await read(date) });
+    return Response.json({ counts: await read(date) }, { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } });
   } catch (e) {
     return fail(e);
   }
