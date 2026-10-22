@@ -2,7 +2,7 @@ import { mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test, vi } from "vitest";
-import { addDays, frozenChanges, generate, replace, validate, type Puzzle } from "./puzzles";
+import { addDays, frozenChanges, generate, refill, replace, validate, type Puzzle } from "./puzzles";
 import { NoValidNoteError } from "./notes";
 import { baseWord, meetsMix, selectReplacement } from "./select";
 
@@ -91,6 +91,30 @@ test("replace refuses servable dates, approved files and bad input", async () =>
   await expect(replace(dir, addDays(TODAY, 20), 0, TODAY, deps)).rejects.toThrow("No puzzle file");
   await expect(replace(dir, addDays(TODAY, 5), 5, TODAY, deps)).rejects.toThrow("Index");
   await expect(replace(dir, "../etc/passwd", 0, TODAY, deps)).rejects.toThrow("Bad date");
+});
+
+test("refill swaps a whole draft for theme passwords and sets its theme", async () => {
+  const dir = await tmp();
+  await generate(dir, TODAY, deps);
+  const date = addDays(TODAY, 5);
+  const before = await read(dir, date);
+  const others = (await allPasswords(dir)).filter((x) => !before.passwords.some((e) => e.password === x));
+  // Themed pool shares base words with nearby days and holds one password already used, which refill must skip.
+  const candidates = [...pool.slice(1000, 1100), ...others.slice(0, 20).map((x) => x.toUpperCase()), others[0]];
+
+  await refill(dir, date, "halloween", TODAY, { ...deps, candidates });
+
+  const after = await read(dir, date);
+  expect(after.theme).toBe("halloween");
+  expect(after.status).toBe("draft");
+  expect(after.passwords.every((e) => pool.slice(1000, 1100).includes(e.password))).toBe(true);
+  expect(after.passwords[0].note).toBe(`Note for ${after.passwords[0].password}.`);
+  expect((await validate(dir, TODAY)).errors).toEqual([]);
+
+  await expect(refill(dir, date, "spooky", TODAY, deps)).rejects.toThrow("Theme must be");
+  await writeFile(join(dir, `${date}.json`), JSON.stringify({ ...after, status: "approved" }));
+  await expect(refill(dir, date, "halloween", TODAY, deps)).rejects.toThrow("approved");
+  await expect(refill(dir, addDays(TODAY, 1), "halloween", TODAY, deps)).rejects.toThrow("can already be served");
 });
 
 test("selectReplacement skips used and unclean passwords and candidates that break R3", async () => {

@@ -1,7 +1,7 @@
 import { isClean, letters } from "./filter.ts";
 import { pwnedCount } from "./pwned.ts";
 
-type Entry = { password: string; count: number };
+export type Entry = { password: string; count: number };
 
 // The content filter's normalisation, so "Whatever123" and "whatever2024" share "whatever"
 // and "m@nutd" and "manutd" share "manutd". All-digit passwords get "" (D33).

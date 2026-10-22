@@ -32,3 +32,8 @@ export async function candidates(dir = "scripts/seeds"): Promise<string[]> {
   for (const pw of await lines(join(dir, "seclists/10k-most-common.txt"))) out.add(pw);
   return [...out].filter((pw) => pw.length <= 20);
 }
+
+// Variations of one theme's seeds only (D49). They live in a subfolder so random days never draw them.
+export async function themeCandidates(theme: string, dir = "scripts/seeds/themes"): Promise<string[]> {
+  return (await lines(join(dir, `${theme}.txt`))).flatMap(variations).filter((pw) => pw.length <= 20);
+}

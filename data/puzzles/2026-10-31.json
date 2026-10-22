@@ -1,31 +1,32 @@
 {
   "date": "2026-10-31",
   "status": "approved",
+  "theme": "halloween",
   "passwords": [
     {
-      "password": "Qweasd2025",
-      "count": 0,
-      "note": "Two keyboard rows zigzagged plus a year, a pattern that never showed up in a leak."
+      "password": "spooky12",
+      "count": 14574,
+      "note": "Halloween's go-to adjective with \"12\" on the end, a pattern leaked lists are full of."
     },
     {
-      "password": "photo",
-      "count": 36322,
-      "note": "A plain five-letter noun that comes to mind when a photo site asks for a password."
+      "password": "zombie2000",
+      "count": 1407,
+      "note": "A monster name plus the year 2000, a habit that shows up in many lists."
     },
     {
-      "password": "Michael2020",
-      "count": 8666,
-      "note": "Pairing a common first name with a year is a predictable habit, so it turns up often in leaked lists."
+      "password": "hocuspocus2020",
+      "count": 3,
+      "note": "A spell word with a recent year on the end; few people land on this exact pairing."
     },
     {
-      "password": "Anna1!",
-      "count": 252,
-      "note": "Short, name-plus-digit-plus-symbol habit makes it a common pattern, yet this exact combination stays uncommon."
+      "password": "Werewolf!",
+      "count": 512,
+      "note": "\"Werewolf\" with one \"!\" on the end, the quickest fix when a site insists on a symbol."
     },
     {
-      "password": "penguin1",
-      "count": 191471,
-      "note": "An animal word with \"1\" added, the quickest way to satisfy a rule asking for a number."
+      "password": "pumpkin",
+      "count": 466560,
+      "note": "A plain dictionary word with nothing added, so it's among the first things people type when picking a password."
     }
   ]
 }

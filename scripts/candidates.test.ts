@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
-import { candidates, variations } from "./candidates";
+import { candidates, themeCandidates, variations } from "./candidates";
 
 test("applies case, digit, year, ! and letter-swap variations without stacking", () => {
   const v = variations("dragon");
@@ -42,4 +42,10 @@ test("drops candidates longer than 20 characters", async () => {
   expect(all).not.toContain("abcdefghijklmnopq1234"); // 21
   expect(all).toContain("abcdefghijklmnopqrst"); // 20
   expect(all).not.toContain("abcdefghijklmnopqrstu"); // 21
+});
+
+test("theme seeds expand on their own and stay out of random days", async () => {
+  const halloween = await themeCandidates("halloween");
+  expect(halloween).toContain("Jackolantern2025");
+  expect(await candidates()).not.toContain("Jackolantern2025");
 });

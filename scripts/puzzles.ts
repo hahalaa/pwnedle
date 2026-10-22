@@ -5,7 +5,7 @@ import { addDays, utcToday } from "../lib/days.ts";
 import { isClean } from "./filter.ts";
 import { NoValidNoteError, draftNote, noteProblem } from "./notes.ts";
 import { pwnedCount } from "./pwned.ts";
-import { baseWord, meetsMix, selectPuzzle, selectReplacement } from "./select.ts";
+import { baseWord, meetsMix, selectPuzzle, selectReplacement, type Entry } from "./select.ts";
 
 // D21: one file per date, entries in display order. D49: a theme day also names its theme.
 export type Puzzle = {
@@ -52,6 +52,29 @@ async function save(dir: string, p: Puzzle) {
   await writeFile(file(dir, p.date), JSON.stringify(p, null, 2) + "\n");
 }
 
+// Drafts a note for each picked entry. When a password gets no valid note after 3 drafts,
+// swaps it and tries again (R34). selectReplacement throws once the pool runs out. API errors still stop the run.
+async function withNotes(picked: Entry[], candidates: string[], used: Set<string>, near: Set<string>, count: NonNullable<Deps["count"]>, note: NonNullable<Deps["note"]>) {
+  picked.forEach((e) => used.add(e.password));
+  const passwords = [];
+  for (let j = 0; j < 5; j++) {
+    for (;;) {
+      const e = picked[j];
+      try {
+        passwords.push({ ...e, note: await note(e.password, e.count) });
+        break;
+      } catch (err) {
+        if (!(err instanceof NoValidNoteError)) throw err;
+        const rest = picked.filter((_, k) => k !== j);
+        const avoid = new Set([...near, ...rest.map((x) => baseWord(x.password))]);
+        picked[j] = await selectReplacement(candidates, used, rest.map((x) => x.count), count, avoid);
+        used.add(picked[j].password);
+      }
+    }
+  }
+  return passwords;
+}
+
 // Writes a draft for each of the 14 days from today, or from launch if that is later, that has no file yet (R33, D21, D22).
 // Returns the dates written.
 export async function generate(dir: string, today: string, { candidates, count = pwnedCount, note = draftNote, launch = LAUNCH_DATE }: Deps): Promise<string[]> {
@@ -65,26 +88,7 @@ export async function generate(dir: string, today: string, { candidates, count =
     if (have.has(date)) continue;
     const near = nearBases(puzzles, date);
     const picked = await selectPuzzle(candidates, used, count, near);
-    picked.forEach((e) => used.add(e.password));
-    const passwords = [];
-    for (let j = 0; j < 5; j++) {
-      // When a password gets no valid note after 3 drafts, swap it and try again (R34).
-      // selectReplacement throws once the pool runs out. API errors still stop the run.
-      for (;;) {
-        const e = picked[j];
-        try {
-          passwords.push({ ...e, note: await note(e.password, e.count) });
-          break;
-        } catch (err) {
-          if (!(err instanceof NoValidNoteError)) throw err;
-          const rest = picked.filter((_, k) => k !== j);
-          const avoid = new Set([...near, ...rest.map((x) => baseWord(x.password))]);
-          picked[j] = await selectReplacement(candidates, used, rest.map((x) => x.count), count, avoid);
-          used.add(picked[j].password);
-        }
-      }
-    }
-    const p: Puzzle = { date, status: "draft", passwords };
+    const p: Puzzle = { date, status: "draft", passwords: await withNotes(picked, candidates, used, near, count, note) };
     await save(dir, p);
     puzzles.push(p);
     written.push(date);
@@ -92,22 +96,39 @@ export async function generate(dir: string, today: string, { candidates, count =
   return written;
 }
 
-// Swaps the password at `index` in a draft for a new one that keeps R3 and R5 (R34).
-// Only drafts dated today+2 or later, since the server already serves up to today+1 (R2, D21).
-export async function replace(dir: string, date: string, index: number, today: string, { candidates, count = pwnedCount, note = draftNote }: Deps) {
+// All puzzles plus the draft at `date`, if that draft may still change: dated today+2 or later,
+// since the server already serves up to today+1 (R2, D21), and not yet approved.
+async function loadDraft(dir: string, date: string, today: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error(`Bad date: ${date}`);
-  if (!Number.isInteger(index) || index < 0 || index > 4) throw new Error(`Index must be 0 to 4, got ${index}`);
   if (date < addDays(today, 2)) throw new Error(`${date} can already be served; only dates from ${addDays(today, 2)} can change`);
-
   const puzzles = await loadAll(dir);
   const p = puzzles.find((x) => x.date === date);
   if (!p) throw new Error(`No puzzle file for ${date}`);
   if (p.status !== "draft") throw new Error(`${date} is ${p.status}; set it back to draft first`);
+  return { puzzles, p };
+}
+
+// Swaps the password at `index` in a draft for a new one that keeps R3 and R5 (R34).
+export async function replace(dir: string, date: string, index: number, today: string, { candidates, count = pwnedCount, note = draftNote }: Deps) {
+  if (!Number.isInteger(index) || index < 0 || index > 4) throw new Error(`Index must be 0 to 4, got ${index}`);
+  const { puzzles, p } = await loadDraft(dir, date, today);
 
   const others = p.passwords.filter((_, i) => i !== index).map((e) => e.count);
   const e = await selectReplacement(candidates, usedSet(puzzles), others, count, nearBases(puzzles, date, p.passwords[index].password));
   p.passwords[index] = { ...e, note: await note(e.password, e.count) };
   await save(dir, p);
+}
+
+// Refills a whole draft from a theme's candidates and sets its theme, keeping R3, R5 and D33 (D49).
+export async function refill(dir: string, date: string, theme: string, today: string, { candidates, count = pwnedCount, note = draftNote }: Deps) {
+  if (!(THEMES as readonly string[]).includes(theme)) throw new Error(`Theme must be one of ${THEMES.join(", ")}, got ${theme}`);
+  const { puzzles } = await loadDraft(dir, date, today);
+  const others = puzzles.filter((x) => x.date !== date);
+  const used = usedSet(others);
+  const near = nearBases(others, date);
+  const picked = await selectPuzzle(candidates, used, count, near);
+  const passwords = await withNotes(picked, candidates, used, near, count, note);
+  await save(dir, { date, status: "draft", theme: theme as Puzzle["theme"], passwords });
 }
 
 // Checks every puzzle file against R3, R5, R30, D33, D49's themes and the note limits (R35).
