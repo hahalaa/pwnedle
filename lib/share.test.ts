@@ -7,3 +7,7 @@ test("builds the R19 share text with the daily tier from the average", () => {
   // Average 29.8 is Weak; 9 is Pwned, 10 is Weak.
   expect(shareText(3, [0, 9, 10, 40, 90])).toBe("Pwnedle #3 · 149/500 · Weak\n🟥🟥🟧🟨🟩\npwnedle.com");
 });
+
+test("a Halloween share puts a pumpkin after the puzzle number (T58a)", () => {
+  expect(shareText(12, [100, 65, 90, 35, 100], "halloween")).toBe("Pwnedle #12 🎃 · 390/500 · Strong\n🟩🟨🟩🟧🟩\npwnedle.com");
+});

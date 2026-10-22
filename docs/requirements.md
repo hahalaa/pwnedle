@@ -39,7 +39,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
   🟩🟨🟩🟧🟩
   pwnedle.com
   ```
-  Squares per password: 🟩 Uncrackable or Strong, 🟨 Mid, 🟧 Weak, 🟥 Pwned. Shared via clipboard or the native share sheet.
+  Squares per password: 🟩 Uncrackable or Strong, 🟨 Mid, 🟧 Weak, 🟥 Pwned. Shared via clipboard or the native share sheet. On a Halloween day the first line reads `Pwnedle #12 🎃 · 390/500 · Strong` (D50).
 
 ## 6. Archive
 - **R20 (v1)** A free archive of every past puzzle, selectable by puzzle number or date. Future puzzles are never listed.

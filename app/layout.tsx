@@ -8,6 +8,7 @@ import { Backdrop } from "./backdrop";
 import { HowToPlay } from "./how-to-play";
 import { NavLabel } from "./nav-label";
 import { Sound } from "./sound";
+import { Spider } from "./spider";
 import { Stats } from "./stats";
 import { Theme } from "./theme";
 import { TimeZone } from "./time-zone";
@@ -49,10 +50,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             From lg the column widens; header and footer sit inside it, so they line up (T40). */}
         <main className="flex min-h-dvh w-full flex-col items-center px-4 py-6 sm:py-8 short:py-4 sm:before:max-h-24 sm:before:flex-[2] sm:before:content-[''] sm:after:flex-[3] sm:after:content-['']">
           <div className="flex w-full max-w-xl flex-1 lg:max-w-240 flex-col sm:flex-none">
-            <header className="mb-8 short:mb-6 flex items-center sm:items-baseline justify-between border-b border-line pb-3">
-              <h1 className="font-dot text-2xl sm:text-4xl">
-                <Link href="/" className="tap focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">Pwnedle</Link>
-              </h1>
+            <header className="relative mb-8 short:mb-6 flex items-center sm:items-baseline justify-between border-b border-line pb-3">
+              {/* T58a: Halloween days turn the wordmark orange and add the label and spider. */}
+              <div>
+                <h1 className="font-dot text-2xl sm:text-4xl halloween:text-pumpkin">
+                  <Link href="/" className="tap focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">Pwnedle</Link>
+                </h1>
+                <p className="hidden text-xs text-pumpkin halloween:block">halloween special</p>
+              </div>
+              <Spider />
               <nav className="flex gap-5 sm:gap-4">
                 <HowToPlay />
                 <Link href="/archive" aria-label="archive" className="tap text-sm text-ash underline underline-offset-4 hover:text-bone focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">

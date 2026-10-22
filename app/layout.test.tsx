@@ -19,6 +19,14 @@ test("every page has the title linking home, an archive link and stats, as words
   expect(html).toContain("page");
 });
 
+test("the Halloween label and spider are in every header but hidden unless the page is a Halloween day (T58a)", () => {
+  const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
+  expect(html).toMatch(/<h1 class="[^"]*halloween:text-pumpkin">/);
+  expect(html).toMatch(/<p class="hidden [^"]*halloween:block">halloween special<\/p>/);
+  // Server-rendered with the drop; the browser drops it once per session (app/spider.test.tsx).
+  expect(html).toMatch(/<span class="[^"]*hidden[^"]*halloween:block"><svg[^>]*class="[^"]*animate-drop/);
+});
+
 test("the footer has only the about and coffee links (R23, R24, D29)", () => {
   const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
   const footer = html.slice(html.indexOf("<footer"));

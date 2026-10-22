@@ -7,6 +7,10 @@
   --color-ash: light-dark(#6b665d, #8d8a84);
   --color-line: light-dark(#d9d2c4, #2a2a2d);
   --color-signal: light-dark(#ce2422, #e5322d);
+  /* T58a: decoration only, never next to a tier colour. `pumpkin` passes 4.5:1 on void (4.89 light, 7.32 dark);
+     `pumpkin-line` matches the luminance of `line`, so the background keeps its contrast (D47). */
+  --color-pumpkin: light-dark(#a84a00, #ff7518);
+  --color-pumpkin-line: light-dark(#f0cda8, #3b2414);
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
   --font-dot: var(--font-doto), var(--font-plex-mono), monospace;
   /* T35: reveals, the end screen and each new page fade in with a 4px rise. */
@@ -15,6 +19,16 @@
     from {
       opacity: 0;
       transform: translateY(4px);
+    }
+  }
+  /* T58a: the Halloween spider drops down its thread on a spring (damping ratio 0.6), overshooting about 2px before
+     it settles. A cubic-bezier overshoot on a 24px drop stays under a pixel. */
+  --animate-drop: drop 700ms
+    linear(0, 0.034, 0.12, 0.238, 0.372, 0.508, 0.638, 0.754, 0.853, 0.934, 0.997, 1.042, 1.071, 1.088, 1.094, 1.093, 1.086, 1.076, 1.063, 1.05, 1.038, 1.026, 1.016, 1.008, 1.002, 0.997, 0.994, 0.992, 1)
+    400ms backwards;
+  @keyframes drop {
+    from {
+      transform: translateY(-100%);
     }
   }
 }
@@ -31,6 +45,11 @@
 /* T45: desktop screens no taller than 900px, such as 1280×800 and 1366×768, get tighter spacing so the round, reveal and
    end screen fit without scrolling. */
 @custom-variant short (@media (min-width: 64rem) and (max-height: 900px));
+
+/* T58a: anything on a Halloween day's page, set by the round's `data-event` decoration (app/pumpkin.tsx). The round
+   is server-rendered, so the header and background are themed from the first paint. Next keeps the last page in the
+   DOM after navigating away, hidden with an inline `display: none`, so a decoration inside that doesn't count. */
+@custom-variant halloween (:root:has([data-event="halloween"]:not([style*="display: none"] *)) &);
 
 /* Follows the system theme; the header toggle overrides it with data-theme. */
 html {

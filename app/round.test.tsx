@@ -83,8 +83,8 @@ test("every tier colour is always emitted, since the reveal only builds its name
 
 test("every colour token has a light and a dark value (T44)", () => {
   const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
-  const tokens = css.match(/--color-[a-z]+: [^;]+;/g)!;
-  expect(tokens).toHaveLength(10);
+  const tokens = css.match(/--color-[a-z-]+: [^;]+;/g)!;
+  expect(tokens).toHaveLength(12);
   for (const t of tokens) expect(t).toMatch(/: light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\);$/);
 });
 
@@ -144,19 +144,36 @@ test("end screen shows one drawing, for the daily tier, hidden from screen reade
   for (const [score, name] of [[100, "uncrackable"], [0, "pwned"]] as const) {
     const html = end(score, name);
     expect(html.match(/\/art\//g)).toHaveLength(1);
-    expect(html).toMatch(new RegExp(`<span aria-hidden="true"[^>]*mask-image:url\\(/art/${name}\\.svg\\)`));
+    expect(html).toMatch(new RegExp(`<span aria-hidden="true"[^>]*><span [^>]*mask-image:url\\(/art/${name}\\.svg\\)`));
   }
 });
 
-test("a Halloween puzzle perches hidden pumpkins on the password window in the round and the end screen; other days get none (D49)", () => {
+test("a Halloween puzzle perches hidden pumpkins and a cobweb on the password window in the round and the end screen, and marks the page for the header and background; other days get none (D49, T58a)", () => {
   const result = { guess: 1, count: 1, score: 100, tier: "Uncrackable", note: "n" };
   const views = (theme?: string) => [
     renderToStaticMarkup(<Round date="2026-10-24" number={1} passwords={["a"]} theme={theme} />),
     renderToStaticMarkup(<End number={1} passwords={["a"]} results={[result]} theme={theme} />),
   ];
   for (const html of views("halloween")) {
-    expect(html).toMatch(/brackets relative[^>]*><svg aria-hidden="true"[^>]*viewBox="0 0 44 20" class="absolute[^"]*bottom-full/);
+    expect(html).toMatch(/brackets relative[^>]*><span data-event="halloween" class="contents"><svg aria-hidden="true"[^>]*viewBox="0 0 44 20" class="absolute[^"]*bottom-full/);
+    expect(html).toMatch(/viewBox="0 0 17 17" class="absolute -top-\(--bracket\) -left-\(--bracket\)/);
     expect(html.match(/<ellipse/g)).toHaveLength(2);
   }
-  for (const html of views()) expect(html).not.toContain("<ellipse");
+  for (const html of views()) {
+    expect(html).not.toContain("<ellipse");
+    expect(html).not.toContain("data-event");
+  }
+});
+
+test("a Halloween end screen puts a pumpkin sticker on the tier drawing's laptop lid, placed for that tier (T58a)", () => {
+  const sticker = (scores: number[], theme?: string) =>
+    renderToStaticMarkup(<End number={1} passwords={scores.map(String)} results={scores.map((score) => ({ guess: 1, count: 1, score, tier: "Mid", note: "n" }))} theme={theme} />).match(/<svg aria-hidden="true" viewBox="0 0 24 20" fill="currentColor"[^>]*>/)?.[0];
+  expect(sticker([100], "halloween")).toContain("left:48%");
+  expect(sticker([50], "halloween")).toContain("left:52%");
+  expect(sticker([50])).toBeUndefined();
+});
+
+test("the Halloween variant ignores a page Next has hidden after navigating away (T58a)", () => {
+  const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
+  expect(css).toContain(`@custom-variant halloween (:root:has([data-event="halloween"]:not([style*="display: none"] *)) &);`);
 });
