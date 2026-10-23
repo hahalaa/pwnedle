@@ -191,6 +191,31 @@ test("Enter on the page with an untouched guess sends nothing and focuses the bo
   expect(document.activeElement).toBe(screen.getByRole("textbox"));
 });
 
+test("focus empties an untouched box and leaving it empty puts the 0 back; a real guess never clears (T68)", async () => {
+  stubMotion(true);
+  render(<Round {...props} />);
+  const box = screen.getByRole<HTMLInputElement>("textbox");
+  fireEvent.focus(box);
+  expect(box.value).toBe("");
+  expect(box.placeholder).toBe("0");
+  expect(box.getAttribute("aria-invalid")).toBe("false");
+  fireEvent.blur(box);
+  expect(box.value).toBe("0");
+  // Still untouched, so Enter sends nothing (D46).
+  fireEvent.keyDown(box, { key: "Enter" });
+  expect(fetch).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByRole("slider"), { target: { value: "300" } });
+  const slid = box.value;
+  fireEvent.focus(box);
+  fireEvent.blur(box);
+  expect(box.value).toBe(slid);
+  fireEvent.focus(box);
+  fireEvent.change(box, { target: { value: "2.5m" } });
+  fireEvent.keyDown(box, { key: "Enter" });
+  await screen.findByRole("button", { name: "Next password" });
+  expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string).guess).toBe(2_500_000);
+});
+
 test("on a touch screen nothing focuses the box for the player, whatever the click reports (T51)", async () => {
   stubMotion(true, true);
   render(<Round {...props} />);

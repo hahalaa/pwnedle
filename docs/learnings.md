@@ -104,3 +104,4 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-24 [tooling] Next.js 16.4.0 checks npm security advisories on `next build` and `next dev` and sometimes exits 1 after a successful build to show an upgrade notice; the next run passes -> rerun, and treat it as a reminder to upgrade Next.js.
 2026-10-24 [tooling] `uv` isn't installed here, so the supply-chain auditor's `uv run collect.py` fails -> run its scripts with plain `python3` (they need no packages), but not `python3 -I`, which hides the sibling modules they import.
 2026-10-24 [tooling] `@next/eslint-plugin-next@16.4.3` still pins `fast-glob@3.3.1`, and braces still has no fix -> the T32 override stays; check again on the next Next.js upgrade.
+2026-10-24 [tooling] Tapping "your guess" to leave the guess box focuses it again, because the text sits inside its `<label>` -> to tap away in playwright, tap the prompt heading instead.

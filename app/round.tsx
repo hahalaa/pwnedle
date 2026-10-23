@@ -101,7 +101,8 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
   const [typing, setTyping] = useState(false);
   const [touched, setTouched] = useState(false);
   const result = results[index];
-  const invalid = parseGuess(text) === null;
+  // T68: an untouched box is empty while focused, so it isn't marked invalid.
+  const invalid = touched && parseGuess(text) === null;
   const last = index === passwords.length - 1;
   // T57: the running total in the title bar. A fresh reveal leaves its points out until the Reveal climbs them in; a
   // reopened one shows the total as it stood after that password.
@@ -278,12 +279,16 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
                   aria-describedby="guess-help"
                   ref={box}
                   autoFocus={typing}
+                  // T68: the untouched 0 clears on focus, so typing doesn't append to it, and comes back if left empty.
+                  placeholder="0"
+                  onFocus={() => touched || setText("")}
+                  onBlur={() => touched || setText("0")}
                   onChange={(e) => {
                     setText(e.target.value);
                     setGuess(parseGuess(e.target.value) ?? guess);
                     setTouched(true);
                   }}
-                  className="border border-line bg-void px-3 py-2 text-xl focus:border-bone focus:outline-none aria-invalid:border-signal"
+                  className="border border-line bg-void px-3 py-2 text-xl placeholder:text-ash focus:border-bone focus:outline-none aria-invalid:border-signal"
                 />
                 <span id="guess-help" className="text-sm text-ash">
                   {invalid ? "Enter a whole number from 0 to 100m, like 2,500 or 2.5m." : "Type a number, or use k and m: 40k, 2.5m."}
