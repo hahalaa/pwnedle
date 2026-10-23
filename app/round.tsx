@@ -265,8 +265,12 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
                 <span className="text-xs text-ash">your guess</span>
                 <input
                   type="text"
-                  inputMode="decimal"
+                  // Full keyboard, so k and m can be typed (T66); parseGuess still takes only numbers (D4).
+                  inputMode="text"
+                  enterKeyHint="go"
                   autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
                   spellCheck={false}
                   value={text}
                   disabled={state === "sending"}
