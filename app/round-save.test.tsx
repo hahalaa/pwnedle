@@ -33,18 +33,20 @@ test.each([
   ["the home page sends its guesses once", {}, 1],
   ["the archive never sends", { archive: true }, 0],
 ])("finishing a game from %s to the score counts (T63)", async (_, extra, calls) => {
-  const fetch = vi.fn(async () => new Response(null, { status: 204 }));
+  const fetch = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(async () => new Response(null, { status: 204 }));
   vi.stubGlobal("fetch", fetch);
+  // The end screen also reads the counts (T64); only POSTs count here.
+  const posts = () => fetch.mock.calls.filter(([, init]) => init?.method === "POST").length;
   localStorage.setItem(KEY, JSON.stringify(lastRound));
   render(<Round {...props} {...extra} />);
   fireEvent.click(await screen.findByRole("button", { name: "See results" }));
-  expect(fetch).toHaveBeenCalledTimes(calls);
+  expect(posts()).toBe(calls);
   if (calls) expect(fetch).toHaveBeenCalledWith("/api/scores", expect.objectContaining({ method: "POST", body: JSON.stringify({ date: props.date, guesses: [1, 1, 1, 1, 1] }) }));
   // A refresh lands on the saved end screen and sends nothing more.
   cleanup();
   render(<Round {...props} {...extra} />);
   await screen.findByRole("button", { name: "Share result" });
-  expect(fetch).toHaveBeenCalledTimes(calls);
+  expect(posts()).toBe(calls);
 });
 
 test.each([
@@ -128,4 +130,68 @@ test.each([
   render(<Round {...props} />);
   fireEvent.click(await screen.findByRole("button", { name: "Lock in" }), { detail: 1 });
   expect((await screen.findByRole("alert")).textContent).toContain(message);
+});
+
+// Ten other players: 4 below this game's 500 and, with this one, 7 at 500.
+const tenOthers = { "500": 7, "100": 4 };
+
+test.each([
+  ["a daily game counts itself once", {}, "Better than 40% of today's players", "11 players"],
+  ["an archive game only shows that day", { archive: true }, "Better than 36% of that day's players", "11 players"],
+])("the end screen shows how everyone did: %s (T64)", async (_, extra, line, players) => {
+  vi.stubGlobal("fetch", vi.fn(async () => Response.json({ counts: tenOthers })));
+  localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true, ...extra }));
+  render(<Round {...props} {...extra} />);
+  expect(await screen.findByText(line)).toBeDefined();
+  expect(screen.getByText(players)).toBeDefined();
+  expect(screen.getByText("how everyone did")).toBeDefined();
+  expect(fetch).toHaveBeenCalledWith("/api/scores?date=2026-10-24", expect.anything());
+});
+
+test.each([
+  ["alone", { "500": 1 }, "You're the first player today", "1 player"],
+  ["with 2 others", { "500": 1, "20": 2 }, "Better than 2 of 2 players so far today", "3 players"],
+])("under 10 players, %s, the line gives counts and the chart still shows (T64)", async (_, counts, line, players) => {
+  vi.stubGlobal("fetch", vi.fn(async () => Response.json({ counts })));
+  localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true }));
+  render(<Round {...props} />);
+  expect(await screen.findByText(line)).toBeDefined();
+  expect(screen.getByText("how everyone did")).toBeDefined();
+  expect(screen.getByText(players)).toBeDefined();
+});
+
+test("on desktop the chart column is held from the first render and collapses once if the read fails (T64)", async () => {
+  let fail = () => {};
+  vi.stubGlobal("fetch", vi.fn(() => new Promise((_, reject) => (fail = () => reject(new TypeError("offline"))))));
+  localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true }));
+  render(<Round {...props} />);
+  const section = (await screen.findByRole("button", { name: "Share result" })).closest("section")!;
+  expect(section.className).toContain("lg:grid-cols-[1fr_20rem]");
+  fail();
+  await vi.waitFor(() => expect(section.className).not.toContain("lg:grid-cols-[1fr_20rem]"));
+});
+
+test.each([
+  ["a network error", async () => Promise.reject(new TypeError("offline"))],
+  ["the firewall's 429 (T65)", async () => new Response("Too Many Requests", { status: 429 })],
+])("a failed count read from %s hides how everyone did (T64)", async (_, impl) => {
+  const fetch = vi.fn(impl);
+  vi.stubGlobal("fetch", fetch);
+  localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true }));
+  render(<Round {...props} />);
+  await screen.findByRole("button", { name: "Share result" });
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
+  await new Promise((r) => setTimeout(r));
+  expect(screen.queryByText(/players|how everyone did/)).toBeNull();
+});
+
+test("an archive game finished in this visit never counts itself (T64)", async () => {
+  vi.stubGlobal("fetch", vi.fn(async () => Response.json({ counts: {} })));
+  localStorage.setItem(KEY, JSON.stringify(lastRound));
+  render(<Round {...props} archive />);
+  fireEvent.click(await screen.findByRole("button", { name: "See results" }));
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledWith("/api/scores?date=2026-10-24", expect.anything()));
+  // That day had no players, so nothing shows and the column collapses.
+  await vi.waitFor(() => expect(screen.getByRole("button", { name: "Share result" }).closest("section")!.className).not.toContain("lg:grid"));
+  expect(screen.queryByText(/player|how everyone did/)).toBeNull();
 });

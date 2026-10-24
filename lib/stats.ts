@@ -5,7 +5,7 @@ import { tier } from "./scoring";
 // `archive` marks a game last played from the archive (R18).
 export type Game = { index: number; done: boolean; results: { score: number }[]; archive?: boolean };
 
-const TIERS = ["Uncrackable", "Strong", "Mid", "Weak", "Pwned"];
+export const TIERS = ["Uncrackable", "Strong", "Mid", "Weak", "Pwned"];
 
 // R17: only finished daily games count; archive games are left out (R18). A streak is a run of
 // consecutive puzzle dates; the current one survives until a whole day is missed, so it still counts

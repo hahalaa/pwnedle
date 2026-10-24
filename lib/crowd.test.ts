@@ -1,0 +1,41 @@
+import { expect, test } from "vitest";
+import { crowd, crowdLine } from "./crowd";
+
+test("a sent daily game is taken out of the others once, and better than counts strictly lower totals", () => {
+  // 10 players: this one at 300 plus 2 more at 300, 4 below, 3 above.
+  const c = crowd({ "300": 3, "100": 4, "450": 3 }, 300, true);
+  expect(c.players).toBe(10);
+  // 4 of the 9 others are lower; the 2 others at 300 are not.
+  expect(c.lower).toBe(4);
+  expect(crowdLine(c)).toBe("Better than 44% of today's players");
+  expect(c.bins[12]).toBe(3);
+  expect(c.bins[4]).toBe(4);
+  expect(c.bins[18]).toBe(3);
+  expect(c.tiers).toEqual([["Uncrackable", 30], ["Strong", 0], ["Mid", 30], ["Weak", 40], ["Pwned", 0]]);
+});
+
+test("a sent game missing from the counts still shows once", () => {
+  const c = crowd({ "100": 9 }, 300, true);
+  expect(c.players).toBe(10);
+  expect(c.lower).toBe(9);
+  expect(c.bins.reduce((a, b) => a + b)).toBe(10);
+});
+
+test("an archive game never counts itself", () => {
+  const c = crowd({ "300": 10, "100": 10 }, 300, false);
+  expect(c.players).toBe(20);
+  expect(c.lower).toBe(10);
+  expect(crowdLine(c, true)).toBe("Better than 50% of that day's players");
+  expect(crowdLine(crowd({ "1": 1, "400": 2 }, 300, false), true)).toBe("Better than 1 of 3 players that day");
+  expect(crowd({}, 300, false).players).toBe(0);
+  // A daily game opened from the archive was sent, so it can be alone.
+  expect(crowdLine(crowd({ "300": 1 }, 300, true), true)).toBe("You were the only player that day");
+});
+
+test("under 10 players the line gives counts, not a percentage", () => {
+  expect(crowdLine(crowd({ "300": 1 }, 300, true))).toBe("You're the first player today");
+  expect(crowdLine(crowd({ "300": 1, "20": 2 }, 300, true))).toBe("Better than 2 of 2 players so far today");
+  expect(crowdLine(crowd({ "300": 1, "400": 1 }, 300, true))).toBe("Better than 0 of 1 player so far today");
+  // 500 goes in the top bar.
+  expect(crowd({ "500": 2 }, 500, true).bins[19]).toBe(2);
+});

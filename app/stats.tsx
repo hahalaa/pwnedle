@@ -49,7 +49,6 @@ export function Stats() {
 }
 
 export function StatsBody({ s }: { s: ReturnType<typeof stats> }) {
-  const most = Math.max(1, ...s.tiers.map(([, n]) => n));
   return (
     <div className="flex flex-col gap-6">
       <h2 id="stats-title" className="border-b border-line pb-3 text-lg">
@@ -73,21 +72,31 @@ export function StatsBody({ s }: { s: ReturnType<typeof stats> }) {
       </dl>
       <div className="flex flex-col gap-2">
         <h3 className="text-xs text-ash">tiers</h3>
-        {/* R25: each bar is labelled with its tier name. */}
-        <ul className="flex flex-col gap-1.5 text-sm">
-          {s.tiers.map(([t, n]) => (
-            <li key={t} className="grid grid-cols-[7rem_1fr] items-center gap-3" style={{ color: tierColor(t) }}>
-              <span>{t.toLowerCase()}</span>
-              <span className="flex items-center gap-2">
-                <span className="h-3 bg-current" style={{ width: `${(n / most) * 100}%` }} />
-                <span className="text-bone">{n}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
+        <TierBars tiers={s.tiers} />
       </div>
       {/* R18: archive games are saved but left out of these numbers. */}
       <p className="text-xs text-ash">Archive games don&apos;t count towards stats.</p>
     </div>
+  );
+}
+
+// R25: each bar is labelled with its tier name. Also used by the end screen's "how everyone did" (T64).
+export function TierBars({ tiers, unit = "" }: { tiers: readonly (readonly [string, number])[]; unit?: string }) {
+  const most = Math.max(1, ...tiers.map(([, n]) => n));
+  return (
+    <ul className="flex flex-col gap-1.5 text-sm">
+      {tiers.map(([t, n]) => (
+        <li key={t} className="grid grid-cols-[7rem_1fr] items-center gap-3" style={{ color: tierColor(t) }}>
+          <span>{t.toLowerCase()}</span>
+          <span className="flex items-center gap-2">
+            <span className="h-3 bg-current" style={{ width: `${(n / most) * 100}%` }} />
+            <span className="text-bone">
+              {n}
+              {unit}
+            </span>
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }

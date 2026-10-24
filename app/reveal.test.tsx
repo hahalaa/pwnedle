@@ -277,7 +277,7 @@ test.each([
   expect(b.closest("section")!.className).not.toContain("animate-enter");
   expect(live.textContent).toBe("");
   // Nothing was sent, saved or tracked.
-  expect(fetch).not.toHaveBeenCalled();
+  expect(sends()).toEqual([]);
   expect(localStorage.getItem("pwnedle:2026-10-24")).toBe(saved);
   expect(track).not.toHaveBeenCalled();
 });
@@ -322,9 +322,12 @@ test("Enter on the end screen page sends, opens and skips nothing (T51, T56)", a
   fireEvent.keyDown(document.body, { key: "Escape" });
   expect(screen.getByRole("button", { name: "Share result" })).toBeDefined();
   expect(Element.prototype.animate).not.toHaveBeenCalled();
-  expect(fetch).not.toHaveBeenCalled();
+  expect(sends()).toEqual([]);
   expect(localStorage.getItem("pwnedle:2026-10-24")).toBe(saved);
 });
+
+// Requests other than the end screen's count read (T64).
+const sends = () => vi.mocked(fetch).mock.calls.filter(([url]) => !String(url).startsWith("/api/scores?date="));
 
 // An end screen row by its password. jsdom runs the row's lines together in its accessible name.
 const row = (password: string) => screen.getByText(password, { selector: "span" }).closest("button")!;

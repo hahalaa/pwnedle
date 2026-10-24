@@ -105,3 +105,6 @@ Areas: pipeline, api, ui, deploy, tooling.
 2026-10-24 [tooling] `uv` isn't installed here, so the supply-chain auditor's `uv run collect.py` fails -> run its scripts with plain `python3` (they need no packages), but not `python3 -I`, which hides the sibling modules they import.
 2026-10-24 [tooling] `@next/eslint-plugin-next@16.4.3` still pins `fast-glob@3.3.1`, and braces still has no fix -> the T32 override stays; check again on the next Next.js upgrade.
 2026-10-24 [tooling] Tapping "your guess" to leave the guess box focuses it again, because the text sits inside its `<label>` -> to tap away in playwright, tap the prompt heading instead.
+2026-10-24 [tooling] The end screen reads `/api/scores` as soon as it mounts (T64), so tests that expect no fetch on the end screen fail -> count only the requests that matter, as `sends()` in app/reveal.test.tsx and `posts()` in app/round-save.test.tsx do.
+2026-10-24 [ui] `Round.update` saved the archive flag to localStorage but not to the game held in state, so an archive game finished in the same visit looked like a sent daily game and counted itself in T64's numbers -> `update` puts the flag on both.
+2026-10-24 [tooling] A playwright `page.route` mock stays on the page for later runs in the same session, and it answered the audit's real POSTs too -> call `page.unrouteAll()` before checking the real API.

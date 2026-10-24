@@ -1,12 +1,14 @@
 "use client";
 
 import { type ComponentProps, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { crowd, crowdLine } from "../lib/crowd";
 import { DECADE, formatGuess, fromSlider, missRatio, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
 import { isMuted, playTier, unlockAudio } from "../lib/sound";
 import { type Game, loadGame, saveGame } from "../lib/stats";
 import { Halloween, Sticker } from "./pumpkin";
+import { TierBars } from "./stats";
 
 // A number's place along the slider, from 0 at the 0 stop to 1 at 100m (lib/guess.ts).
 const pos = (n: number) => Math.min(toSlider(n), SLIDER_MAX) / SLIDER_MAX;
@@ -110,9 +112,11 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
   const before = results.slice(0, index).reduce((a, r) => a + r.score, 0);
   const climbing = playing && reopened === null;
 
+  // The archive flag goes on the game in memory too, so the end screen knows it was never sent (T64).
   function update(g: Saved) {
-    setPlayed(g);
-    saveGame(date, archive ? { ...g, archive } : g);
+    const saved = archive ? { ...g, archive } : g;
+    setPlayed(saved);
+    saveGame(date, saved);
   }
 
   async function lockIn() {
@@ -211,7 +215,7 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
       </p>
       {/* Focus moves to Share when the game ends during this visit; a finished game loaded from storage leaves focus alone. */}
       {ended ? (
-        <End number={number} passwords={passwords} results={results} autoFocus={played !== null} back={back} onOpen={reopen} theme={theme} />
+        <End date={date} archive={archive} sent={!game.archive} number={number} passwords={passwords} results={results} autoFocus={played !== null} back={back} onOpen={reopen} theme={theme} />
       ) : (
         <section className="flex flex-1 flex-col gap-6 sm:flex-none short:gap-4">
           <h2 className="text-lg leading-snug lg:text-xl">How many times has this password appeared in data breaches?</h2>
@@ -510,10 +514,27 @@ export function Dots({ results, index, total }: { results: Result[]; index: numb
 
 // R12: total, daily tier, per-password breakdown and share (R19). The coffee link is only in the footer (D31). Each row
 // reopens its reveal (T56). Coming `back` from one, the screen doesn't fade in again and focus returns to that row.
-export function End({ number, passwords, results, autoFocus, back, onOpen, theme }: { number: number; passwords: string[]; results: Result[]; autoFocus?: boolean; back?: number; onOpen?: (i: number) => void; theme?: string }) {
+// T64: how everyone did loads once the screen is up. Any failure, a 429 or a request slower than 5 s hides it, and on
+// desktop its column, held open from the first render, collapses. `sent` marks a game finished as a daily one (D51).
+export function End({ date, archive, sent, number, passwords, results, autoFocus, back, onOpen, theme }: { date?: string; archive?: boolean; sent?: boolean; number: number; passwords: string[]; results: Result[]; autoFocus?: boolean; back?: number; onOpen?: (i: number) => void; theme?: string }) {
   const [status, setStatus] = useState("");
+  // null while loading; false once the read fails or the day has no players.
+  const [others, setOthers] = useState<ReturnType<typeof crowd> | null | false>(null);
   const total = results.reduce((a, r) => a + r.score, 0);
   const daily = tier(total / results.length);
+  const column = date && others !== false;
+
+  useEffect(() => {
+    if (!date) return;
+    let live = true;
+    fetch(`/api/scores?date=${date}`, { signal: AbortSignal.timeout(5000) })
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((body) => crowd(body.counts, total, !!sent))
+      .then((c) => live && setOthers(c.players > 0 && c), () => live && setOthers(false));
+    return () => {
+      live = false;
+    };
+  }, [date, total, sent]);
 
   async function share() {
     const text = shareText(number, results.map((r) => r.score), theme);
@@ -526,9 +547,10 @@ export function End({ number, passwords, results, autoFocus, back, onOpen, theme
   }
 
   return (
-    <section className={`flex flex-1 ${back === undefined ? "animate-enter" : ""} flex-col gap-6 sm:flex-none short:gap-4`}>
+    // From lg up the chart takes a column beside the breakdown, so the screen grows no taller; on phones it follows Share.
+    <section className={`flex flex-1 ${back === undefined ? "animate-enter" : ""} flex-col gap-6 sm:flex-none short:gap-4 ${column ? "lg:grid lg:grid-cols-[1fr_20rem] lg:gap-x-10" : ""}`}>
       {/* The daily tier sits with the total it describes, and wraps under it on narrow phones. */}
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-2 lg:col-span-2">
         {/* Decorative; the tier label beside it carries the meaning (R25, D41). */}
         <span aria-hidden="true" className="relative size-15 shrink-0">
           <span className="absolute inset-0 bg-current [mask:center/contain_no-repeat]" style={{ maskImage: `url(/art/${daily.toLowerCase()}.svg)` }} />
@@ -541,6 +563,7 @@ export function End({ number, passwords, results, autoFocus, back, onOpen, theme
           <span className="size-3 bg-current" />
           {daily.toLowerCase()}
         </p>
+        {others && <p className="basis-full text-sm text-ash">{crowdLine(others, archive)}</p>}
       </div>
       <div className="brackets relative mx-(--bracket) border border-line">
         {theme === "halloween" && <Halloween />}
@@ -591,6 +614,44 @@ export function End({ number, passwords, results, autoFocus, back, onOpen, theme
           {status}
         </p>
       </div>
+      {others && <Crowd c={others} total={total} />}
     </section>
+  );
+}
+
+// T64: a bar per 25 points, coloured by the tier it falls in, with this player's bar marked; the tiers listed under it
+// name the colours (R25).
+function Crowd({ c, total }: { c: ReturnType<typeof crowd>; total: number }) {
+  const most = Math.max(...c.bins);
+  const mine = Math.min(19, Math.floor(total / 25));
+  return (
+    <div className="flex animate-enter flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-2">
+      <div className="flex items-baseline justify-between border-b border-line pb-2 text-xs text-ash">
+        <h3>how everyone did</h3>
+        <p>
+          {formatGuess(c.players)} player{c.players > 1 && "s"}
+        </p>
+      </div>
+      <div role="img" aria-label={`Bar chart of totals from 0 to 500, with your ${total} marked`} className="relative pt-5">
+        <span className="absolute top-0 -translate-x-1/2 text-xs" style={{ left: `${(mine + 0.5) * 5}%` }}>
+          you
+        </span>
+        <div className="flex h-24 items-end gap-px border-b border-line">
+          {c.bins.map((n, i) => (
+            <span
+              key={i}
+              className={`flex-1 ${i === mine ? "outline-1 outline-offset-1 outline-bone" : ""}`}
+              style={{ height: `${(n / most) * 100}%`, background: tierColor(tier(i * 5)) }}
+            />
+          ))}
+        </div>
+        <div className="flex justify-between pt-1 text-xs text-ash">
+          <span>0</span>
+          <span>250</span>
+          <span>500</span>
+        </div>
+      </div>
+      <TierBars tiers={c.tiers} unit="%" />
+    </div>
   );
 }
