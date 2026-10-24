@@ -631,14 +631,14 @@ export function End({ date, archive, sent, posted, number, passwords, results, a
           {status}
         </p>
       </div>
-      {others && <Crowd c={others} total={total} />}
+      {others && <Crowd c={others} total={total} sent={sent} />}
     </section>
   );
 }
 
 // T64: a bar per 25 points, coloured by the tier it falls in, with this player's bar marked; the tiers listed under it
 // name the colours (R25).
-function Crowd({ c, total }: { c: ReturnType<typeof crowd>; total: number }) {
+function Crowd({ c, total, sent }: { c: ReturnType<typeof crowd>; total: number; sent?: boolean }) {
   const most = Math.max(...c.bins);
   const mine = Math.min(19, Math.floor(total / 25));
   return (
@@ -647,6 +647,7 @@ function Crowd({ c, total }: { c: ReturnType<typeof crowd>; total: number }) {
         <h3>how everyone did</h3>
         <p>
           {formatGuess(c.players)} player{c.players > 1 && "s"}
+          {!sent && " + you"}
         </p>
       </div>
       <div role="img" aria-label={`Bar chart of totals from 0 to 500, with your ${total} marked`} className="relative pt-5">

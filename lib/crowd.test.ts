@@ -21,9 +21,11 @@ test("a sent game missing from the counts still shows once", () => {
   expect(c.bins.reduce((a, b) => a + b)).toBe(10);
 });
 
-test("an archive game never counts itself", () => {
+test("an archive game is added to the chart but never to the players it is compared with (T70)", () => {
   const c = crowd({ "300": 10, "100": 10 }, 300, false);
   expect(c.players).toBe(20);
+  expect(c.bins[12]).toBe(11);
+  expect(c.tiers).toEqual([["Uncrackable", 0], ["Strong", 0], ["Mid", 52], ["Weak", 48], ["Pwned", 0]]);
   expect(c.lower).toBe(10);
   expect(crowdLine(c, true)).toBe("Better than 50% of that day's players");
   expect(crowdLine(crowd({ "1": 1, "400": 2 }, 300, false), true)).toBe("Better than 1 of 3 players that day");

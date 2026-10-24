@@ -102,6 +102,7 @@ Status: `todo`, `doing`, `done`, `superseded`. Update in the same commit that fi
   3. Shorten the GET cache to s-maxage=15 with stale-while-revalidate=30, so revisits are at most about a minute behind. Keep the T65 rate limit.
   4. Tests: two players submitting a minute apart each see the right count; a cached GET that's missing the player's own entry can't produce "first player" for someone who isn't first.
   Update D51/D52. (D51, D52)
+- [done] **T70** Archive end screens add the player's own total to the chart in the browser only (never sent or stored), so their bar appears marked "you" and the tier breakdown includes them. The header reads "N players + you". The "better than" line still compares against that day's real players only. Daily games are unchanged. Update D52 and add tests (archive: own bar has height, nothing is POSTed). (R12, R20)
 - [todo] **Later** Idea from a player: a "recognisable vs random" split on themed days.
 - [todo] **T32** Remove the tinyglobby override in package.json once eslint-config-next no longer pulls in fast-glob/braces; check on each Next.js upgrade.
 - [done] **T38** CI rejects any modification or deletion of a puzzle file in data/puzzles/ dated before today+2 UTC, the pipeline:replace cut-off; new files for any date are allowed. (D11, D21, R37)

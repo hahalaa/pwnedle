@@ -137,7 +137,7 @@ const tenOthers = { "500": 7, "100": 4 };
 
 test.each([
   ["a daily game counts itself once", {}, "Better than 40% of today's players", "11 players"],
-  ["an archive game only shows that day", { archive: true }, "Better than 36% of that day's players", "11 players"],
+  ["an archive game compares only with that day's players", { archive: true }, "Better than 36% of that day's players", "11 players + you"],
 ])("the end screen shows how everyone did: %s (T64)", async (_, extra, line, players) => {
   vi.stubGlobal("fetch", vi.fn(async () => Response.json({ counts: tenOthers })));
   localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true, ...extra }));
@@ -194,6 +194,22 @@ test("an archive game finished in this visit never counts itself (T64)", async (
   // That day had no players, so nothing shows and the column collapses.
   await vi.waitFor(() => expect(screen.getByRole("button", { name: "Share result" }).closest("section")!.className).not.toContain("lg:grid"));
   expect(screen.queryByText(/player|how everyone did/)).toBeNull();
+});
+
+test("an archive game adds its own bar in the browser only and sends nothing (T70)", async () => {
+  // That day: 4 players at 100. This game scores 500, so the top bar holds only this player.
+  const fetch = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(async () => Response.json({ counts: { "100": 4 } }));
+  vi.stubGlobal("fetch", fetch);
+  localStorage.setItem(KEY, JSON.stringify(lastRound));
+  render(<Round {...props} archive />);
+  fireEvent.click(await screen.findByRole("button", { name: "See results" }));
+  expect(await screen.findByText("4 players + you")).toBeDefined();
+  expect(screen.getByText("Better than 4 of 4 players that day")).toBeDefined();
+  const bars = screen.getByRole("img").querySelectorAll("span[style*=height]");
+  expect((bars[19] as HTMLElement).style.height).toBe("25%");
+  // Uncrackable holds 1 of the 5 bars' players, this one.
+  expect(screen.getByText("20%")).toBeDefined();
+  expect(fetch.mock.calls.filter(([, init]) => init?.method === "POST")).toHaveLength(0);
 });
 
 // T69: the POST answers with the day's counts, this player included; a stale cached GET has only the other player.

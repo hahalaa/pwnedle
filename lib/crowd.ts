@@ -9,8 +9,8 @@ export function crowd(counts: Record<string, number>, total: number, sent: boole
   const others = Object.entries(counts).map(([k, n]) => [Number(k), sent && Number(k) === total ? Math.max(0, n - 1) : n] as const);
   const rest = others.reduce((a, [, n]) => a + n, 0);
   const lower = others.reduce((a, [t, n]) => a + (t < total ? n : 0), 0);
-  // The chart shows everyone who played, so a sent game counts once at its own total.
-  const all = sent ? [...others, [total, 1] as const] : others;
+  // The chart always holds this player once at its own total. For an archive game this happens only here, in the browser (T70).
+  const all = [...others, [total, 1] as const];
   const players = rest + (sent ? 1 : 0);
   // 20 bars of 25 points, 500 in the top one. Tier bands are multiples of 25, so each bar sits in one tier.
   const bins = Array<number>(20).fill(0);
@@ -20,7 +20,7 @@ export function crowd(counts: Record<string, number>, total: number, sent: boole
     lower,
     others: rest,
     bins,
-    tiers: TIERS.map((name) => [name, Math.round((100 * all.reduce((a, [t, n]) => a + (tier(t / 5) === name ? n : 0), 0)) / (players || 1))] as const),
+    tiers: TIERS.map((name) => [name, Math.round((100 * all.reduce((a, [t, n]) => a + (tier(t / 5) === name ? n : 0), 0)) / (rest + 1))] as const),
   };
 }
 
