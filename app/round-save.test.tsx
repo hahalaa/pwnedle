@@ -150,7 +150,7 @@ test.each([
 
 test.each([
   ["alone", { "500": 1 }, "You're the first player today", "1 player"],
-  ["with 2 others", { "500": 1, "20": 2 }, "Better than 2 of 2 players so far today", "3 players"],
+  ["with 2 others", { "500": 1, "20": 2 }, "You placed #1 of 3 so far today", "3 players"],
 ])("under 10 players, %s, the line gives counts and the chart still shows (T64)", async (_, counts, line, players) => {
   vi.stubGlobal("fetch", vi.fn(async () => Response.json({ counts })));
   localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true }));
@@ -204,12 +204,25 @@ test("an archive game adds its own bar in the browser only and sends nothing (T7
   render(<Round {...props} archive />);
   fireEvent.click(await screen.findByRole("button", { name: "See results" }));
   expect(await screen.findByText("4 players + you")).toBeDefined();
-  expect(screen.getByText("Better than 4 of 4 players that day")).toBeDefined();
+  expect(screen.getByText("You'd have placed #1 of 5 that day")).toBeDefined();
   const bars = screen.getByRole("img").querySelectorAll("span[style*=height]");
   expect((bars[19] as HTMLElement).style.height).toBe("25%");
   // Uncrackable holds 1 of the 5 bars' players, this one.
   expect(screen.getByText("20%")).toBeDefined();
   expect(fetch.mock.calls.filter(([, init]) => init?.method === "POST")).toHaveLength(0);
+});
+
+test("a sent daily game opened from the archive page counts itself once and is never added locally (T70, T71)", async () => {
+  // That day's counts already hold this game's 500, plus one more 500 and one 100.
+  vi.stubGlobal("fetch", vi.fn(async () => Response.json({ counts: { "500": 2, "100": 1 } })));
+  localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true }));
+  render(<Round {...props} archive />);
+  expect(await screen.findByText("You placed #1 of 3 that day")).toBeDefined();
+  expect(screen.getByText("3 players")).toBeDefined();
+  expect(screen.queryByText(/\+ you/)).toBeNull();
+  const bars = [...screen.getByRole("img").querySelectorAll<HTMLElement>("span[style*=height]")].map((b) => b.style.height);
+  expect([bars[19], bars[4]]).toEqual(["100%", "50%"]);
+  expect(screen.getByText("67%")).toBeDefined();
 });
 
 // T69: the POST answers with the day's counts, this player included; a stale cached GET has only the other player.
@@ -219,7 +232,7 @@ const scores = (posted: Record<string, number>, cached: Record<string, number>) 
 test("two players a minute apart each see the right count from their own POST (T69)", async () => {
   for (const [posted, line] of [
     [{ "500": 1 }, "You're the first player today"],
-    [{ "500": 1, "20": 1 }, "Better than 1 of 1 player so far today"],
+    [{ "500": 1, "20": 1 }, "You placed #1 of 2 so far today"],
   ] as const) {
     const fetch = scores(posted, {});
     vi.stubGlobal("fetch", fetch);
@@ -240,12 +253,12 @@ test("a cached GET missing this player's entry can't make them the first player 
   localStorage.setItem(KEY, JSON.stringify(lastRound));
   render(<Round {...props} />);
   fireEvent.click(await screen.findByRole("button", { name: "See results" }));
-  expect(await screen.findByText("Better than 0 of 1 player so far today")).toBeDefined();
+  expect(await screen.findByText("You placed #1 of 2 so far today")).toBeDefined();
   // Back on the tab, the GET is read again but a stale one can't take this player out.
   document.dispatchEvent(new Event("visibilitychange"));
   await vi.waitFor(() => expect(fetch).toHaveBeenCalledWith("/api/scores?date=2026-10-24", expect.anything()));
   await new Promise((r) => setTimeout(r));
-  expect(screen.getByText("Better than 0 of 1 player so far today")).toBeDefined();
+  expect(screen.getByText("You placed #1 of 2 so far today")).toBeDefined();
   expect(screen.queryByText(/first player/)).toBeNull();
 });
 
@@ -256,5 +269,5 @@ test("returning to the tab on a finished game reads the counts again (T69)", asy
   render(<Round {...props} />);
   expect(await screen.findByText("You're the first player today")).toBeDefined();
   document.dispatchEvent(new Event("visibilitychange"));
-  expect(await screen.findByText("Better than 2 of 2 players so far today")).toBeDefined();
+  expect(await screen.findByText("You placed #1 of 3 so far today")).toBeDefined();
 });

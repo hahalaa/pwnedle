@@ -28,16 +28,21 @@ test("an archive game is added to the chart but never to the players it is compa
   expect(c.tiers).toEqual([["Uncrackable", 0], ["Strong", 0], ["Mid", 52], ["Weak", 48], ["Pwned", 0]]);
   expect(c.lower).toBe(10);
   expect(crowdLine(c, true)).toBe("Better than 50% of that day's players");
-  expect(crowdLine(crowd({ "1": 1, "400": 2 }, 300, false), true)).toBe("Better than 1 of 3 players that day");
+  expect(crowdLine(crowd({ "1": 1, "400": 2 }, 300, false), true)).toBe("You'd have placed #3 of 4 that day");
   expect(crowd({}, 300, false).players).toBe(0);
   // A daily game opened from the archive was sent, so it can be alone.
   expect(crowdLine(crowd({ "300": 1 }, 300, true), true)).toBe("You were the only player that day");
 });
 
-test("under 10 players the line gives counts, not a percentage", () => {
+test("under 10 players the line gives a rank, and ties share it (T71)", () => {
   expect(crowdLine(crowd({ "300": 1 }, 300, true))).toBe("You're the first player today");
-  expect(crowdLine(crowd({ "300": 1, "20": 2 }, 300, true))).toBe("Better than 2 of 2 players so far today");
-  expect(crowdLine(crowd({ "300": 1, "400": 1 }, 300, true))).toBe("Better than 0 of 1 player so far today");
+  expect(crowdLine(crowd({ "300": 1, "20": 2 }, 300, true))).toBe("You placed #1 of 3 so far today");
+  expect(crowdLine(crowd({ "300": 1, "400": 1 }, 300, true))).toBe("You placed #2 of 2 so far today");
+  // Tied with one other at 300, behind one at 400: both 300s are #2.
+  expect(crowdLine(crowd({ "300": 2, "400": 1, "20": 1 }, 300, true))).toBe("You placed #2 of 4 so far today");
+  expect(crowdLine(crowd({ "300": 1, "400": 1 }, 300, false), true)).toBe("You'd have placed #2 of 3 that day");
+  // A daily game opened from the archive page was sent, and is in the counts once.
+  expect(crowdLine(crowd({ "300": 1, "400": 1 }, 300, true), true)).toBe("You placed #2 of 2 that day");
   // 500 goes in the top bar.
   expect(crowd({ "500": 2 }, 500, true).bins[19]).toBe(2);
 });

@@ -1,4 +1,3 @@
-import { formatGuess } from "./guess";
 import { tier } from "./scoring";
 import { TIERS } from "./stats";
 
@@ -9,6 +8,7 @@ export function crowd(counts: Record<string, number>, total: number, sent: boole
   const others = Object.entries(counts).map(([k, n]) => [Number(k), sent && Number(k) === total ? Math.max(0, n - 1) : n] as const);
   const rest = others.reduce((a, [, n]) => a + n, 0);
   const lower = others.reduce((a, [t, n]) => a + (t < total ? n : 0), 0);
+  const higher = others.reduce((a, [t, n]) => a + (t > total ? n : 0), 0);
   // The chart always holds this player once at its own total. For an archive game this happens only here, in the browser (T70).
   const all = [...others, [total, 1] as const];
   const players = rest + (sent ? 1 : 0);
@@ -18,18 +18,22 @@ export function crowd(counts: Record<string, number>, total: number, sent: boole
   return {
     players,
     lower,
+    higher,
     others: rest,
+    sent,
     bins,
     tiers: TIERS.map((name) => [name, Math.round((100 * all.reduce((a, [t, n]) => a + (tier(t / 5) === name ? n : 0), 0)) / (rest + 1))] as const),
   };
 }
 
-// The one line under the total. Under 10 players it gives counts, since a percentage of a handful says little.
+// The one line under the total. Under 10 players it gives a rank, since a percentage of a handful says little.
 export function crowdLine(c: ReturnType<typeof crowd>, archive?: boolean) {
-  const when = archive ? "that day" : "so far today";
   // "Better than" counts strictly lower totals among the others, rounded down so it never overstates.
   if (c.players >= 10) return `Better than ${Math.floor((100 * c.lower) / c.others)}% of ${archive ? "that day's" : "today's"} players`;
   // No one else: a sent game alone. An archive day with no players at all never reaches here (app/round.tsx).
   if (!c.others) return archive ? "You were the only player that day" : "You're the first player today";
-  return `Better than ${c.lower} of ${formatGuess(c.others)} player${c.others > 1 ? "s" : ""} ${when}`;
+  // Ties share a rank: 1 + the others strictly higher, out of the others plus this player (T71).
+  const rank = `#${c.higher + 1} of ${c.others + 1}`;
+  // A daily game opened from the archive page was sent, so it really placed.
+  return archive ? `You${c.sent ? "" : "'d have"} placed ${rank} that day` : `You placed ${rank} so far today`;
 }
