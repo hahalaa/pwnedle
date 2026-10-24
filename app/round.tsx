@@ -83,6 +83,8 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
   // is saved, sent or tracked, and a refresh lands back on the end screen. `back` is the row to focus on return.
   const [reopened, setReopened] = useState<number | null>(null);
   const [back, setBack] = useState<number>();
+  // T69: the counts the score POST returns, so this visit's end screen never relies on the cached GET.
+  const [posted, setPosted] = useState<Promise<Record<string, number>>>();
   const index = reopened ?? game.index;
   // guess is the last valid number, so the slider stays put while the box holds a typo.
   const [guess, setGuess] = useState(0);
@@ -173,10 +175,11 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
     update({ ...game, done: true });
     track("puzzle-complete", number, archive);
     // T63: a finished daily game adds its total to the day's counts; archive games never do. `done` is saved above and
-    // a finished game never shows See results again, so this sends once, refreshes included. Nothing waits on it.
+    // a finished game never shows See results again, so this sends once, refreshes included. Only the chart waits on it.
     if (!archive) {
       const body = JSON.stringify({ date, guesses: results.map((r) => r.guess) });
-      fetch("/api/scores", { method: "POST", body, keepalive: true }).catch(() => {});
+      const counts = fetch("/api/scores", { method: "POST", body, keepalive: true }).then((res) => (res.ok ? res.json() : Promise.reject())).then((b) => b.counts);
+      setPosted(counts);
     }
   }
 
@@ -215,7 +218,7 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
       </p>
       {/* Focus moves to Share when the game ends during this visit; a finished game loaded from storage leaves focus alone. */}
       {ended ? (
-        <End date={date} archive={archive} sent={!game.archive} number={number} passwords={passwords} results={results} autoFocus={played !== null} back={back} onOpen={reopen} theme={theme} />
+        <End date={date} archive={archive} sent={!game.archive} posted={posted} number={number} passwords={passwords} results={results} autoFocus={played !== null} back={back} onOpen={reopen} theme={theme} />
       ) : (
         <section className="flex flex-1 flex-col gap-6 sm:flex-none short:gap-4">
           <h2 className="text-lg leading-snug lg:text-xl">How many times has this password appeared in data breaches?</h2>
@@ -515,8 +518,9 @@ export function Dots({ results, index, total }: { results: Result[]; index: numb
 // R12: total, daily tier, per-password breakdown and share (R19). The coffee link is only in the footer (D31). Each row
 // reopens its reveal (T56). Coming `back` from one, the screen doesn't fade in again and focus returns to that row.
 // T64: how everyone did loads once the screen is up. Any failure, a 429 or a request slower than 5 s hides it, and on
-// desktop its column, held open from the first render, collapses. `sent` marks a game finished as a daily one (D51).
-export function End({ date, archive, sent, number, passwords, results, autoFocus, back, onOpen, theme }: { date?: string; archive?: boolean; sent?: boolean; number: number; passwords: string[]; results: Result[]; autoFocus?: boolean; back?: number; onOpen?: (i: number) => void; theme?: string }) {
+// desktop its column, held open from the first render, collapses. `sent` marks a game finished as a daily one (D51), and
+// `posted` holds the counts its POST returned in this visit (T69). Coming back to the tab reads them again.
+export function End({ date, archive, sent, posted, number, passwords, results, autoFocus, back, onOpen, theme }: { date?: string; archive?: boolean; sent?: boolean; posted?: Promise<Record<string, number>>; number: number; passwords: string[]; results: Result[]; autoFocus?: boolean; back?: number; onOpen?: (i: number) => void; theme?: string }) {
   const [status, setStatus] = useState("");
   // null while loading; false once the read fails or the day has no players.
   const [others, setOthers] = useState<ReturnType<typeof crowd> | null | false>(null);
@@ -527,14 +531,27 @@ export function End({ date, archive, sent, number, passwords, results, autoFocus
   useEffect(() => {
     if (!date) return;
     let live = true;
-    fetch(`/api/scores?date=${date}`, { signal: AbortSignal.timeout(5000) })
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((body) => crowd(body.counts, total, !!sent))
-      .then((c) => live && setOthers(c.players > 0 && c), () => live && setOthers(false));
+    // Counts only grow, so each read keeps the highest count seen per total. A cached GET that predates this game's POST
+    // can't then drop it. A failed read after one that worked keeps the chart as it was.
+    let seen: Record<string, number> = {};
+    const show = (counts: Promise<Record<string, number>>) =>
+      counts
+        .then((c) => {
+          for (const k in seen) c[k] = Math.max(c[k] ?? 0, seen[k]);
+          return (seen = c);
+        })
+        .then((c) => crowd(c, total, !!sent))
+        .then((c) => live && setOthers(c.players > 0 && c), () => live && setOthers((o) => o || false));
+    // no-cache: the browser asks again every time, so only the CDN's short cache applies (D51).
+    const get = () => fetch(`/api/scores?date=${date}`, { cache: "no-cache", signal: AbortSignal.timeout(5000) }).then((res) => (res.ok ? res.json() : Promise.reject())).then((b) => b.counts);
+    show(posted ?? get());
+    const refresh = () => document.visibilityState === "visible" && show(get());
+    document.addEventListener("visibilitychange", refresh);
     return () => {
       live = false;
+      document.removeEventListener("visibilitychange", refresh);
     };
-  }, [date, total, sent]);
+  }, [date, total, sent, posted]);
 
   async function share() {
     const text = shareText(number, results.map((r) => r.score), theme);

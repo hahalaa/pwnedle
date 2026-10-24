@@ -4,7 +4,7 @@ import { TIERS } from "./stats";
 
 // T64: the day's counts from GET /api/scores ({ "<total>": players }) seen from one player's total. A daily game was
 // sent on See results (D51), so one player at `total` is taken to be this player; the others are everyone else.
-// If the counts don't hold it yet (cached, or the POST still in flight), this drops someone else with the same total.
+// A game sent in this visit uses the counts its POST returned, which always hold it (T69); a later GET is assumed to.
 export function crowd(counts: Record<string, number>, total: number, sent: boolean) {
   const others = Object.entries(counts).map(([k, n]) => [Number(k), sent && Number(k) === total ? Math.max(0, n - 1) : n] as const);
   const rest = others.reduce((a, [, n]) => a + n, 0);

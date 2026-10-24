@@ -27,8 +27,8 @@ async function add(date: string, total: number) {
   memory.set(date, counts);
 }
 
-async function read(date: string): Promise<Record<string, number>> {
-  const token = process.env.KV_REST_API_READ_ONLY_TOKEN;
+// GET reads with the read-only token; POST reads back with the write token it just used.
+async function read(date: string, token = process.env.KV_REST_API_READ_ONLY_TOKEN): Promise<Record<string, number>> {
   if (!process.env.KV_REST_API_URL || !token) return memory.get(date) ?? {};
   // HGETALL comes back flat: [field, value, field, value, ...], all strings.
   const flat: string[] = await upstash(token, ["HGETALL", `scores:${date}`]);
@@ -42,7 +42,8 @@ const fail = (e: unknown) => {
   return Response.json({ error: "Unavailable" }, { status: 503 });
 };
 
-// Counts one finished daily game. The total is worked out here from the guesses, never taken from the browser.
+// Counts one finished daily game and returns the date's counts with it in (T69), so the end screen never waits on the
+// cached GET. The total is worked out here from the guesses, never taken from the browser. POSTs aren't cached.
 export async function POST(req: Request) {
   const text = await req.text();
   if (text.length > 1000) return Response.json({ error: "Too large" }, { status: 413 });
@@ -61,19 +62,19 @@ export async function POST(req: Request) {
   const total = puzzle.passwords.reduce((a, e, i) => a + score(guesses[i], e.count), 0);
   try {
     await add(date, total);
+    return Response.json({ counts: await read(date, process.env.KV_REST_API_TOKEN) });
   } catch (e) {
     return fail(e);
   }
-  return new Response(null, { status: 204 });
 }
 
 // That date's counts, as { counts: { "<total>": players } }. Archive dates too, for T64. The CDN serves repeat reads
-// for a minute so they don't use Upstash's monthly commands (T65); errors aren't cached.
+// briefly so they don't use Upstash's monthly commands (T65, T69); errors aren't cached.
 export async function GET(req: Request) {
   const date = new URL(req.url).searchParams.get("date") ?? "";
   if (!(await loadPuzzle(date))) return Response.json({ error: "Not found" }, { status: 404 });
   try {
-    return Response.json({ counts: await read(date) }, { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } });
+    return Response.json({ counts: await read(date) }, { headers: { "Cache-Control": "public, s-maxage=15, stale-while-revalidate=30" } });
   } catch (e) {
     return fail(e);
   }

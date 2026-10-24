@@ -195,3 +195,50 @@ test("an archive game finished in this visit never counts itself (T64)", async (
   await vi.waitFor(() => expect(screen.getByRole("button", { name: "Share result" }).closest("section")!.className).not.toContain("lg:grid"));
   expect(screen.queryByText(/player|how everyone did/)).toBeNull();
 });
+
+// T69: the POST answers with the day's counts, this player included; a stale cached GET has only the other player.
+const scores = (posted: Record<string, number>, cached: Record<string, number>) =>
+  vi.fn(async (_: string, init?: RequestInit) => Response.json({ counts: init?.method === "POST" ? posted : cached }));
+
+test("two players a minute apart each see the right count from their own POST (T69)", async () => {
+  for (const [posted, line] of [
+    [{ "500": 1 }, "You're the first player today"],
+    [{ "500": 1, "20": 1 }, "Better than 1 of 1 player so far today"],
+  ] as const) {
+    const fetch = scores(posted, {});
+    vi.stubGlobal("fetch", fetch);
+    localStorage.setItem(KEY, JSON.stringify(lastRound));
+    render(<Round {...props} />);
+    fireEvent.click(await screen.findByRole("button", { name: "See results" }));
+    expect(await screen.findByText(line)).toBeDefined();
+    // The cached GET is never read for a game sent in this visit.
+    expect(fetch.mock.calls.every(([, init]) => init?.method === "POST")).toBe(true);
+    cleanup();
+    localStorage.clear();
+  }
+});
+
+test("a cached GET missing this player's entry can't make them the first player (T69)", async () => {
+  const fetch = scores({ "500": 2 }, { "500": 1 });
+  vi.stubGlobal("fetch", fetch);
+  localStorage.setItem(KEY, JSON.stringify(lastRound));
+  render(<Round {...props} />);
+  fireEvent.click(await screen.findByRole("button", { name: "See results" }));
+  expect(await screen.findByText("Better than 0 of 1 player so far today")).toBeDefined();
+  // Back on the tab, the GET is read again but a stale one can't take this player out.
+  document.dispatchEvent(new Event("visibilitychange"));
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledWith("/api/scores?date=2026-10-24", expect.anything()));
+  await new Promise((r) => setTimeout(r));
+  expect(screen.getByText("Better than 0 of 1 player so far today")).toBeDefined();
+  expect(screen.queryByText(/first player/)).toBeNull();
+});
+
+test("returning to the tab on a finished game reads the counts again (T69)", async () => {
+  const fetch = vi.fn().mockResolvedValueOnce(Response.json({ counts: { "500": 1 } })).mockResolvedValue(Response.json({ counts: { "500": 1, "20": 2 } }));
+  vi.stubGlobal("fetch", fetch);
+  localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true }));
+  render(<Round {...props} />);
+  expect(await screen.findByText("You're the first player today")).toBeDefined();
+  document.dispatchEvent(new Event("visibilitychange"));
+  expect(await screen.findByText("Better than 2 of 2 players so far today")).toBeDefined();
+});
