@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-08",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "sophia2024",
+      "count": 143,
+      "note": "A name plus a recent year is a predictable pattern, but this specific pairing keeps it out of the most common lists."
+    },
+    {
+      "password": "xerxes",
+      "count": 38593,
+      "note": "Xerxes is a famous ancient king, and people still pick his name as a clever-sounding, easy-to-recall word."
+    },
+    {
+      "password": "battle",
+      "count": 107040,
+      "note": "Plain dictionary word with no digits or symbols, the kind people pick first from a short mental list."
+    },
+    {
+      "password": "Mia!",
+      "count": 35,
+      "note": "A short name plus an exclamation mark is too thin to be unique, yet few people choose it."
+    },
+    {
+      "password": "Zxcvbn1234",
+      "count": 3592,
+      "note": "Its keyboard-row start \"zxcvbn\" runs along the bottom-left keys, then tacks on the predictable \"1234\" tail."
+    }
+  ]
+}

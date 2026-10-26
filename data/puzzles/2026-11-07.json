@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-07",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "Ashley2025",
+      "count": 91,
+      "note": "A common first name with a current year tacked on is a predictable combo, just less universal than bare \"password123\" variants."
+    },
+    {
+      "password": "797979",
+      "count": 119875,
+      "note": "Repeating the same pair of digits, 79, is a pattern people type without thinking."
+    },
+    {
+      "password": "Giants1",
+      "count": 6560,
+      "note": "Pairing a team nickname with a single trailing digit is a pattern many people use to meet password rules."
+    },
+    {
+      "password": "oooo",
+      "count": 34786,
+      "note": "Four repeated o's is a lazy filler that many people type when mashing the keyboard for a quick throwaway password."
+    },
+    {
+      "password": "letmeinplease123",
+      "count": 334,
+      "note": "Pleading phrase plus a standard number run, yet the exact combo is less common than the bare \"letmein\" family."
+    }
+  ]
+}
