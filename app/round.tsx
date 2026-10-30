@@ -496,7 +496,7 @@ export function Reveal({ result, play, onLand, onClimb }: { result: Result; play
           <div data-meter className="h-full origin-left bg-current" style={{ transform: `scaleX(${result.score / 100})` }} />
         </div>
       </div>
-      <p data-later className="max-w-prose leading-relaxed text-ash">{result.note}</p>
+      <p data-later className="leading-relaxed text-ash">{result.note}</p>
     </div>
   );
 }

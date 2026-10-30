@@ -25,6 +25,8 @@ test("reveal shows the count, the guess, the points, the tier label in its colou
   );
   for (const t of ["12,500,000", "40,000", ">3</span><span class=\"text-xs\">/100</span>", "pwned", "Seen everywhere."]) expect(html).toContain(t);
   expect(html).toContain("color:var(--color-pwned)");
+  // The note uses the full column, with no line-length cap (T76).
+  expect(html).toContain('<p data-later="true" class="leading-relaxed text-ash">Seen everywhere.</p>');
 });
 
 test("the reveal labels the chart lines with both numbers on two rows and puts the ratio in one result row (T48)", () => {
