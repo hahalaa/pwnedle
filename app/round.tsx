@@ -2,6 +2,7 @@
 
 import { type ComponentProps, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { crowd, crowdLine, hardestLine } from "../lib/crowd";
+import { addDays } from "../lib/days";
 import { DECADE, formatGuess, fromSlider, missRatio, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
@@ -628,6 +629,7 @@ export function End({ date, archive, sent, posted, number, passwords, results, a
         >
           Share result
         </button>
+        {date && !archive && <NextPuzzle date={date} />}
         <p role="status" className="text-center text-sm text-ash sm:text-left">
           {status}
         </p>
@@ -635,6 +637,25 @@ export function End({ date, archive, sent, posted, number, passwords, results, a
       {others && <Crowd c={others} total={total} sent={sent} archive={archive} />}
     </section>
   );
+}
+
+// T73: time left until the local midnight after `date`, in the browser's zone, the same zone the tz cookie sends (D30).
+// It checks each second so the minutes turn over on time, and shows nothing once midnight passes.
+const everySecond = (tick: () => void) => {
+  const id = setInterval(tick, 1000);
+  return () => clearInterval(id);
+};
+
+function NextPuzzle({ date }: { date: string }) {
+  const text = useSyncExternalStore(
+    everySecond,
+    () => {
+      const m = Math.ceil((Date.parse(`${addDays(date, 1)}T00:00`) - Date.now()) / 60_000);
+      return m > 0 ? `Next puzzle in ${Math.floor(m / 60)}h ${m % 60}m` : "";
+    },
+    () => "",
+  );
+  return text && <p className="text-center text-sm text-ash sm:text-left">{text}</p>;
 }
 
 // T64: a bar per 25 points, coloured by the tier it falls in, with this player's bar marked; the tiers listed under it

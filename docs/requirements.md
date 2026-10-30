@@ -20,7 +20,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
 - **R9 (v1)** Pressing "Lock in" reveals, for that password: the actual count, the player's guess, points earned, the tier label, and the reveal note. Then "Next password" or, after the fifth, "See results".
 - **R10 (v1)** Scoring per password: `d = |log10(guess + 1) - log10(actual + 1)|`, `score = round(100 * e^(-(d / K)^2))`, with `K = 1.25` stored as a single config value.
 - **R11 (v1)** Tier per password, by score: Uncrackable 90 to 100, Strong 70 to 89, Mid 40 to 69, Weak 10 to 39, Pwned 0 to 9. The daily tier uses the same bands on the average score.
-- **R12 (v1)** The end screen shows the total out of 500, the daily tier, a per-password breakdown (password, count, guess, points), and the share button (D31).
+- **R12 (v1)** The end screen shows the total out of 500, the daily tier, a per-password breakdown (password, count, guess, points), and the share button (D31). Today's game also shows the time until the next puzzle at the player's local midnight (T73).
 
 ## 3. Answer handling
 - **R13 (v1)** The client receives the day's 5 passwords up front, but no counts or notes.

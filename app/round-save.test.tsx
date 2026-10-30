@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { Round } from "./round";
+import { End, Round } from "./round";
 
 // Next asks whether the screen is touch first (T51); jsdom has no matchMedia.
 beforeEach(() => vi.stubGlobal("matchMedia", () => ({ matches: false })));
@@ -10,6 +10,7 @@ afterEach(() => {
   cleanup();
   localStorage.clear();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 const KEY = "pwnedle:2026-10-24";
@@ -273,4 +274,20 @@ test("returning to the tab on a finished game reads the counts again (T69)", asy
   expect(await screen.findByText("You're the first player today")).toBeDefined();
   document.dispatchEvent(new Event("visibilitychange"));
   expect(await screen.findByText("You placed #1 of 3 so far today")).toBeDefined();
+});
+
+test.each([
+  ["today's game counts down to local midnight", {}, true],
+  ["an archive game has no countdown", { archive: true }, false],
+])("%s (T73)", (_, extra, shown) => {
+  vi.useFakeTimers({ now: new Date(2026, 9, 24, 22, 30, 20) });
+  vi.stubGlobal("fetch", vi.fn(async () => Promise.reject(new TypeError("offline"))));
+  render(<End {...props} {...extra} results={lastRound.results} />);
+  const text = () => screen.queryByText(/^Next puzzle in/)?.textContent;
+  expect(text()).toBe(shown ? "Next puzzle in 1h 30m" : undefined);
+  act(() => vi.advanceTimersByTime(40_000));
+  expect(text()).toBe(shown ? "Next puzzle in 1h 29m" : undefined);
+  act(() => vi.setSystemTime(new Date(2026, 9, 25)));
+  act(() => vi.advanceTimersByTime(1000));
+  expect(text()).toBeUndefined();
 });
