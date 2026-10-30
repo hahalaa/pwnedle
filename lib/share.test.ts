@@ -11,3 +11,9 @@ test("builds the R19 share text with the daily tier from the average", () => {
 test("a Halloween share puts a pumpkin after the puzzle number (T58a)", () => {
   expect(shareText(12, [100, 65, 90, 35, 100], "halloween")).toBe("Pwnedle #12 🎃 · 390/500 · Strong\n🟩🟨🟩🟧🟩\npwnedle.com");
 });
+
+test("a streak of 2 or more ends the first line; a streak of 1 adds nothing (T74)", () => {
+  expect(shareText(12, [100, 65, 90, 35, 100], undefined, 1)).toBe("Pwnedle #12 · 390/500 · Strong\n🟩🟨🟩🟧🟩\npwnedle.com");
+  expect(shareText(12, [100, 65, 90, 35, 100], undefined, 2)).toBe("Pwnedle #12 · 390/500 · Strong · 🔥 2\n🟩🟨🟩🟧🟩\npwnedle.com");
+  expect(shareText(12, [100, 65, 90, 35, 100], "halloween", 7)).toBe("Pwnedle #12 🎃 · 390/500 · Strong · 🔥 7\n🟩🟨🟩🟧🟩\npwnedle.com");
+});

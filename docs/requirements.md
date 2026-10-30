@@ -39,7 +39,7 @@ Status key: **v1** = needed for launch, **later** = after launch.
   🟩🟨🟩🟧🟩
   pwnedle.com
   ```
-  Squares per password: 🟩 Uncrackable or Strong, 🟨 Mid, 🟧 Weak, 🟥 Pwned. Shared via clipboard or the native share sheet. On a Halloween day the first line reads `Pwnedle #12 🎃 · 390/500 · Strong` (D50).
+  Squares per password: 🟩 Uncrackable or Strong, 🟨 Mid, 🟧 Weak, 🟥 Pwned. Shared via clipboard or the native share sheet. On a Halloween day the first line reads `Pwnedle #12 🎃 · 390/500 · Strong` (D50). When the current streak (R17) is 2 or more after today's game, the first line ends with it: `Pwnedle #12 · 390/500 · Strong · 🔥 3`. Archive games never show a streak (R18).
 
 ## 6. Archive
 - **R20 (v1)** A free archive of every past puzzle, selectable by puzzle number or date. Future puzzles are never listed.

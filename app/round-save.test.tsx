@@ -31,6 +31,22 @@ test.each([
 });
 
 test.each([
+  ["today's game adds the streak", {}, "Pwnedle #1 · 500/500 · Uncrackable · 🔥 3\n"],
+  ["an archive game leaves it out", { archive: true }, "Pwnedle #1 · 500/500 · Uncrackable\n"],
+])("sharing: %s (T74, R18)", async (_, extra, first) => {
+  vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 204 })));
+  const writeText = vi.fn(async () => {});
+  Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+  // Two finished daily games just before, so the streak is already 2 without this game.
+  for (const d of ["2026-10-22", "2026-10-23"]) localStorage.setItem(`pwnedle:${d}`, JSON.stringify({ ...lastRound, done: true }));
+  localStorage.setItem(KEY, JSON.stringify(lastRound));
+  render(<Round {...props} {...extra} />);
+  fireEvent.click(await screen.findByRole("button", { name: "See results" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Share result" }));
+  await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining(first)));
+});
+
+test.each([
   ["the home page sends its guesses once", {}, 1],
   ["the archive never sends", { archive: true }, 0],
 ])("finishing a game from %s to the score counts (T63)", async (_, extra, calls) => {

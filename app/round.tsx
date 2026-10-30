@@ -7,7 +7,7 @@ import { DECADE, formatGuess, fromSlider, missRatio, parseGuess, SLIDER_MAX, toS
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
 import { isMuted, playTier, unlockAudio } from "../lib/sound";
-import { type Game, loadGame, saveGame } from "../lib/stats";
+import { type Game, loadGame, saveGame, savedGames, stats } from "../lib/stats";
 import { Halloween, Sticker } from "./pumpkin";
 import { TierBars } from "./stats";
 
@@ -556,7 +556,9 @@ export function End({ date, archive, sent, posted, number, passwords, results, a
   }, [date, total, sent, posted]);
 
   async function share() {
-    const text = shareText(number, results.map((r) => r.score), theme);
+    // Only today's game carries the streak; archive games never count toward it (R18).
+    const streak = date && !archive ? stats(savedGames(), date).current : 0;
+    const text = shareText(number, results.map((r) => r.score), theme, streak);
     // The share sheet on phones; the clipboard on desktop, where the sheet is less familiar.
     if (navigator.share && matchMedia("(pointer: coarse)").matches) return navigator.share({ text }).catch(() => {});
     await navigator.clipboard.writeText(text).then(
