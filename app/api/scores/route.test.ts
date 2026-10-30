@@ -70,19 +70,39 @@ test("rejects dates older than UTC today-1 or outside the window with 404", asyn
   expect((await GET(new Request("http://x/api/scores"))).status).toBe(404);
 });
 
+test("adds each password's points and sends their averages from 10 players, never per player (T72, D53)", async () => {
+  const body = async (date: string) => (await GET(new Request(`http://x/api/scores?date=${date}`))).json();
+  // A date no other test posts to, since the in-memory store lasts the whole file.
+  vi.setSystemTime(new Date("2026-10-21T12:00:00Z"));
+  // Exact guesses score 100 each; guessing 0 scores 94, 50, 8, 0 and 0.
+  for (let i = 0; i < 9; i++) await post({ date: "2026-10-20", guesses: i < 6 ? exact : [0, 0, 0, 0, 0] });
+  expect(await body("2026-10-20")).toEqual({ counts: { 500: 6, 152: 3 } });
+  const tenth = await (await post({ date: "2026-10-20", guesses: [0, 10, 100, 1000, 0] })).json();
+  // Password 1: (6 × 100 + 4 × 94) / 10; password 5: 6 × 100 / 10.
+  expect(tenth.averages).toEqual([97.6, 85, 72.4, 70, 60]);
+  expect(await body("2026-10-20")).toEqual(tenth);
+});
+
 test("uses Upstash with the write token for a POST and its read-back, and the read-only token for GETs", async () => {
   upstashEnv();
-  const fetch = vi.fn(async (_: string, init: RequestInit) =>
-    Response.json({ result: JSON.parse(init.body as string)[0] === "HGETALL" ? ["500", "3", "12", "1"] : 1 }),
-  );
+  const hashes: Record<string, string[]> = { "scores:2026-10-24": ["500", "3", "12", "1"], "points:2026-10-24": ["n", "10", "0", "400", "1", "1000", "2", "500", "3", "1000", "4", "1000"] };
+  const fetch = vi.fn(async (_: string, init: RequestInit) => {
+    const [command, key] = JSON.parse(init.body as string);
+    return Response.json({ result: command === "HGETALL" ? hashes[key] : 1 });
+  });
   vi.stubGlobal("fetch", fetch);
-  expect(await (await post({ date: "2026-10-24", guesses: exact })).json()).toEqual({ counts: { 500: 3, 12: 1 } });
-  expect(await counts("2026-10-24")).toEqual({ 500: 3, 12: 1 });
+  const scores = { counts: { 500: 3, 12: 1 }, averages: [40, 100, 50, 100, 100] };
+  expect(await (await post({ date: "2026-10-24", guesses: exact })).json()).toEqual(scores);
+  expect(await (await GET(new Request("http://x/api/scores?date=2026-10-24"))).json()).toEqual(scores);
   const calls = fetch.mock.calls.map(([url, init]) => [url, (init.headers as Record<string, string>).Authorization, JSON.parse(init.body as string)]);
   expect(calls).toEqual([
     ["https://kv.test", "Bearer write", ["HINCRBY", "scores:2026-10-24", 500, 1]],
+    ["https://kv.test", "Bearer write", ["HINCRBY", "points:2026-10-24", "n", 1]],
+    ...[0, 1, 2, 3, 4].map((i) => ["https://kv.test", "Bearer write", ["HINCRBY", "points:2026-10-24", i, 100]]),
     ["https://kv.test", "Bearer write", ["HGETALL", "scores:2026-10-24"]],
+    ["https://kv.test", "Bearer write", ["HGETALL", "points:2026-10-24"]],
     ["https://kv.test", "Bearer read", ["HGETALL", "scores:2026-10-24"]],
+    ["https://kv.test", "Bearer read", ["HGETALL", "points:2026-10-24"]],
   ]);
 });
 

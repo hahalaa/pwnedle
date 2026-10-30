@@ -136,14 +136,15 @@ test.each([
 const tenOthers = { "500": 7, "100": 4 };
 
 test.each([
-  ["a daily game counts itself once", {}, "Better than 40% of today's players", "11 players"],
-  ["an archive game compares only with that day's players", { archive: true }, "Better than 36% of that day's players", "11 players + you"],
-])("the end screen shows how everyone did: %s (T64)", async (_, extra, line, players) => {
-  vi.stubGlobal("fetch", vi.fn(async () => Response.json({ counts: tenOthers })));
+  ["a daily game counts itself once", {}, "Better than 40% of today's players", "11 players", "today's"],
+  ["an archive game compares only with that day's players", { archive: true }, "Better than 36% of that day's players", "11 players + you", "that day's"],
+])("the end screen shows how everyone did: %s (T64, T72)", async (_, extra, line, players, day) => {
+  vi.stubGlobal("fetch", vi.fn(async () => Response.json({ counts: tenOthers, averages: [80, 41.6, 12.4, 90, 60] })));
   localStorage.setItem(KEY, JSON.stringify({ ...lastRound, done: true, ...extra }));
   render(<Round {...props} {...extra} />);
   expect(await screen.findByText(line)).toBeDefined();
   expect(screen.getByText(players)).toBeDefined();
+  expect(screen.getByText(`Password 3 was ${day} hardest: players averaged 12 points`)).toBeDefined();
   expect(screen.getByText("how everyone did")).toBeDefined();
   expect(fetch).toHaveBeenCalledWith("/api/scores?date=2026-10-24", expect.anything());
 });
@@ -158,6 +159,8 @@ test.each([
   expect(await screen.findByText(line)).toBeDefined();
   expect(screen.getByText("how everyone did")).toBeDefined();
   expect(screen.getByText(players)).toBeDefined();
+  // The API sends no averages under 10 players (T72).
+  expect(screen.queryByText(/hardest/)).toBeNull();
 });
 
 test("on desktop the chart column is held from the first render and collapses once if the read fails (T64)", async () => {

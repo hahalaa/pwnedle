@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { crowd, crowdLine } from "./crowd";
+import { crowd, crowdLine, hardestLine } from "./crowd";
 
 test("a sent daily game is taken out of the others once, and better than counts strictly lower totals", () => {
   // 10 players: this one at 300 plus 2 more at 300, 4 below, 3 above.
@@ -45,4 +45,9 @@ test("under 10 players the line gives a rank, and ties share it (T71)", () => {
   expect(crowdLine(crowd({ "300": 1, "400": 1 }, 300, true), true)).toBe("You placed #2 of 2 that day");
   // 500 goes in the top bar.
   expect(crowd({ "500": 2 }, 500, true).bins[19]).toBe(2);
+});
+
+test("the hardest password has the lowest average, the first one on a tie (T72)", () => {
+  expect(hardestLine([80, 41.6, 12.4, 90, 12.4])).toBe("Password 3 was today's hardest: players averaged 12 points");
+  expect(hardestLine([0, 50, 50, 50, 50], true)).toBe("Password 1 was that day's hardest: players averaged 0 points");
 });

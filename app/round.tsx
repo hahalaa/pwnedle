@@ -1,7 +1,7 @@
 "use client";
 
 import { type ComponentProps, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
-import { crowd, crowdLine } from "../lib/crowd";
+import { crowd, crowdLine, hardestLine } from "../lib/crowd";
 import { DECADE, formatGuess, fromSlider, missRatio, parseGuess, SLIDER_MAX, toSlider } from "../lib/guess";
 import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
@@ -84,7 +84,7 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
   const [reopened, setReopened] = useState<number | null>(null);
   const [back, setBack] = useState<number>();
   // T69: the counts the score POST returns, so this visit's end screen never relies on the cached GET.
-  const [posted, setPosted] = useState<Promise<Record<string, number>>>();
+  const [posted, setPosted] = useState<Promise<Scores>>();
   const index = reopened ?? game.index;
   // guess is the last valid number, so the slider stays put while the box holds a typo.
   const [guess, setGuess] = useState(0);
@@ -178,8 +178,7 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
     // a finished game never shows See results again, so this sends once, refreshes included. Only the chart waits on it.
     if (!archive) {
       const body = JSON.stringify({ date, guesses: results.map((r) => r.guess) });
-      const counts = fetch("/api/scores", { method: "POST", body, keepalive: true }).then((res) => (res.ok ? res.json() : Promise.reject())).then((b) => b.counts);
-      setPosted(counts);
+      setPosted(fetch("/api/scores", { method: "POST", body, keepalive: true }).then((res) => (res.ok ? res.json() : Promise.reject())));
     }
   }
 
@@ -515,12 +514,15 @@ export function Dots({ results, index, total }: { results: Result[]; index: numb
   );
 }
 
+// What /api/scores returns: players per total, and from 10 players each password's average points (T72).
+type Scores = { counts: Record<string, number>; averages?: number[] };
+
 // R12: total, daily tier, per-password breakdown and share (R19). The coffee link is only in the footer (D31). Each row
 // reopens its reveal (T56). Coming `back` from one, the screen doesn't fade in again and focus returns to that row.
 // T64: how everyone did loads once the screen is up. Any failure, a 429 or a request slower than 5 s hides it, and on
 // desktop its column, held open from the first render, collapses. `sent` marks a game finished as a daily one (D51), and
 // `posted` holds the counts its POST returned in this visit (T69). Coming back to the tab reads them again.
-export function End({ date, archive, sent, posted, number, passwords, results, autoFocus, back, onOpen, theme }: { date?: string; archive?: boolean; sent?: boolean; posted?: Promise<Record<string, number>>; number: number; passwords: string[]; results: Result[]; autoFocus?: boolean; back?: number; onOpen?: (i: number) => void; theme?: string }) {
+export function End({ date, archive, sent, posted, number, passwords, results, autoFocus, back, onOpen, theme }: { date?: string; archive?: boolean; sent?: boolean; posted?: Promise<Scores>; number: number; passwords: string[]; results: Result[]; autoFocus?: boolean; back?: number; onOpen?: (i: number) => void; theme?: string }) {
   const [status, setStatus] = useState("");
   // null while loading; false once the read fails or the day has no players.
   const [others, setOthers] = useState<ReturnType<typeof crowd> | null | false>(null);
@@ -534,16 +536,15 @@ export function End({ date, archive, sent, posted, number, passwords, results, a
     // Counts only grow, so each read keeps the highest count seen per total. A cached GET that predates this game's POST
     // can't then drop it. A failed read after one that worked keeps the chart as it was.
     let seen: Record<string, number> = {};
-    const show = (counts: Promise<Record<string, number>>) =>
-      counts
-        .then((c) => {
+    const show = (scores: Promise<Scores>) =>
+      scores
+        .then(({ counts: c, averages }) => {
           for (const k in seen) c[k] = Math.max(c[k] ?? 0, seen[k]);
-          return (seen = c);
+          return crowd((seen = c), total, !!sent, averages);
         })
-        .then((c) => crowd(c, total, !!sent))
         .then((c) => live && setOthers(c.players > 0 && c), () => live && setOthers((o) => o || false));
     // no-cache: the browser asks again every time, so only the CDN's short cache applies (D51).
-    const get = () => fetch(`/api/scores?date=${date}`, { cache: "no-cache", signal: AbortSignal.timeout(5000) }).then((res) => (res.ok ? res.json() : Promise.reject())).then((b) => b.counts);
+    const get = () => fetch(`/api/scores?date=${date}`, { cache: "no-cache", signal: AbortSignal.timeout(5000) }).then((res) => (res.ok ? res.json() : Promise.reject()));
     show(posted ?? get());
     const refresh = () => document.visibilityState === "visible" && show(get());
     document.addEventListener("visibilitychange", refresh);
@@ -631,14 +632,14 @@ export function End({ date, archive, sent, posted, number, passwords, results, a
           {status}
         </p>
       </div>
-      {others && <Crowd c={others} total={total} sent={sent} />}
+      {others && <Crowd c={others} total={total} sent={sent} archive={archive} />}
     </section>
   );
 }
 
 // T64: a bar per 25 points, coloured by the tier it falls in, with this player's bar marked; the tiers listed under it
 // name the colours (R25).
-function Crowd({ c, total, sent }: { c: ReturnType<typeof crowd>; total: number; sent?: boolean }) {
+function Crowd({ c, total, sent, archive }: { c: ReturnType<typeof crowd>; total: number; sent?: boolean; archive?: boolean }) {
   const most = Math.max(...c.bins);
   const mine = Math.min(19, Math.floor(total / 25));
   return (
@@ -670,6 +671,7 @@ function Crowd({ c, total, sent }: { c: ReturnType<typeof crowd>; total: number;
         </div>
       </div>
       <TierBars tiers={c.tiers} unit="%" />
+      {c.averages && <p className="text-sm text-ash">{hardestLine(c.averages, archive)}</p>}
     </div>
   );
 }
