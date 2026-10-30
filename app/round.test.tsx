@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
-import { DECADE, SLIDER_MAX } from "../lib/guess";
+import { DECADE, SLIDER_MAX, toSlider } from "../lib/guess";
 import { chartViews, Dots, End, REVEAL, Reveal, Round } from "./round";
 import Template from "./template";
 
@@ -45,6 +45,24 @@ test("the reveal's chart ends fitting the guess and the count, with labels insid
   expect(html).toMatch(/w-0.5 bg-current" style="left:0%"><span[^>]*style="translate:0%">you/);
   expect(html).toContain('<div data-meter="true" class="h-full origin-left bg-current" style="transform:scaleX(0.03)">');
   for (const t of ["0", "1", "100m"]) expect(html).toContain(`</span>${t}</div>`);
+});
+
+test("tick labels past the ends of the zoomed chart are dropped, and the rest fit inside it on phones and desktop (T75)", () => {
+  const html = renderToStaticMarkup(<Reveal result={{ guess: 10, count: 8, score: 100, tier: "Uncrackable", note: "" }} />);
+  const ticks = [...html.matchAll(/data-at="([\d.e-]+)"[^>]*><div[^>]*><span class="h-1.5 w-px bg-ash"><\/span>([^<]*)<\/div>/g)];
+  expect(ticks.map(([, , t]) => t)).toEqual(["", "1", "10", "", "", "", "", "", "", ""]);
+  const [from, to] = chartViews(toSlider(10) / SLIDER_MAX, toSlider(8) / SLIDER_MAX)[1];
+  // Clip box widths and root sizes measured in Chrome. The axis is inset by px-3 and half the thumb (0.75rem + 0.4375rem),
+  // and a text-xs IBM Plex Mono character is 0.6 of 0.75rem wide.
+  for (const { clip, rem } of [{ clip: 358, rem: 16 }, { clip: 1029, rem: 17.1429 }]) {
+    const inset = 1.1875 * rem;
+    for (const [, at, t] of ticks.filter(([, , t]) => t)) {
+      const x = inset + ((Number(at) - from) / (to - from)) * (clip - 2 * inset);
+      const half = (t.length * 0.6 * 0.75 * rem) / 2;
+      expect(x - half).toBeGreaterThanOrEqual(0);
+      expect(x + half).toBeLessThanOrEqual(clip);
+    }
+  }
 });
 
 test("the chart starts at two decades around the guess and zooms out to fit both with a margin, inside the axis (T48)", () => {

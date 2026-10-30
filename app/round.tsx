@@ -340,14 +340,15 @@ function Pin({ at, view, className, ...props }: { at: number; view?: View } & Co
 }
 
 // One tick per stop. The margins match the slider thumb's centre, which travels from half the thumb's width in from
-// each end (--thumb, globals.css).
+// each end (--thumb, globals.css). With `view`, a tick past either end of that stretch loses its label, which the clip
+// box would cut (T75); a tick on it has room, since the chart's inset is wider than half the longest label.
 function Ticks({ view }: { view?: View }) {
   return (
     <div className="relative mx-[calc(var(--thumb)/2)] h-7 text-xs text-ash" aria-hidden>
       {TICKS.map(([t, f]) => (
         <Pin key={t} at={f} view={view} className="flex flex-col items-center gap-1">
           <span className="h-1.5 w-px bg-ash" />
-          {t}
+          {(!view || (f >= view[0] - 1e-9 && f <= view[1] + 1e-9)) && t}
         </Pin>
       ))}
     </div>
