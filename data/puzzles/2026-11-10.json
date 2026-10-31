@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-10",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "Qweasd2000",
+      "count": 112,
+      "note": "Qweasd is a keyboard run down the left side, and the trailing 2000 is a common add-on, which is why it's rare rather than unique."
+    },
+    {
+      "password": "1q2w3e4r2025",
+      "count": 0,
+      "note": "Its keyboard-row run \"1q2w3e4r\" followed by \"2025\" is a patterned guess that still feels unique enough to have never surfaced."
+    },
+    {
+      "password": "follow",
+      "count": 26212,
+      "note": "A plain English verb with no added twist, the kind of word people grab without thinking."
+    },
+    {
+      "password": "slow",
+      "count": 5366,
+      "note": "A single plain English word with no digits or symbols, the kind people grab on impulse and reuse everywhere."
+    },
+    {
+      "password": "patriots1",
+      "count": 124133,
+      "note": "Sports-team names with a tacked-on digit are among the first things people type, so \"patriots1\" gets tried constantly."
+    }
+  ]
+}

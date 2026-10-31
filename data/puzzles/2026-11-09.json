@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-09",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "wrinkle5",
+      "count": 2307,
+      "note": "A dictionary word with a lone digit tacked on the end is a pattern people reuse constantly."
+    },
+    {
+      "password": "666666",
+      "count": 5016100,
+      "note": "Six repeated sixes is the first pattern anyone tries when asked for a number that feels edgy but easy to type."
+    },
+    {
+      "password": "chicken",
+      "count": 917870,
+      "note": "Plain dictionary food words like \"chicken\" sit at the top of every list people pick from when they want something easy to remember."
+    },
+    {
+      "password": "services",
+      "count": 73895,
+      "note": "Plain dictionary noun, the kind of word people pick because it sounds official and simple to type."
+    },
+    {
+      "password": "h@rry",
+      "count": 98,
+      "note": "Swapping the \"a\" for \"@\" in a name is a tweak many people try, so it shows up often but not in the most common lists."
+    }
+  ]
+}

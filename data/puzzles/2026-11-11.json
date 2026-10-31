@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-11",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "forme",
+      "count": 7235,
+      "note": "It's a short, plain English word with a sentimental ring, the kind people type without thinking of it as a secret."
+    },
+    {
+      "password": "shakira",
+      "count": 205531,
+      "note": "A single celebrity first name, typed in lowercase with nothing added, is about as predictable as a password gets."
+    },
+    {
+      "password": "pepper",
+      "count": 1097892,
+      "note": "Pepper is a plain dictionary word, and people pick it because they like its sound and its spice-rack familiarity."
+    },
+    {
+      "password": "silly",
+      "count": 31108,
+      "note": "A single playful word with no digits or symbols, the kind of quick pick people make when they want something easy to type."
+    },
+    {
+      "password": "p@ck3r$",
+      "count": 12,
+      "note": "Swapping letters for symbols like @, 3 and $ in \"packers\" makes it look clever, yet the core word is still a predictable pattern."
+    }
+  ]
+}

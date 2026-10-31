@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-12",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "opensesame2000",
+      "count": 81,
+      "note": "A famous phrase from a folk tale, with a birth-year-style suffix bolted on, which keeps it out of the most common lists."
+    },
+    {
+      "password": "colnago",
+      "count": 28733,
+      "note": "Colnago is a famous Italian bicycle brand, so a cycling enthusiast's surname-as-password turns up often."
+    },
+    {
+      "password": "everett",
+      "count": 48367,
+      "note": "Plain first name with no digits or symbols, the sort of word people pick without thinking twice."
+    },
+    {
+      "password": "pretty",
+      "count": 496065,
+      "note": "It's an ordinary English adjective with nothing added, so people pick it constantly and it shows up in leak lists everywhere."
+    },
+    {
+      "password": "Welcomehome1234",
+      "count": 129,
+      "note": "Pairing a sentimental phrase like \"Welcomehome\" with a plain 1234 tail makes it feel personal, yet the combination is still uncommon."
+    }
+  ]
+}

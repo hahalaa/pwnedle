@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-13",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "steven1",
+      "count": 250797,
+      "note": "Tacking a single digit onto a common first name is the first thing many people try."
+    },
+    {
+      "password": "q@zw$x",
+      "count": 1,
+      "note": "Keyboard-row neighbors q, z, w and x stitched together with symbols give it a random-looking scramble that few others share."
+    },
+    {
+      "password": "martinez",
+      "count": 341934,
+      "note": "Just a surname with no digits or symbols, the kind of plain word people reuse everywhere."
+    },
+    {
+      "password": "picard",
+      "count": 84256,
+      "note": "Picard is a Star Trek captain's surname, and fans pick it as a lone, easy-to-remember word."
+    },
+    {
+      "password": "masterbaiting",
+      "count": 1880,
+      "note": "Built on \"master,\" a playful twist on \"masturbating\" that people reuse as a quick, memorable joke password."
+    }
+  ]
+}
