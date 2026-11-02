@@ -27,6 +27,18 @@ test("the Halloween label and spider are in every header but hidden unless the p
   expect(html).toMatch(/<span class="[^"]*hidden[^"]*halloween:block"><svg[^>]*class="[^"]*animate-drop/);
 });
 
+test("the Christmas label is in every header but hidden unless the page is a Christmas day (T60)", () => {
+  const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
+  const label = html.match(/<p class="hidden [^"]*christmas:block">(.*?)<\/p>/)![1];
+  // One phrase for screen readers; the coloured letters are hidden from them.
+  expect(label).toMatch(/^<span class="sr-only">christmas special<\/span><span aria-hidden="true">/);
+  const letters = [...label.matchAll(/<span class="text-(\w+)">(.)<\/span>/g)].map(([, colour, c]) => [c, colour]);
+  expect(letters.map(([c]) => c).join("")).toBe("christmas special");
+  // Alternates holly and berry, carrying across the space.
+  const colours = letters.filter(([c]) => c !== " ").map(([, colour]) => colour);
+  expect(colours).toEqual(colours.map((_, i) => (i % 2 ? "berry" : "holly")));
+});
+
 test("the footer has only the about and coffee links (R23, R24, D29)", () => {
   const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
   const footer = html.slice(html.indexOf("<footer"));

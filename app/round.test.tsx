@@ -105,7 +105,7 @@ test("every tier colour is always emitted, since the reveal only builds its name
 test("every colour token has a light and a dark value (T44)", () => {
   const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
   const tokens = css.match(/--color-[a-z-]+: [^;]+;/g)!;
-  expect(tokens).toHaveLength(12);
+  expect(tokens).toHaveLength(16);
   for (const t of tokens) expect(t).toMatch(/: light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\);$/);
 });
 
@@ -194,7 +194,24 @@ test("a Halloween end screen puts a pumpkin sticker on the tier drawing's laptop
   expect(sticker([50])).toBeUndefined();
 });
 
-test("the Halloween variant ignores a page Next has hidden after navigating away (T58a)", () => {
+test("the theme variants ignore a page Next has hidden after navigating away (T58a, T60)", () => {
   const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
-  expect(css).toContain(`@custom-variant halloween (:root:has([data-event="halloween"]:not([style*="display: none"] *)) &);`);
+  for (const theme of ["halloween", "christmas"]) {
+    expect(css).toContain(`@custom-variant ${theme} (:root:has([data-event="${theme}"]:not([style*="display: none"] *)) &);`);
+  }
+});
+
+test("a Christmas puzzle puts a hidden tree and present on the password window in the round and the end screen, and a Santa hat on the laptop; Halloween gets neither (T60)", () => {
+  const result = { guess: 1, count: 1, score: 50, tier: "Mid", note: "n" };
+  const views = (theme?: string) => [
+    renderToStaticMarkup(<Round date="2026-10-24" number={1} passwords={["a"]} theme={theme} />),
+    renderToStaticMarkup(<End number={1} passwords={["a"]} results={[result]} theme={theme} />),
+  ];
+  for (const html of views("christmas")) {
+    expect(html).toMatch(/brackets relative[^>]*><span data-event="christmas" class="contents"><svg aria-hidden="true"[^>]*viewBox="0 0 44 20" class="absolute[^"]*bottom-full/);
+    expect(html).not.toContain("<ellipse");
+  }
+  const hat = views("christmas")[1].match(/<svg aria-hidden="true" viewBox="0 0 24 20" fill="currentColor"[^>]*style="left:52%">(.*?)<\/svg>/)?.[1];
+  expect(hat).toContain("<circle");
+  for (const html of views("halloween")) expect(html).not.toContain('data-event="christmas"');
 });

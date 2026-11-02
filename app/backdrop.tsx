@@ -12,30 +12,36 @@ const PHONE = 640; // Tailwind's sm breakpoint
 const FRAME = 1000 / 24; // the drift is slow, so at most 24 fps (20 on a 60 Hz screen) is plenty
 
 type Box = { left: number; right: number };
-type Column = { x: number; speed: number; fade: number; phase: number; text: string[]; words?: string[] };
+type Column = { x: number; speed: number; fade: number; phase: number; text: string[]; words?: Record<string, string[]> };
+type Flake = { x: number; y: number; speed: number; sway: number; phase: number };
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const pair = () => Math.floor(Math.random() * 256).toString(16).toUpperCase().padStart(2, "0");
 
-// T58a: on Halloween days some columns swap in a copy of their pairs with a hex word every 5 to 9 rows, now and then
-// DEAD over BEEF.
-const WORDS = ["B00", "DEAD", "BAD", "0DD", "FADE"];
-export function haunt(text: string[]) {
+// T58a, T60: on theme days some columns swap in a copy of their pairs with a hex word every 5 to 9 rows, now and then
+// a pair of words one over the other: DEAD over BEEF, or FA1A over 1A1A for "fa la la".
+export const WORDS = {
+  halloween: { words: ["B00", "DEAD", "BAD", "0DD", "FADE"], pair: ["DEAD", "BEEF"] },
+  christmas: { words: ["DEC25", "C0C0A", "BE11", "C0A1"], pair: ["FA1A", "1A1A"] },
+};
+export function spell(text: string[], { words, pair }: (typeof WORDS)[keyof typeof WORDS]) {
   const out = [...text];
   for (let i = Math.floor(rand(0, 5)); i < out.length - 1; i += Math.floor(rand(5, 10))) {
-    if (Math.random() < 0.15) out.splice(i, 2, "DEAD", "BEEF");
-    else out[i] = WORDS[Math.floor(Math.random() * WORDS.length)];
+    if (Math.random() < 0.15) out.splice(i, 2, ...pair);
+    else out[i] = words[Math.floor(Math.random() * words.length)];
   }
   return out;
 }
 
+// Where glyphs may go: the margins on desktop, the whole width on phones.
+const regions = (width: number, content: Box) => (width < PHONE ? [[0, width]] : [[0, content.left - GAP], [content.right + GAP, width]]);
+
 // About a third of the slots in each margin, evenly spaced so neither side comes out empty. Phones have no margins,
 // so their columns run across the whole width. Fades are spread out so about half the columns show at any moment.
-// About one column in six, at least one, gets Halloween words, starting from a random column so it isn't always the
+// About one column in six, at least one, gets theme words, starting from a random column so it isn't always the
 // same slot.
 export function pickColumns(width: number, content: Box, rows: number): Column[] {
-  const regions = width < PHONE ? [[0, width]] : [[0, content.left - GAP], [content.right + GAP, width]];
-  const columns = regions.flatMap(([from, to]) => {
+  const columns = regions(width, content).flatMap(([from, to]) => {
     const slots = Math.floor((to - from - GLYPH) / PITCH) + 1;
     if (slots < 1) return [];
     const inset = (to - from - GLYPH - (slots - 1) * PITCH) / 2;
@@ -50,8 +56,26 @@ export function pickColumns(width: number, content: Box, rows: number): Column[]
     }));
   });
   const start = Math.floor(Math.random() * Math.min(6, columns.length));
-  for (let i = start; i < columns.length; i += 6) columns[i].words = haunt(columns[i].text);
+  for (let i = start; i < columns.length; i += 6) {
+    columns[i].words = Object.fromEntries(Object.entries(WORDS).map(([event, set]) => [event, spell(columns[i].text, set)]));
+  }
   return columns;
+}
+
+// T60: light snow for Christmas days, about one flake per 12,000px² in the same places as the columns. Each flake
+// falls at 8 to 20px a second and sways up to 6px. `y` is a fraction of the height, so a resize keeps the spread.
+const SWAY = 6;
+export function pickFlakes(width: number, content: Box, height: number): Flake[] {
+  return regions(width, content).flatMap(([from, to]) => {
+    if (to - from < 2 * SWAY + GLYPH) return [];
+    return Array.from({ length: Math.round(((to - from) * height) / 12000) }, () => ({
+      x: rand(from + SWAY + GLYPH / 2, to - SWAY - GLYPH / 2),
+      y: Math.random(),
+      speed: rand(8, 20),
+      sway: rand(2, SWAY),
+      phase: rand(0, 2 * Math.PI),
+    }));
+  });
 }
 
 export function Backdrop() {
@@ -68,6 +92,7 @@ export function Backdrop() {
     // Enough pairs for the tallest the screen can get, so a phone's toolbar hiding doesn't reshuffle the columns.
     const textRows = Math.ceil(Math.max(innerHeight, screen.height) / SIZE) + 2;
     let columns: Column[] = [];
+    let flakes: Flake[] = [];
     let picked = "";
     let w = 0;
     let h = 0;
@@ -86,6 +111,7 @@ export function Backdrop() {
       if (key !== picked) {
         picked = key;
         columns = pickColumns(w, box, textRows);
+        flakes = pickFlakes(w, box, h);
       }
     };
 
@@ -97,21 +123,30 @@ export function Backdrop() {
       ctx.textBaseline = "top";
       // Centred on the slot, so a four-letter word overhangs a pair evenly on both sides.
       ctx.textAlign = "center";
-      // On Halloween days the `halloween` variant tints the colour and sets --haunted (T58a).
-      ctx.fillStyle = style.color;
-      const halloween = style.getPropertyValue("--haunted");
+      // On theme days the variants set --event, and tint the colour (T58a) or, for Christmas, set green in `fill` and
+      // red in `stroke`, which the canvas doesn't otherwise use (T60). Computed styles give them as plain rgb.
+      const event = style.getPropertyValue("--event").trim();
+      const christmas = event === "christmas";
       // Faint on phones, where the columns run behind the content. 28% keeps the light theme's muted text at 4.5:1;
       // red text can dip to about 4.0 to 4.3:1 for a moment (D47).
       const strength = w >= PHONE ? 1 : current() === "light" ? 0.28 : 0.45;
-      for (const c of columns) {
+      for (const [k, c] of columns.entries()) {
+        ctx.fillStyle = christmas ? (k % 2 ? style.stroke : style.fill) : style.color;
         ctx.globalAlpha = ((Math.sin(s * c.fade + c.phase) + 1) / 2) * strength;
         const scroll = s * c.speed;
         const off = ((scroll % SIZE) + SIZE) % SIZE;
         const shift = Math.floor(scroll / SIZE);
-        const text = (halloween && c.words) || c.text;
+        const text = c.words?.[event] ?? c.text;
         const n = text.length;
         for (let i = 0, top = off - SIZE; top < h; i++, top += SIZE) {
           ctx.fillText(text[(((i - shift) % n) + n) % n], c.x + GLYPH / 2, top + 1);
+        }
+      }
+      if (christmas) {
+        ctx.fillStyle = style.color;
+        ctx.globalAlpha = strength;
+        for (const f of flakes) {
+          ctx.fillText("*", f.x + Math.sin(s * 0.6 + f.phase) * f.sway, ((f.y * (h + SIZE) + s * f.speed) % (h + SIZE)) - SIZE);
         }
       }
     };
@@ -134,7 +169,7 @@ export function Backdrop() {
     // The still frame needs a redraw when the theme toggle or the system theme changes the colour.
     const theme = new MutationObserver(invalidate);
     theme.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-    // The still frame also redraws when navigating to or from a Halloween day changes the page (T58a).
+    // The still frame also redraws when navigating to or from a theme day changes the page (T58a).
     if (still) theme.observe(content, { childList: true, subtree: true, attributeFilter: ["style"] });
     scheme.addEventListener("change", invalidate);
     addEventListener("resize", invalidate);
@@ -146,5 +181,5 @@ export function Backdrop() {
     };
   }, []);
 
-  return <canvas ref={ref} aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 size-full text-line halloween:text-pumpkin-line halloween:[--haunted:1]" />;
+  return <canvas ref={ref} aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 size-full text-line halloween:text-pumpkin-line halloween:[--event:halloween] christmas:fill-holly-line christmas:stroke-berry-line christmas:[--event:christmas]" />;
 }

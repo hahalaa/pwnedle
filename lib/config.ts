@@ -13,6 +13,6 @@ export const UMAMI_WEBSITE_ID = "6c99dc08-3553-4422-a640-ad15dbd123f7";
 // T44: the saved theme, "light" or "dark". Read before first paint in app/layout.tsx and set by app/theme.tsx.
 export const THEME_KEY = "pwnedle-theme";
 // D49: themes a puzzle file may set. Each one needs its decoration in app/round.tsx and a tag below.
-export const THEMES = ["halloween"] as const;
+export const THEMES = ["halloween", "christmas"] as const;
 // D49: the archive list shows this on a theme day's row.
-export const THEME_TAGS: Record<(typeof THEMES)[number], string> = { halloween: "🎃 halloween special" };
+export const THEME_TAGS: Record<(typeof THEMES)[number], string> = { halloween: "🎃 halloween special", christmas: "🎄 christmas special" };

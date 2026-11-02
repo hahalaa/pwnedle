@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
 import { candidates, themeCandidates, variations } from "./candidates";
+import { isClean } from "./filter";
 
 test("applies case, digit, year, ! and letter-swap variations without stacking", () => {
   const v = variations("dragon");
@@ -48,4 +49,10 @@ test("theme seeds expand on their own and stay out of random days", async () => 
   const halloween = await themeCandidates("halloween");
   expect(halloween).toContain("Jackolantern2025");
   expect(await candidates()).not.toContain("Jackolantern2025");
+});
+
+test("every Christmas seed variation passes the content filter (T60)", async () => {
+  const christmas = await themeCandidates("christmas");
+  expect(christmas).toContain("Merrychristmas2025");
+  expect(christmas.filter((pw) => !isClean(pw))).toEqual([]);
 });

@@ -8,7 +8,7 @@ import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
 import { isMuted, playTier, unlockAudio } from "../lib/sound";
 import { type Game, loadGame, saveGame, savedGames, stats } from "../lib/stats";
-import { Halloween, Sticker } from "./pumpkin";
+import { Christmas, Halloween, Sticker } from "./pumpkin";
 import { TierBars } from "./stats";
 
 // A number's place along the slider, from 0 at the 0 stop to 1 at 100m (lib/guess.ts).
@@ -225,6 +225,7 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
           {/* The password sits in a bracketed 1px window; its title bar carries the progress (D25). */}
           <div className="brackets relative mx-(--bracket) border border-line">
             {theme === "halloween" && <Halloween />}
+            {theme === "christmas" && <Christmas />}
             <div className="flex items-center justify-between border-b border-line px-3 py-1.5 text-xs text-ash">
               <p>
                 password {index + 1} of {passwords.length}
@@ -576,7 +577,7 @@ export function End({ date, archive, sent, posted, number, passwords, results, a
         {/* Decorative; the tier label beside it carries the meaning (R25, D41). */}
         <span aria-hidden="true" className="relative size-15 shrink-0">
           <span className="absolute inset-0 bg-current [mask:center/contain_no-repeat]" style={{ maskImage: `url(/art/${daily.toLowerCase()}.svg)` }} />
-          {theme === "halloween" && <Sticker tier={daily} />}
+          {theme && <Sticker tier={daily} theme={theme} />}
         </span>
         <p id="end-total">
           <span className="text-6xl">{total}</span> <span className="text-xl text-ash">/ 500</span>
@@ -589,6 +590,7 @@ export function End({ date, archive, sent, posted, number, passwords, results, a
       </div>
       <div className="brackets relative mx-(--bracket) border border-line">
         {theme === "halloween" && <Halloween />}
+        {theme === "christmas" && <Christmas />}
         <div className="flex items-center justify-between border-b border-line px-3 py-1.5 text-xs text-ash">
           <p>puzzle #{number}</p>
           <p>points</p>

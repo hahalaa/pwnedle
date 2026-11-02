@@ -31,15 +31,44 @@ export function Halloween() {
   );
 }
 
+// T60: on Christmas days a line tree and a wrapped present sit where the pumpkins go, at the same size. `data-event`
+// themes the background and header through the `christmas` variant.
+export function Christmas() {
+  return (
+    <span data-event="christmas" className="contents">
+      <svg {...svg} viewBox="0 0 44 20" className="absolute right-4 bottom-full h-5 text-ash">
+        <path d="M10 .5v3M8.5 2h3M10 3.5L5 8.5h2.5L3.5 13.5h3L2.5 17.5h15l-4-4h3l-4-5H15zM8.5 17.5v2h3v-2" />
+        <path d="M25.5 10.5h13v9h-13zM24.5 8.5h15v2h-15zM32 8.5v11M32 8.5c-1.5-3-5-3.5-4-1.25S32 8.5 32 8.5c1.5-3 5-3.5 4-1.25S32 8.5 32 8.5" />
+      </svg>
+    </span>
+  );
+}
+
 // The laptop lid's centre in each tier drawing, as a percentage across the 60px box, measured from public/art.
 const LID: Record<string, number> = { Pwned: 49, Weak: 52, Mid: 52, Strong: 49, Uncrackable: 48 };
 
-// A carved-pumpkin sticker on the laptop lid of the end screen's tier drawing: a solid shape with the face cut out.
-export function Sticker({ tier }: { tier: string }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 20" fill="currentColor" className="absolute top-[83%] h-2.5 -translate-1/2 -rotate-8" style={{ left: `${LID[tier]}%` }}>
+// A sticker on the laptop lid of the end screen's tier drawing, in solid shapes: a carved pumpkin with its face cut
+// out, or a Santa hat with a gap between the hat and its brim (T60).
+const STICKERS: Record<string, React.ReactNode> = {
+  halloween: (
+    <>
       <path d="M11.25 2.5h1.5v3.5h-1.5z" />
       <path fillRule="evenodd" d="M2.5 12.5a9.5 7 0 1 0 19 0a9.5 7 0 1 0-19 0zM8.5 11.5l1.5-2.5 1.5 2.5zM12.5 11.5l1.5-2.5 1.5 2.5zM8 14.5l1.5 1 1.25-1 1.25 1 1.25-1 1.25 1 1.5-1q-4 4-8 0z" />
+    </>
+  ),
+  christmas: (
+    <>
+      <path d="M4 13C4 6 9 2 14 2c4 0 7 3 7.5 6.5L19 9c-.5-2-2-3-3-2-1 1.5 0 4 1 6z" />
+      <circle cx="21" cy="11.5" r="2.5" />
+      <rect x="2" y="15" width="17" height="4.5" rx="2.25" />
+    </>
+  ),
+};
+
+export function Sticker({ tier, theme }: { tier: string; theme: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 20" fill="currentColor" className="absolute top-[83%] h-2.5 -translate-1/2 -rotate-8" style={{ left: `${LID[tier]}%` }}>
+      {STICKERS[theme]}
     </svg>
   );
 }
