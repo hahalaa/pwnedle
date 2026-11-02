@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-14",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "believe",
+      "count": 157582,
+      "note": "Plain dictionary word with no digits or symbols, the kind people pick because it sounds inspiring."
+    },
+    {
+      "password": "waqw3p",
+      "count": 1691,
+      "note": "Short and random-looking, but the \"w3p\" pattern is a leetspeak-style swap that many people land on, so it shows up often."
+    },
+    {
+      "password": "finder",
+      "count": 25021,
+      "note": "Just a plain English word with no digits or symbols, the sort of thing people type without thinking twice."
+    },
+    {
+      "password": "robert12",
+      "count": 113031,
+      "note": "Just a first name with \"12\" tacked on, the lazy add-two-digits habit that countless people fall into."
+    },
+    {
+      "password": "Music2025",
+      "count": 21,
+      "note": "A familiar word with a current year stuck on the end makes it a modest, not-unusual pick."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-15",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "123qwe2025",
+      "count": 0,
+      "note": "Two keyboard-row runs, \"123\" and \"qwe,\" joined with a year, is a habit people rarely stop to make unique."
+    },
+    {
+      "password": "lion1990",
+      "count": 1918,
+      "note": "A word people love plus a birth year tacked on the end is a pattern that shows up again and again."
+    },
+    {
+      "password": "loveme1",
+      "count": 370969,
+      "note": "Pairing a short, sentimental phrase with a bare \"1\" is the sort of easy add-a-digit habit that shows up across countless accounts."
+    },
+    {
+      "password": "greywolf",
+      "count": 27846,
+      "note": "Two plain dictionary words mashed together, the kind of animal-pairing people settle on because it feels strong but is easy to recall."
+    },
+    {
+      "password": "baseball",
+      "count": 1937864,
+      "note": "Plain dictionary word with no digits or symbols, so it sits near the top of every common-password list."
+    }
+  ]
+}
