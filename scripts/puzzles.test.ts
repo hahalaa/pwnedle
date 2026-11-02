@@ -203,7 +203,7 @@ test("validate reports mix, reuse, content, note and shape errors", async () => 
     `${b}.json: note 0: contradicts band "extremely common"`,
     `${b}.json: password 3 is also in ${a}.json`,
     `${b}.json: password 4 has a bad count`,
-    `${b}.json: theme must be one of halloween, christmas, got spooky`,
+    `${b}.json: theme must be one of halloween, christmas, newyear, got spooky`,
     "2026-01-01.json: date 2026-01-02 does not match the file name",
     "2026-01-01.json: needs exactly 5 passwords",
     "2026-01-03.json: not valid JSON",

@@ -44,11 +44,26 @@ export function Christmas() {
   );
 }
 
+// T61: on New Year days a firework burst and two clinking champagne flutes sit in the same place. Each flute leans 12°
+// from its base, so their rims touch.
+const flute = <path d="M1.5 .5h5l-.5 6.5a2 2 0 0 1-4 0zM4 9v10.5M1.5 19.5h5" />;
+export function NewYear() {
+  return (
+    <span data-event="newyear" className="contents">
+      <svg {...svg} viewBox="0 0 44 20" className="absolute right-4 bottom-full h-5 text-ash">
+        <path d="M12 8h4M6 8H2M9 5V1M9 11v3M11.1 5.9l2.8-2.8M6.9 5.9L4.1 3.1M11.1 10.1l2.8 2.8M6.9 10.1l-2.8 2.8M9 16.5v1M9 19v.5" />
+        <g transform="translate(23 0) rotate(12 4 19.5)">{flute}</g>
+        <g transform="translate(35 0) rotate(-12 4 19.5)">{flute}</g>
+      </svg>
+    </span>
+  );
+}
+
 // The laptop lid's centre in each tier drawing, as a percentage across the 60px box, measured from public/art.
 const LID: Record<string, number> = { Pwned: 49, Weak: 52, Mid: 52, Strong: 49, Uncrackable: 48 };
 
 // A sticker on the laptop lid of the end screen's tier drawing, in solid shapes: a carved pumpkin with its face cut
-// out, or a Santa hat with a gap between the hat and its brim (T60).
+// out, a Santa hat with a gap between the hat and its brim (T60), or a party hat with a stripe cut out and a pompom (T61).
 const STICKERS: Record<string, React.ReactNode> = {
   halloween: (
     <>
@@ -61,6 +76,12 @@ const STICKERS: Record<string, React.ReactNode> = {
       <path d="M4 13C4 6 9 2 14 2c4 0 7 3 7.5 6.5L19 9c-.5-2-2-3-3-2-1 1.5 0 4 1 6z" />
       <circle cx="21" cy="11.5" r="2.5" />
       <rect x="2" y="15" width="17" height="4.5" rx="2.25" />
+    </>
+  ),
+  newyear: (
+    <>
+      <path fillRule="evenodd" d="M12 5L5.5 19.5h13zM9.31 11h5.38l.9 2H8.41z" />
+      <circle cx="12" cy="3" r="2.5" />
     </>
   ),
 };

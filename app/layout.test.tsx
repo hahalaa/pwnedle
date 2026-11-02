@@ -33,6 +33,11 @@ test("the Christmas label is in every header but hidden unless the page is a Chr
   expect(html).toMatch(/<p class="hidden [^"]*christmas:block"><span class="text-holly">christmas<\/span> <span class="text-berry">special<\/span><\/p>/);
 });
 
+test("the New Year label is in every header but hidden unless the page is a New Year day (T61)", () => {
+  const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
+  expect(html).toMatch(/<p class="hidden text-xs text-gold newyear:block">new year special<\/p>/);
+});
+
 test("the footer has only the about and coffee links (R23, R24, D29)", () => {
   const html = renderToStaticMarkup(<RootLayout params={Promise.resolve({})}>page</RootLayout>);
   const footer = html.slice(html.indexOf("<footer"));

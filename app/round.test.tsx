@@ -105,7 +105,7 @@ test("every tier colour is always emitted, since the reveal only builds its name
 test("every colour token has a light and a dark value (T44)", () => {
   const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
   const tokens = css.match(/--color-[a-z-]+: [^;]+;/g)!;
-  expect(tokens).toHaveLength(16);
+  expect(tokens).toHaveLength(19);
   for (const t of tokens) expect(t).toMatch(/: light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\);$/);
 });
 
@@ -194,9 +194,9 @@ test("a Halloween end screen puts a pumpkin sticker on the tier drawing's laptop
   expect(sticker([50])).toBeUndefined();
 });
 
-test("the theme variants ignore a page Next has hidden after navigating away (T58a, T60)", () => {
+test("the theme variants ignore a page Next has hidden after navigating away (T58a, T60, T61)", () => {
   const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
-  for (const theme of ["halloween", "christmas"]) {
+  for (const theme of ["halloween", "christmas", "newyear"]) {
     expect(css).toContain(`@custom-variant ${theme} (:root:has([data-event="${theme}"]:not([style*="display: none"] *)) &);`);
   }
 });
@@ -214,4 +214,21 @@ test("a Christmas puzzle puts a hidden tree and present on the password window i
   const hat = views("christmas")[1].match(/<svg aria-hidden="true" viewBox="0 0 24 20" fill="currentColor"[^>]*style="left:52%">(.*?)<\/svg>/)?.[1];
   expect(hat).toContain("<circle");
   for (const html of views("halloween")) expect(html).not.toContain('data-event="christmas"');
+});
+
+test("a New Year puzzle puts a hidden firework and two flutes on the password window in the round and the end screen, and a party hat on the laptop; Christmas gets neither (T61)", () => {
+  const result = { guess: 1, count: 1, score: 50, tier: "Mid", note: "n" };
+  const views = (theme?: string) => [
+    renderToStaticMarkup(<Round date="2026-10-24" number={1} passwords={["a"]} theme={theme} />),
+    renderToStaticMarkup(<End number={1} passwords={["a"]} results={[result]} theme={theme} />),
+  ];
+  for (const html of views("newyear")) {
+    expect(html).toMatch(/brackets relative[^>]*><span data-event="newyear" class="contents"><svg aria-hidden="true"[^>]*viewBox="0 0 44 20" class="absolute[^"]*bottom-full/);
+    expect(html).toContain("rotate(12 4 19.5)");
+    expect(html).toContain("rotate(-12 4 19.5)");
+  }
+  const hat = views("newyear")[1].match(/<svg aria-hidden="true" viewBox="0 0 24 20" fill="currentColor"[^>]*style="left:52%">(.*?)<\/svg>/)?.[1];
+  expect(hat).toContain('fill-rule="evenodd"');
+  expect(hat).toContain("<circle");
+  for (const html of views("christmas")) expect(html).not.toContain('data-event="newyear"');
 });

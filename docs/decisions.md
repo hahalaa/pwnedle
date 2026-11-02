@@ -197,7 +197,7 @@ It redraws at most 24 times a second, which is 20 on a 60Hz screen. Browsers don
 Each row in the end screen's breakdown is a button that reopens that password's reveal, at home and in the archive. The view looks like the round did: the prompt, the password window with its progress and dots, the reveal, and "Back to results" where Next was. It replays the D42 sequence, tier sound included, and mute and reduced motion apply as they do in the round. It reads only the saved game: no guess goes to the API, the saved game, stats and streak stay as they were, and no Umami event is sent. The reopened view isn't saved either, so a refresh lands on the end screen. "Back to results", or Escape once the reveal has landed, returns to the end screen without its fade and puts focus back on the row. While the reveal plays, Escape only skips, like any other key.
 
 ## D49. Theme days (T58, supersedes R6 and D13 for theme days)
-A puzzle file can set `"theme"`: `"halloween"` or `"christmas"` so far. Allowed themes are listed in `THEMES` in `lib/config.ts`, and `pipeline:validate` reports any other value as an error. Days without a theme are still random mixes (R6, D13). R3, R5 and D33 apply to theme days as well.
+A puzzle file can set `"theme"`: `"halloween"`, `"christmas"` or `"newyear"` so far. Allowed themes are listed in `THEMES` in `lib/config.ts`, and `pipeline:validate` reports any other value as an error. Days without a theme are still random mixes (R6, D13). R3, R5 and D33 apply to theme days as well.
 
 On a Halloween puzzle, two carved pumpkins sit on the top edge of the password window, at the right. They show in the round, in reopened reveals and on the end screen, at home and in the archive. `docs/art/` has no pumpkin drawing, so `app/pumpkin.tsx` draws them with 1px lines in `ash`, like the nav icons. They are 20px tall and sit in the gap above the window, clear of the text and the reveal, and screen readers skip them. The theme goes to the browser with the passwords, which reveals nothing about the counts (R13). In the archive list, a theme day shows an emoji and a label next to its number, such as "🎃 halloween special". `THEME_TAGS` in `lib/config.ts` sets them for each theme (T77).
 
@@ -236,3 +236,13 @@ A Christmas day gets the same kind of dressing as Halloween, kept just as quiet.
 - On the end screen, a solid Santa hat sticker sits on the laptop lid, placed like the pumpkin.
 - The share text adds 🎄 after the puzzle number (R19). It takes the emoji from the theme's archive tag.
 A `christmas` variant works like the `halloween` one, through `data-event="christmas"`. The canvas reads the two tints from its CSS `fill` and `stroke`, which it doesn't otherwise use, because computed styles give them as plain rgb that a canvas can draw with.
+
+## D55. New Year special (T61, follows D54)
+A New Year day is dressed like Christmas, just as quietly. Tier colours and text contrast don't change.
+- The hash columns alternate between `gold-line` (#e9d098 light, #342913 dark) and `silver-line` (#ccd2da light, #262a32 dark). Each matches the luminance of `line`, so D47 still holds. The word columns carry 2027, C0FFEE (for the morning after) and CAFE, and now and then DEC31 over 0101. A long word in an edge column shifts in so it isn't cut off by the screen edge.
+- Small firework bursts in place of the snow: eight 1px rays in `line`, about one per 40,000px² in the same places as the columns. They stay in place and fade slowly in and out. Under reduced motion they don't change.
+- A "new year special" label under the wordmark, all in `gold` (#835e00 light, #e2b33c dark), which passes 4.5:1 on `void` at 5.0 and 10.07. The wordmark keeps its usual colour.
+- A line firework and two clinking champagne flutes sit on the password window's top edge, in 1px `ash` lines and hidden from screen readers.
+- On the end screen, a solid party hat sticker (a cone with a stripe cut out and a pompom) sits on the laptop lid.
+- The share text adds 🎆 after the puzzle number (R19), taken from the tag "🎆 new year special".
+A `newyear` variant works like the `christmas` one, through `data-event="newyear"`.

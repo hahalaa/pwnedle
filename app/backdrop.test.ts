@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { WORDS, pickColumns, pickFlakes, spell } from "./backdrop";
+import { WORDS, pickBursts, pickColumns, pickFlakes, spell } from "./backdrop";
 
 const content = { left: 360, right: 1560 };
 
@@ -36,6 +36,7 @@ test("about one column in six gets theme copies with hex words, at least one, in
     expect(phone).toHaveLength(1);
     expect(phone[0].words?.halloween).toHaveLength(70);
     expect(phone[0].words?.christmas).toHaveLength(70);
+    expect(phone[0].words?.newyear).toHaveLength(70);
   }
   expect(slots.size).toBeGreaterThan(1);
 });
@@ -66,4 +67,14 @@ test("snow stays in the margins on desktop and covers phones, about one flake pe
   const phone = pickFlakes(390, { left: 16, right: 374 }, 844);
   expect(phone).toHaveLength(Math.round((390 * 844) / 12000));
   for (const f of phone) expect(f.y >= 0 && f.y < 1).toBe(true);
+});
+
+test("firework bursts stay in the margins on desktop and cover phones, about one per 40,000px² (T61)", () => {
+  const desktop = pickBursts(1920, content, 800);
+  // Two 336px margins by 800px.
+  expect(desktop).toHaveLength(2 * Math.round((336 * 800) / 40000));
+  for (const b of desktop) expect(b.x - b.r >= 0 && b.x + b.r <= 336 || b.x - b.r >= 1584 && b.x + b.r <= 1920).toBe(true);
+  const phone = pickBursts(390, { left: 16, right: 374 }, 844);
+  expect(phone).toHaveLength(Math.round((390 * 844) / 40000));
+  for (const b of phone) expect(b.r >= 5 && b.r <= 9 && b.y >= 0 && b.y < 1).toBe(true);
 });

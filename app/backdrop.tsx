@@ -14,15 +14,17 @@ const FRAME = 1000 / 24; // the drift is slow, so at most 24 fps (20 on a 60 Hz 
 type Box = { left: number; right: number };
 type Column = { x: number; speed: number; fade: number; phase: number; text: string[]; words?: Record<string, string[]> };
 type Flake = { x: number; y: number; speed: number; sway: number; phase: number };
+type Burst = { x: number; y: number; r: number; phase: number };
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const pair = () => Math.floor(Math.random() * 256).toString(16).toUpperCase().padStart(2, "0");
 
 // T58a, T60: on theme days some columns swap in a copy of their pairs with a hex word every 5 to 9 rows, now and then
-// a pair of words one over the other: DEAD over BEEF, or FA1A over 1A1A for "fa la la".
+// a pair of words one over the other: DEAD over BEEF, FA1A over 1A1A for "fa la la", or DEC31 over 0101 (T61).
 export const WORDS = {
   halloween: { words: ["B00", "DEAD", "BAD", "0DD", "FADE"], pair: ["DEAD", "BEEF"] },
   christmas: { words: ["DEC25", "C0C0A", "BE11", "C0A1"], pair: ["FA1A", "1A1A"] },
+  newyear: { words: ["2027", "C0FFEE", "CAFE"], pair: ["DEC31", "0101"] },
 };
 export function spell(text: string[], { words, pair }: (typeof WORDS)[keyof typeof WORDS]) {
   const out = [...text];
@@ -78,6 +80,21 @@ export function pickFlakes(width: number, content: Box, height: number): Flake[]
   });
 }
 
+// T61: small firework bursts for New Year days, about one per 40,000px² in the same places as the columns. They stay
+// put and fade in and out. `y` is a fraction of the height, so a resize keeps the spread.
+const BURST = 9;
+export function pickBursts(width: number, content: Box, height: number): Burst[] {
+  return regions(width, content).flatMap(([from, to]) => {
+    if (to - from < 2 * BURST) return [];
+    return Array.from({ length: Math.round(((to - from) * height) / 40000) }, () => ({
+      x: rand(from + BURST, to - BURST),
+      y: Math.random(),
+      r: rand(5, BURST),
+      phase: rand(0, 2 * Math.PI),
+    }));
+  });
+}
+
 export function Backdrop() {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -93,6 +110,7 @@ export function Backdrop() {
     const textRows = Math.ceil(Math.max(innerHeight, screen.height) / SIZE) + 2;
     let columns: Column[] = [];
     let flakes: Flake[] = [];
+    let bursts: Burst[] = [];
     let picked = "";
     let w = 0;
     let h = 0;
@@ -112,6 +130,7 @@ export function Backdrop() {
         picked = key;
         columns = pickColumns(w, box, textRows);
         flakes = pickFlakes(w, box, h);
+        bursts = pickBursts(w, box, h);
       }
     };
 
@@ -123,15 +142,18 @@ export function Backdrop() {
       ctx.textBaseline = "top";
       // Centred on the slot, so a four-letter word overhangs a pair evenly on both sides.
       ctx.textAlign = "center";
-      // On theme days the variants set --event, and tint the colour (T58a) or, for Christmas, set green in `fill` and
-      // red in `stroke`, which the canvas doesn't otherwise use (T60). Computed styles give them as plain rgb.
+      const advance = ctx.measureText("0").width;
+      // On theme days the variants set --event, and tint the colour (T58a) or set two tints in `fill` and `stroke`,
+      // which the canvas doesn't otherwise use: green and red for Christmas (T60), gold and silver for New Year (T61).
+      // Computed styles give them as plain rgb.
       const event = style.getPropertyValue("--event").trim();
       const christmas = event === "christmas";
+      const newyear = event === "newyear";
       // Faint on phones, where the columns run behind the content. 28% keeps the light theme's muted text at 4.5:1;
       // red text can dip to about 4.0 to 4.3:1 for a moment (D47).
       const strength = w >= PHONE ? 1 : current() === "light" ? 0.28 : 0.45;
       for (const [k, c] of columns.entries()) {
-        ctx.fillStyle = christmas ? (k % 2 ? style.stroke : style.fill) : style.color;
+        ctx.fillStyle = christmas || newyear ? (k % 2 ? style.stroke : style.fill) : style.color;
         ctx.globalAlpha = ((Math.sin(s * c.fade + c.phase) + 1) / 2) * strength;
         const scroll = s * c.speed;
         const off = ((scroll % SIZE) + SIZE) % SIZE;
@@ -139,7 +161,10 @@ export function Backdrop() {
         const text = c.words?.[event] ?? c.text;
         const n = text.length;
         for (let i = 0, top = off - SIZE; top < h; i++, top += SIZE) {
-          ctx.fillText(text[(((i - shift) % n) + n) % n], c.x + GLYPH / 2, top + 1);
+          const t = text[(((i - shift) % n) + n) % n];
+          // A long word in an edge column would run off the screen (C0FFEE), so it shifts in to fit.
+          const half = (t.length * advance) / 2;
+          ctx.fillText(t, Math.min(Math.max(c.x + GLYPH / 2, half), w - half), top + 1);
         }
       }
       if (christmas) {
@@ -147,6 +172,22 @@ export function Backdrop() {
         ctx.globalAlpha = strength;
         for (const f of flakes) {
           ctx.fillText("*", f.x + Math.sin(s * 0.6 + f.phase) * f.sway, ((f.y * (h + SIZE) + s * f.speed) % (h + SIZE)) - SIZE);
+        }
+      }
+      if (newyear) {
+        // Eight 1px rays from 40% of the radius out, like the burst on the password window.
+        ctx.strokeStyle = style.color;
+        ctx.lineWidth = 1;
+        for (const b of bursts) {
+          ctx.globalAlpha = ((Math.sin(s * 0.5 + b.phase) + 1) / 2) * strength;
+          const y = BURST + b.y * (h - 2 * BURST);
+          ctx.beginPath();
+          for (let a = 0; a < 8; a++) {
+            const [dx, dy] = [Math.cos((a * Math.PI) / 4), Math.sin((a * Math.PI) / 4)];
+            ctx.moveTo(b.x + dx * b.r * 0.4, y + dy * b.r * 0.4);
+            ctx.lineTo(b.x + dx * b.r, y + dy * b.r);
+          }
+          ctx.stroke();
         }
       }
     };
@@ -181,5 +222,5 @@ export function Backdrop() {
     };
   }, []);
 
-  return <canvas ref={ref} aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 size-full text-line halloween:text-pumpkin-line halloween:[--event:halloween] christmas:fill-holly-line christmas:stroke-berry-line christmas:[--event:christmas]" />;
+  return <canvas ref={ref} aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 size-full text-line halloween:text-pumpkin-line halloween:[--event:halloween] christmas:fill-holly-line christmas:stroke-berry-line christmas:[--event:christmas] newyear:fill-gold-line newyear:stroke-silver-line newyear:[--event:newyear]" />;
 }

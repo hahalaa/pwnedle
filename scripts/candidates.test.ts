@@ -56,3 +56,9 @@ test("every Christmas seed variation passes the content filter (T60)", async () 
   expect(christmas).toContain("Merrychristmas2025");
   expect(christmas.filter((pw) => !isClean(pw))).toEqual([]);
 });
+
+test("every New Year seed variation passes the content filter (T61)", async () => {
+  const newyear = await themeCandidates("newyear");
+  expect(newyear).toContain("Happynewyear2025");
+  expect(newyear.filter((pw) => !isClean(pw))).toEqual([]);
+});

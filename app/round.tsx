@@ -8,7 +8,7 @@ import { tier } from "../lib/scoring";
 import { shareText } from "../lib/share";
 import { isMuted, playTier, unlockAudio } from "../lib/sound";
 import { type Game, loadGame, saveGame, savedGames, stats } from "../lib/stats";
-import { Christmas, Halloween, Sticker } from "./pumpkin";
+import { Christmas, Halloween, NewYear, Sticker } from "./pumpkin";
 import { TierBars } from "./stats";
 
 // A number's place along the slider, from 0 at the 0 stop to 1 at 100m (lib/guess.ts).
@@ -226,6 +226,7 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
           <div className="brackets relative mx-(--bracket) border border-line">
             {theme === "halloween" && <Halloween />}
             {theme === "christmas" && <Christmas />}
+            {theme === "newyear" && <NewYear />}
             <div className="flex items-center justify-between border-b border-line px-3 py-1.5 text-xs text-ash">
               <p>
                 password {index + 1} of {passwords.length}
@@ -591,6 +592,7 @@ export function End({ date, archive, sent, posted, number, passwords, results, a
       <div className="brackets relative mx-(--bracket) border border-line">
         {theme === "halloween" && <Halloween />}
         {theme === "christmas" && <Christmas />}
+        {theme === "newyear" && <NewYear />}
         <div className="flex items-center justify-between border-b border-line px-3 py-1.5 text-xs text-ash">
           <p>puzzle #{number}</p>
           <p>points</p>

@@ -19,6 +19,11 @@
      `pumpkin-line`, so the background keeps its contrast (D47). */
   --color-berry-line: light-dark(#f4c8c4, #41211f);
   --color-holly-line: light-dark(#badac0, #152f1b);
+  /* T61: the New Year label (D55). Passes 4.5:1 on void: 5.0 light, 10.07 dark. */
+  --color-gold: light-dark(#835e00, #e2b33c);
+  /* T61: New Year tints for the hash columns, decoration only, matching the luminance of `line` (D47). */
+  --color-gold-line: light-dark(#e9d098, #342913);
+  --color-silver-line: light-dark(#ccd2da, #262a32);
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
   --font-dot: var(--font-doto), var(--font-plex-mono), monospace;
   /* T35: reveals, the end screen and each new page fade in with a 4px rise. */
@@ -54,12 +59,13 @@
    end screen fit without scrolling. */
 @custom-variant short (@media (min-width: 64rem) and (max-height: 900px));
 
-/* T58a, T60: anything on a Halloween or Christmas day's page, set by the round's `data-event` decoration
+/* T58a, T60, T61: anything on a theme day's page, set by the round's `data-event` decoration
    (app/pumpkin.tsx). The round is server-rendered, so the header and background are themed from the first paint. Next
    keeps the last page in the DOM after navigating away, hidden with an inline `display: none`, so a decoration inside
    that doesn't count. */
 @custom-variant halloween (:root:has([data-event="halloween"]:not([style*="display: none"] *)) &);
 @custom-variant christmas (:root:has([data-event="christmas"]:not([style*="display: none"] *)) &);
+@custom-variant newyear (:root:has([data-event="newyear"]:not([style*="display: none"] *)) &);
 
 /* Follows the system theme; the header toggle overrides it with data-theme. */
 html {

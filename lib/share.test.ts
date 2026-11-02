@@ -16,6 +16,10 @@ test("a Christmas share puts a tree after the puzzle number (T60)", () => {
   expect(shareText(66, [100, 65, 90, 35, 100], "christmas")).toBe("Pwnedle #66 🎄 · 390/500 · Strong\n🟩🟨🟩🟧🟩\npwnedle.com");
 });
 
+test("a New Year share puts a firework after the puzzle number (T61)", () => {
+  expect(shareText(74, [100, 65, 90, 35, 100], "newyear")).toBe("Pwnedle #74 🎆 · 390/500 · Strong\n🟩🟨🟩🟧🟩\npwnedle.com");
+});
+
 test("a streak of 2 or more ends the first line; a streak of 1 adds nothing (T74)", () => {
   expect(shareText(12, [100, 65, 90, 35, 100], undefined, 1)).toBe("Pwnedle #12 · 390/500 · Strong\n🟩🟨🟩🟧🟩\npwnedle.com");
   expect(shareText(12, [100, 65, 90, 35, 100], undefined, 2)).toBe("Pwnedle #12 · 390/500 · Strong · 🔥 2\n🟩🟨🟩🟧🟩\npwnedle.com");

@@ -51,7 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex min-h-dvh w-full flex-col items-center px-4 py-6 sm:py-8 short:py-4 sm:before:max-h-24 sm:before:flex-[2] sm:before:content-[''] sm:after:flex-[3] sm:after:content-['']">
           <div className="flex w-full max-w-xl flex-1 lg:max-w-240 flex-col sm:flex-none">
             <header className="relative mb-8 short:mb-6 flex items-center sm:items-baseline justify-between border-b border-line pb-3">
-              {/* T58a: Halloween days turn the wordmark orange and add the label and spider. T60: Christmas days add a red and green label. */}
+              {/* T58a: Halloween days turn the wordmark orange and add the label and spider. T60: Christmas days add a red and green label. T61: New Year days add a gold label. */}
               <div>
                 <h1 className="font-dot text-2xl sm:text-4xl halloween:text-pumpkin">
                   <Link href="/" className="tap focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">Pwnedle</Link>
@@ -60,6 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <p className="hidden text-xs christmas:block">
                   <span className="text-holly">christmas</span> <span className="text-berry">special</span>
                 </p>
+                <p className="hidden text-xs text-gold newyear:block">new year special</p>
               </div>
               <Spider />
               <nav className="flex gap-5 sm:gap-4">
