@@ -66,7 +66,7 @@ Status: `todo`, `doing`, `done`, `superseded`. Update in the same commit that fi
 - [done] **T51** Pressing Enter in the guess box locks in the guess, the same as clicking Lock in. Enter on the reveal moves to the next password. (R8, R9)
 - [todo] **T60** Christmas puzzle for 2026-12-25 (commit before 2026-12-23 UTC). (R38)
 - [todo] **T61** New Year puzzle for 2027-01-01 (commit before 2026-12-30 UTC). (R38)
-- [todo] **T77** The archive list marks theme days with the theme's emoji and label (for example "🎃 halloween special") on that day's row, driven by the `theme` field in the puzzle file. Add tests for a theme row and a plain row. (R20, R38)
+- [done] **T77** The archive list marks theme days with the theme's emoji and label (for example "🎃 halloween special") on that day's row, driven by the `theme` field in the puzzle file. Add tests for a theme row and a plain row. (R20, R38)
 
 ## Later
 - [todo] **T25** Contact HIBP / Troy Hunt once there are regular players. (R40)

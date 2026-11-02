@@ -11,15 +11,6 @@ const carved = (
 
 export const svg = { "aria-hidden": true, fill: "none", stroke: "currentColor", strokeWidth: 1, strokeLinejoin: "round" } as const;
 
-// One small pumpkin, for the archive list.
-export function Pumpkin() {
-  return (
-    <svg {...svg} viewBox="0 0 24 20" className="h-4">
-      {carved}
-    </svg>
-  );
-}
-
 // The password window's Halloween dressing: a big and a small pumpkin perched on its top edge at the right (the small
 // one scaled to three quarters with its stroke widened to match, so both keep 1px lines), and a cobweb in the top-left
 // bracket corner, clear of the title bar text. `data-event` themes the header and background through the `halloween`

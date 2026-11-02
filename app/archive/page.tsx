@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { pastPuzzles, playerToday } from "../../lib/puzzles";
-import { Pumpkin } from "../pumpkin";
+import { THEME_TAGS } from "../../lib/config";
 
 // R20: every past puzzle by number and date, with theme days marked (D49). Read per request so yesterday appears after
 // the player's local midnight (R2).
@@ -15,12 +15,7 @@ async function List() {
           <Link href={`/archive/${number}`} className="group flex justify-between px-3 py-3 hover:bg-line focus-visible:outline-1 focus-visible:outline-bone">
             <span className="flex items-center gap-3">
               #{number}
-              {theme === "halloween" && (
-                <span className="flex items-center gap-1.5 text-sm text-ash group-hover:text-bone">
-                  <Pumpkin />
-                  halloween
-                </span>
-              )}
+              {theme && <span className="text-sm text-ash group-hover:text-bone">{THEME_TAGS[theme]}</span>}
             </span>
             <span className="text-ash group-hover:text-bone">{date}</span>
           </Link>

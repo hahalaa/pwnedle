@@ -10,12 +10,12 @@ vi.mock("../../lib/puzzles", () => ({
   ],
 }));
 
-test("the archive marks a theme day with a hidden pumpkin and its name, and leaves other days plain (D49)", async () => {
+test("the archive tags a theme day with its emoji and label, and leaves other days plain (D49)", async () => {
   const stream = await renderToReadableStream(<Archive />);
   await stream.allReady;
   const html = await new Response(stream).text();
   const [themed, plain] = html.split("<li>").slice(1);
-  expect(themed).toMatch(/12<span[^>]*><svg aria-hidden="true"[\s\S]*<\/svg>halloween<\/span>/);
-  expect(plain).not.toContain("<svg");
+  expect(themed).toMatch(/12<span[^>]*>🎃 halloween special<\/span>/);
+  expect(plain).not.toContain("🎃");
   expect(plain).not.toContain("halloween");
 });
