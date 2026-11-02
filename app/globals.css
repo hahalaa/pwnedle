@@ -11,10 +11,10 @@
      `pumpkin-line` matches the luminance of `line`, so the background keeps its contrast (D47). */
   --color-pumpkin: light-dark(#a84a00, #ff7518);
   --color-pumpkin-line: light-dark(#f0cda8, #3b2414);
-  /* T60: the Christmas label's letters alternate these (D54). Each passes 4.5:1 on void: holly 5.27 light, 8.03 dark;
-     berry 5.6 light, 5.68 dark. */
+  /* T60: the Christmas label's two words (D54). Each passes 4.5:1 on void: holly 5.27 light, 8.03 dark; berry 5.6
+     light, 5.94 dark. */
   --color-holly: light-dark(#2a6e35, #4cbb5c);
-  --color-berry: light-dark(#b3222e, #f0525c);
+  --color-berry: light-dark(#b3222e, #dc6a70);
   /* T60: Christmas tints for the hash columns, decoration only. Each matches the luminance of `line`, like
      `pumpkin-line`, so the background keeps its contrast (D47). */
   --color-berry-line: light-dark(#f4c8c4, #41211f);

@@ -57,16 +57,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   <Link href="/" className="tap focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">Pwnedle</Link>
                 </h1>
                 <p className="hidden text-xs text-pumpkin halloween:block">halloween special</p>
-                {/* The letters alternate holly and berry, skipping the space. Screen readers get the phrase whole. */}
                 <p className="hidden text-xs christmas:block">
-                  <span className="sr-only">christmas special</span>
-                  <span aria-hidden="true">
-                    {[..."christmas special"].map((c, i, all) => (
-                      <span key={i} className={all.slice(0, i).filter((l) => l !== " ").length % 2 ? "text-berry" : "text-holly"}>
-                        {c}
-                      </span>
-                    ))}
-                  </span>
+                  <span className="text-holly">christmas</span> <span className="text-berry">special</span>
                 </p>
               </div>
               <Spider />
