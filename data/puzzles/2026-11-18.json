@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-18",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "mirror",
+      "count": 77369,
+      "note": "Mirror is a plain dictionary word that people pick for its simplicity, so it shows up in leaked lists again and again."
+    },
+    {
+      "password": "bolitas",
+      "count": 7274,
+      "note": "\"bolitas\" is a Spanish diminutive meaning \"little balls,\" a plain dictionary word that people pick without much thought."
+    },
+    {
+      "password": "stargate",
+      "count": 481925,
+      "note": "Built from a famous sci-fi title, \"stargate\" is a single dictionary word people grab without thinking."
+    },
+    {
+      "password": "dodgers2024",
+      "count": 0,
+      "note": "Pairing a sports team name with a recent year makes it feel strong, yet this exact combo never showed up in any leak."
+    },
+    {
+      "password": "richie",
+      "count": 141188,
+      "note": "Just a first name with nothing added, the sort of word people type when they want something quick to remember."
+    }
+  ]
+}

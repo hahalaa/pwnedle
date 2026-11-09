@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-17",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "bulls2024",
+      "count": 17,
+      "note": "Adding a recent year to a team name like \"bulls\" is a habit many people share, which is why this one shows up in leaks at all."
+    },
+    {
+      "password": "1218",
+      "count": 88592,
+      "note": "Four digits with a December-style date pattern, the kind of short numeric code people pick and reuse."
+    },
+    {
+      "password": "rats",
+      "count": 8511,
+      "note": "Four letters, a plain word, and the kind of short choice people grab without thinking twice."
+    },
+    {
+      "password": "mario1",
+      "count": 189283,
+      "note": "Mario's famous name plus a bare \"1\" is the first thing many people type when a game asks for a password."
+    },
+    {
+      "password": "gagged",
+      "count": 75393,
+      "note": "Plain English past-tense verb with nothing added, so it shows up in lists of common words people pick."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-20",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "r3d$0x",
+      "count": 10,
+      "note": "Leetspeak \"r3d\" swapped in for \"red,\" with a \"$0x\" tail, is a short mix that appears only occasionally in leaked lists."
+    },
+    {
+      "password": "aramis",
+      "count": 77039,
+      "note": "A famous musketeer's name, a go-to pick for people who want something a little literary without much effort."
+    },
+    {
+      "password": "pa55w0rd",
+      "count": 351175,
+      "note": "Swapping letters for lookalike digits, \"pa55w0rd\" just dresses up the word \"password\" in a thin disguise that everyone already tries."
+    },
+    {
+      "password": "Purple",
+      "count": 70423,
+      "note": "A plain dictionary colour with no digits or symbols, so people pick it constantly."
+    },
+    {
+      "password": "Welcome2025",
+      "count": 3563,
+      "note": "Pairing a greeting with a current year and a tacked-on digit follows a template many people reuse across sites."
+    }
+  ]
+}

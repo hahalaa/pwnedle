@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-19",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "chelsea2025",
+      "count": 24,
+      "note": "Pairing a football club's name with a recent year is a habit, though a less universal one than plain dictionary words."
+    },
+    {
+      "password": "nicole2025",
+      "count": 179,
+      "note": "A common first name tied to a current year is a pattern many people use, though this exact combination is less frequent."
+    },
+    {
+      "password": "qazxsw",
+      "count": 797183,
+      "note": "It's the keyboard's diagonal run, qazxsw, typed by sliding down the left-hand columns of QWERTY."
+    },
+    {
+      "password": "jennifer1!",
+      "count": 3748,
+      "note": "Appending \"1!\" to a first name is a tired habit that satisfies length and symbol rules while staying easy to remember."
+    },
+    {
+      "password": "kirsty",
+      "count": 74827,
+      "note": "Kirsty is a popular first name, and people often use their own name as a password without adding anything else."
+    }
+  ]
+}

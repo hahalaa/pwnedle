@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-16",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "scandinavian",
+      "count": 2609,
+      "note": "Just a real English word, spelled out in full with nothing added, so it shows up in leaked lists often."
+    },
+    {
+      "password": "hockey2024",
+      "count": 29,
+      "note": "A sport word plus a current year is a predictable pattern, yet the specific pairing keeps it out of the most-used tier."
+    },
+    {
+      "password": "circus",
+      "count": 53884,
+      "note": "Circus is a plain dictionary word with no digits or symbols, so it turns up in leaked lists often."
+    },
+    {
+      "password": "billyboy",
+      "count": 86988,
+      "note": "Its mix of a common first name and a plain \"boy\" suffix is the kind of pairing people pick over and over."
+    },
+    {
+      "password": "rodney",
+      "count": 133222,
+      "note": "Rodney is just a common first name, and people pick it for their logins as easily as they'd use their own."
+    }
+  ]
+}

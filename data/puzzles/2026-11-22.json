@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-22",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "greenday",
+      "count": 525926,
+      "note": "Pairing a famous band name with nothing else makes it a favorite of people who want something easy to remember."
+    },
+    {
+      "password": "Ashley2024",
+      "count": 52,
+      "note": "A common first name with a current year tacked on is a predictable pattern, though the specific pairing keeps it out of the most-used tier."
+    },
+    {
+      "password": "celtics1!",
+      "count": 552,
+      "note": "Sports-team name plus a digit and symbol is a familiar shape, though \"Celtics\" is less common a pick than many team names."
+    },
+    {
+      "password": "Emily123",
+      "count": 49142,
+      "note": "A popular first name with the most predictable number tacked on the end, a combination people reuse constantly."
+    },
+    {
+      "password": "Cookie!",
+      "count": 4617,
+      "note": "A plain food word with a lone exclamation mark tacked on is the sort of tweak people make to satisfy a complexity rule."
+    }
+  ]
+}

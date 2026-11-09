@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-21",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "mzepab",
+      "count": 1787,
+      "note": "Short, random-looking letters like \"mzepab\" feel unpredictable, yet this one is so brief that people still pick it often."
+    },
+    {
+      "password": "bigman",
+      "count": 117029,
+      "note": "Short, plain, and built from a common word, \"bigman\" is the sort of thing people type without thinking twice."
+    },
+    {
+      "password": "Michael2025",
+      "count": 454,
+      "note": "A name plus the current year is a tidy pattern, but the particular name keeps it out of the most-used lists."
+    },
+    {
+      "password": "Coffee2024",
+      "count": 20,
+      "note": "Pairing a favorite drink with a year is a tidy pattern, just uncommon enough to stay out of the top tier."
+    },
+    {
+      "password": "mash4077",
+      "count": 93600,
+      "note": "A short name plus a run of four digits is a pattern that gets reused across countless sign-ups."
+    }
+  ]
+}
