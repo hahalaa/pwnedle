@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-28",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "sandro",
+      "count": 187516,
+      "note": "\"sandro\" is a short first name, and people pick names like it because they're easy to remember."
+    },
+    {
+      "password": "test1234",
+      "count": 1041972,
+      "note": "Sequential digits tacked onto \"test\" is a first guess everyone makes, so it shows up constantly."
+    },
+    {
+      "password": "Pirate2025",
+      "count": 1,
+      "note": "A playful word plus a current year is a habit many people reuse, which keeps this one in the rare range rather than the common one."
+    },
+    {
+      "password": "nong",
+      "count": 3630,
+      "note": "\"nong\" is a short slang insult, and people grab quick, familiar words like it when they want something easy to remember."
+    },
+    {
+      "password": "dagmar",
+      "count": 44237,
+      "note": "Dagmar is a real name, but as a lone word with no digits or symbols it's a short, familiar pick people reuse often."
+    }
+  ]
+}

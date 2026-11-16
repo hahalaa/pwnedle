@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-25",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "fuaqz4",
+      "count": 861,
+      "note": "Six random-looking characters with a lone digit at the end, which is rare rather than unheard of."
+    },
+    {
+      "password": "123abc1990",
+      "count": 44,
+      "note": "Digits-then-letters with a birth-year tail is a pattern many people try, yet this exact combination shows up only occasionally."
+    },
+    {
+      "password": "rhinos",
+      "count": 25924,
+      "note": "Plain plural animal names like \"rhinos\" pile up in leaked lists because people pick a single easy noun and just add an S."
+    },
+    {
+      "password": "hector",
+      "count": 238051,
+      "note": "Hector is a short, plain first name, and people often use names like it as passwords with no added complexity."
+    },
+    {
+      "password": "pizza!",
+      "count": 9336,
+      "note": "Lots of people end a favorite food word with an exclamation mark, so \"pizza!\" shows up often."
+    }
+  ]
+}

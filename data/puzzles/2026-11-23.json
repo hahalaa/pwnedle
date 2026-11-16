@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-23",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "cub$",
+      "count": 0,
+      "note": "Short, dollar-sign swap of \"s\" in \"cubs\" kept it off every list, yet it's too short to be safe."
+    },
+    {
+      "password": "blackbir",
+      "count": 8370,
+      "note": "Blackbir is just a truncated \"blackbird,\" a familiar word people trim to fit length limits, so it shows up often."
+    },
+    {
+      "password": "636363",
+      "count": 133948,
+      "note": "Six digits in a repeating pair, the kind of pattern people pick because it is quick to type and easy to remember."
+    },
+    {
+      "password": "Dragon1",
+      "count": 72892,
+      "note": "Dragon is a go-to fantasy word, and tacking a single 1 onto the end is the classic bump people make to satisfy a password rule."
+    },
+    {
+      "password": "butterfly123",
+      "count": 46427,
+      "note": "A classic word-plus-\"123\" combo, the kind people add to a pretty word to satisfy a password rule."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-29",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "escort",
+      "count": 132795,
+      "note": "Plain dictionary word, and a go-to pick for people who want something short and familiar."
+    },
+    {
+      "password": "titanium",
+      "count": 83044,
+      "note": "Titanium is a shiny, trendy metal word, so plenty of people pick it as a plain dictionary choice."
+    },
+    {
+      "password": "xirt2k",
+      "count": 869,
+      "note": "A short, made-up-looking mix of letters and a \"2k\" tail, it's odd enough to appear in few leaked lists."
+    },
+    {
+      "password": "James1990",
+      "count": 3583,
+      "note": "A name plus a birth year is a pattern people pick constantly, so this one shows up often."
+    },
+    {
+      "password": "Yankees2024",
+      "count": 12,
+      "note": "Pairing a team nickname with a recent year is a common habit, which is why this one lands in rare rather than never leaked."
+    }
+  ]
+}

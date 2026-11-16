@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-27",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "shamus",
+      "count": 32011,
+      "note": "Shamus is a real word, but it's an old-fashioned nickname for Irishmen, and it shows up in lists of frequently chosen names."
+    },
+    {
+      "password": "Broncos2025",
+      "count": 28,
+      "note": "Pairing a team nickname with a recent year is a habit, but a specific team and year keeps this one out of the most-used tier."
+    },
+    {
+      "password": "ginger",
+      "count": 1031861,
+      "note": "Ginger is a plain dictionary word that people pick for pets, nicknames and favorite flavors, so it shows up constantly."
+    },
+    {
+      "password": "wanda",
+      "count": 25130,
+      "note": "Wanda is a short, friendly first name, and people often pick their own name or a loved one's as a password."
+    },
+    {
+      "password": "chas",
+      "count": 5197,
+      "note": "A short first name with nothing added, so it shows up in leaked lists as a quick, familiar pick."
+    }
+  ]
+}

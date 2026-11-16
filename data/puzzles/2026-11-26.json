@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-26",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "novifarm",
+      "count": 2599,
+      "note": "\"novifarm\" reads like a real word blend, so people reuse it in lists of pet-name and brand-style passwords more than you'd expect."
+    },
+    {
+      "password": "99999",
+      "count": 223643,
+      "note": "Five nines in a row is the sort of run people type when a form insists on a number and they just keep pressing the same key."
+    },
+    {
+      "password": "di@m0nd",
+      "count": 211,
+      "note": "Swapping \"a\" for \"@\" and \"o\" for \"0\" in \"diamond\" is a common trick, but it's not common enough to be widespread."
+    },
+    {
+      "password": "carnival",
+      "count": 56854,
+      "note": "A plain dictionary word with nothing added, so it shows up in leaked lists far more often than people expect."
+    },
+    {
+      "password": "Raiders2024",
+      "count": 23,
+      "note": "Pairing a team nickname with a recent year is a habit, but adding the specific year makes this one less widespread."
+    }
+  ]
+}

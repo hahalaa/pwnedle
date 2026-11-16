@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-24",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "sonic",
+      "count": 119166,
+      "note": "Sonic is a famous video game mascot, and short, familiar names like it get typed by millions of people."
+    },
+    {
+      "password": "jurassic",
+      "count": 44807,
+      "note": "A single dinosaur-film word with no digits or symbols, the kind of pick people make because it's easy to remember."
+    },
+    {
+      "password": "Whatever2025",
+      "count": 0,
+      "note": "Pairing a generic word with a year is a habit, yet this exact combination has never shown up in any leak."
+    },
+    {
+      "password": "12345",
+      "count": 31107584,
+      "note": "Counting up from one is the first pattern anyone types when a form demands a number."
+    },
+    {
+      "password": "Thunder1234",
+      "count": 3137,
+      "note": "A familiar word plus the run of digits 1234 is a combo people pick over and over."
+    }
+  ]
+}
