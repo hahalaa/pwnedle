@@ -25,6 +25,8 @@ export const metadata: Metadata = {
   description,
   openGraph: { title: "Pwnedle", description, type: "website" },
   twitter: { card: "summary_large_image" },
+  // Listdle site ownership check.
+  other: { "listdle-verification": "c1326116-260d-4ea9-86d8-ef460b08df40" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
