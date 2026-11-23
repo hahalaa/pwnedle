@@ -1,0 +1,31 @@
+{
+  "date": "2026-12-02",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "gotohell",
+      "count": 150431,
+      "note": "Plain words strung together, with \"go to hell\" a blunt, habit-forming phrase people type without thinking."
+    },
+    {
+      "password": "amelia123",
+      "count": 44483,
+      "note": "Pairing a first name with the simple \"123\" tail is a routine habit, so this one shows up often in leaked lists."
+    },
+    {
+      "password": "Baseball2024",
+      "count": 563,
+      "note": "A sports word plus a year tacked on the end is a pattern people reuse, though this combo is less universal than the bare word."
+    },
+    {
+      "password": "Matrix2010",
+      "count": 6585,
+      "note": "The Matrix film era plus a tacked-on year is a habit people reuse across many accounts."
+    },
+    {
+      "password": "lovelove2025",
+      "count": 3,
+      "note": "Doubling \"love\" and tacking on a year is a sentimental pattern, so it shows up in leaked lists but far less than the most-used picks."
+    }
+  ]
+}

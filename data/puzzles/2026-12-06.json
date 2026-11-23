@@ -1,0 +1,31 @@
+{
+  "date": "2026-12-06",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "doodoo",
+      "count": 74098,
+      "note": "Its childish, repetitive sound makes it a silly word people type on instinct, which is why it shows up so often."
+    },
+    {
+      "password": "Youknowit2000",
+      "count": 0,
+      "note": "Its casual \"you know it\" phrasing plus a tacked-on year feels personal, which is exactly why it never made a leaked list."
+    },
+    {
+      "password": "contortionist",
+      "count": 2135,
+      "note": "Real English words like \"contortionist\" get picked as passwords for their sound and spelling, so plenty of people land on this same one."
+    },
+    {
+      "password": "Hellokitty2010",
+      "count": 252,
+      "note": "Pairing a beloved character with a year tacks a personal date onto a familiar name, which keeps it out of the most-used tier."
+    },
+    {
+      "password": "pallmall",
+      "count": 184284,
+      "note": "Pallmall is a cigarette brand name, and a single word like that gets picked by people who never bother to make anything up."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-30",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "doqvq3",
+      "count": 828,
+      "note": "Its random-looking letters and single trailing digit make it a short, odd string people rarely pick on purpose."
+    },
+    {
+      "password": "chrissy",
+      "count": 135230,
+      "note": "Chrissy is a short, friendly nickname that people pick over and over, so it shows up in huge numbers of leaked lists."
+    },
+    {
+      "password": "celica",
+      "count": 88358,
+      "note": "Celica is a car model name, and people often reuse model names as easy, memorable passwords."
+    },
+    {
+      "password": "pokemon2025",
+      "count": 40,
+      "note": "A franchise name plus a current year is a habit many people fall into, so it shows up in leaks but far less than the most obvious choices."
+    },
+    {
+      "password": "andrew2000",
+      "count": 9713,
+      "note": "Pairing a first name with a birth-year-style number is a habit that shows up in huge numbers of leaked lists."
+    }
+  ]
+}

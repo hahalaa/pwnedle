@@ -1,0 +1,31 @@
+{
+  "date": "2026-12-01",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "b@rc3l0n@",
+      "count": 61,
+      "note": "Swapping letters for symbols and digits in \"barcelona\" gives a familiar trick, but this exact spelling is less common than the plain word."
+    },
+    {
+      "password": "Shadow",
+      "count": 188060,
+      "note": "Shadow is a single dictionary word that people pick for its edgy, gamer-style ring, so it shows up in leaked lists constantly."
+    },
+    {
+      "password": "warriors2010",
+      "count": 538,
+      "note": "Pairing a team nickname with a year is a habit, but this specific mix is less common than the usual sports-plus-digits combos."
+    },
+    {
+      "password": "tophat",
+      "count": 23356,
+      "note": "Short, dictionary-plain, and easy to picture, so it shows up in leaked lists far more than people expect."
+    },
+    {
+      "password": "myxworld",
+      "count": 3270,
+      "note": "Mixing \"my\" with a plain noun like \"world\" is a pattern many people use, so this one shows up in leaked lists often."
+    }
+  ]
+}

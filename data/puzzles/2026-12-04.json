@@ -1,0 +1,31 @@
+{
+  "date": "2026-12-04",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "rasta220",
+      "count": 1321,
+      "note": "The \"rasta\" stem is a popular word, and tacking on \"220\" is a habit people repeat across many accounts."
+    },
+    {
+      "password": "8543852",
+      "count": 742,
+      "note": "Just seven digits in a row, a sequence that's easy to type but still a pattern many people land on."
+    },
+    {
+      "password": "computer2025",
+      "count": 98,
+      "note": "Pairing a common noun with a trailing year makes it guessable, yet this exact combination is less worn than bare words like \"password1\"."
+    },
+    {
+      "password": "5678",
+      "count": 180841,
+      "note": "It's just the digits 5, 6, 7, 8 counting upward in a row, the first sequence anyone thinks of."
+    },
+    {
+      "password": "dogg",
+      "count": 17655,
+      "note": "It's a slangy spin on \"dog\" that people type by reflex, a playful doubling that feels like a real word."
+    }
+  ]
+}

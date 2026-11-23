@@ -1,0 +1,31 @@
+{
+  "date": "2026-12-03",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "3mm@",
+      "count": 2,
+      "note": "Swapping letters for symbols on a short string like \"3mm@\" is a habit lots of people share, so it lands in the rare band."
+    },
+    {
+      "password": "fields",
+      "count": 21103,
+      "note": "A plain dictionary noun with no digits or symbols, so it shows up in leaked lists constantly."
+    },
+    {
+      "password": "giuseppe",
+      "count": 576600,
+      "note": "Giuseppe is a real Italian first name, yet it's a single lowercase word people pick because it's easy to remember and type."
+    },
+    {
+      "password": "Thomas2024",
+      "count": 629,
+      "note": "Pairing a first name with a recent year makes it a sensible-looking pattern, though far from the most predictable one."
+    },
+    {
+      "password": "Ella2010",
+      "count": 5278,
+      "note": "A first name plus a year is a habit so many people share that it turns up in leaked lists again and again."
+    }
+  ]
+}

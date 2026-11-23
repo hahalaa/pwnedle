@@ -1,0 +1,31 @@
+{
+  "date": "2026-12-05",
+  "status": "draft",
+  "passwords": [
+    {
+      "password": "stacy",
+      "count": 32495,
+      "note": "A common first name with nothing added, so it sits in every list of simple guesses."
+    },
+    {
+      "password": "zxzxzx",
+      "count": 151434,
+      "note": "Its alternating \"zx\" pattern is a keyboard-adjacent sequence, the kind people type on autopilot when filling a box."
+    },
+    {
+      "password": "Welcomehome123",
+      "count": 489,
+      "note": "A friendly phrase plus the standard \"123\" tail makes it easy to guess, yet the exact combination stays uncommon."
+    },
+    {
+      "password": "tiger2025",
+      "count": 21,
+      "note": "A familiar animal word plus a trailing year is a combo many people settle on, which is why this one shows up at all."
+    },
+    {
+      "password": "azerty1!",
+      "count": 2289,
+      "note": "Keyboard-row letters from the French AZERTY layout, with a lone digit and exclamation tacked on to satisfy a complexity rule."
+    }
+  ]
+}
