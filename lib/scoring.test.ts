@@ -17,7 +17,7 @@ test("follows the bell curve with K", () => {
 });
 
 test("maps scores to tiers at the band edges", () => {
-  const edges = [100, 90, 89, 70, 69, 40, 39, 10, 9, 0].map(tier);
+  const edges = [100, 85, 84, 70, 69, 40, 39, 15, 14, 0].map(tier);
   expect(edges).toEqual(["Uncrackable", "Uncrackable", "Strong", "Strong", "Mid", "Mid", "Weak", "Weak", "Pwned", "Pwned"]);
-  expect(tier(89.6)).toBe("Strong"); // daily average is not rounded up into a band
+  expect(tier(84.6)).toBe("Strong"); // daily average is not rounded up into a band
 });

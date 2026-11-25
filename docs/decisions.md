@@ -246,3 +246,6 @@ A New Year day is dressed like Christmas, just as quietly. Tier colours and text
 - On the end screen, a solid party hat sticker (a cone with a stripe cut out and a pompom) sits on the laptop lid.
 - The share text adds 🎆 after the puzzle number (R19), taken from the tag "🎆 new year special".
 A `newyear` variant works like the `christmas` one, through `data-event="newyear"`.
+
+## D56. New tier bands (T80, supersedes R11's bands)
+The bands are now Uncrackable 85 to 100, Strong 70 to 84, Mid 40 to 69, Weak 15 to 39 and Pwned 0 to 14, for each password and for the daily average. Past games and past days take the new bands too. Stats, the share text, the daily tier and the crowd chart already work tiers out from scores. Saved games also store each result's tier name, so `loadGame` works it out again from the score; that replaces D40's Medium-to-Mid fix. Each band edge times 5 (75, 200, 350, 425) is still a multiple of 25, so each of the crowd chart's 25-point bars still sits in a single tier.

@@ -33,10 +33,10 @@ export function stats(games: Record<string, Game>, today: string) {
 // localStorage can throw (blocked storage, some private modes); the game still plays, it just won't resume.
 const KEY = "pwnedle:";
 
-// Games saved before D40 name the Mid tier "Medium".
+// Saved results store the tier name from the bands of their day; work it out again from the score so old games use the current bands (D56).
 export function loadGame(date: string): Game | null {
   try {
-    return JSON.parse(localStorage.getItem(KEY + date) ?? "null", (k, v) => (k === "tier" && v === "Medium" ? "Mid" : v));
+    return JSON.parse(localStorage.getItem(KEY + date) ?? "null", (k, v) => (v?.tier ? { ...v, tier: tier(v.score) } : v));
   } catch {
     return null;
   }

@@ -54,10 +54,11 @@ test("games round-trip through localStorage under pwnedle:<date> (R16)", () => {
   expect(savedGames()).toEqual({ "2026-10-24": g });
 });
 
-test("a game saved before D40 reads its Medium results as Mid", () => {
-  const store: Record<string, string> = { "pwnedle:2026-10-24": JSON.stringify({ index: 1, done: false, results: [{ score: 50, tier: "Medium" }] }) };
+test("a saved game takes its tiers again from the scores, under the current bands (D40, D56)", () => {
+  const results = [{ score: 50, tier: "Medium" }, { score: 88, tier: "Strong" }, { score: 12, tier: "Weak" }];
+  const store: Record<string, string> = { "pwnedle:2026-10-24": JSON.stringify({ index: 1, done: false, results }) };
   vi.stubGlobal("localStorage", { getItem: (k: string) => store[k] ?? null });
-  expect(loadGame("2026-10-24")?.results).toEqual([{ score: 50, tier: "Mid" }]);
+  expect(loadGame("2026-10-24")?.results).toEqual([{ score: 50, tier: "Mid" }, { score: 88, tier: "Uncrackable" }, { score: 12, tier: "Pwned" }]);
 });
 
 test("blocked storage never breaks the game", () => {

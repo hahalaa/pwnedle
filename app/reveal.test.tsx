@@ -235,7 +235,7 @@ test("on a touch screen nothing focuses the box for the player, whatever the cli
 
 // T56: a finished game, with the umami script stubbed so any event would show.
 function finished(extra: object = {}) {
-  const saved = JSON.stringify({ index: 4, done: true, results: ["a", "b", "c", "d", "e"].map((p, i) => ({ guess: 10 ** i, ...body, score: 50 + i, tier: i ? "Mid" : "Pwned", note: `About ${p}.` })), ...extra });
+  const saved = JSON.stringify({ index: 4, done: true, results: ["a", "b", "c", "d", "e"].map((p, i) => ({ guess: 10 ** i, ...body, score: 50 + i, tier: "Mid", note: `About ${p}.` })), ...extra });
   localStorage.setItem("pwnedle:2026-10-24", saved);
   const track = vi.fn();
   vi.stubGlobal("umami", { track });
@@ -288,7 +288,7 @@ test("with reduced motion a reopened reveal shows its end state, and Escape goes
   render(<Round {...props} />);
   fireEvent.click(await row("a"), { detail: 1 });
   expect(Element.prototype.animate).not.toHaveBeenCalled();
-  expect(playTier).toHaveBeenCalledWith("Pwned");
+  expect(playTier).toHaveBeenCalledWith("Mid");
   expect(screen.getByRole("button", { name: "Back to results" }).className).not.toContain("opacity-0");
   // Escape inside an open dialog is the dialog's own.
   const dialog = document.body.appendChild(document.createElement("dialog"));
