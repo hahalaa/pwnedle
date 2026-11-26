@@ -334,3 +334,11 @@ const row = (password: string) => screen.getByText(password, { selector: "span" 
 
 // A click carrying a pointerType, which jsdom's MouseEvent lacks.
 const tap = (pointerType: string) => Object.assign(new MouseEvent("click", { bubbles: true, detail: 1 }), { pointerType });
+
+test("a locked-in result is saved with its password, for the stats highlights (T81)", async () => {
+  stubMotion(true);
+  render(<Round {...props} />);
+  fireEvent.click(screen.getByRole("button", { name: "Lock in" }), { detail: 1 });
+  await screen.findByRole("button", { name: "Next password" });
+  expect(JSON.parse(localStorage.getItem("pwnedle:2026-10-24")!).results[0]).toEqual({ guess: 0, password: "a", ...body });
+});

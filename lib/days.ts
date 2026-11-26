@@ -1,3 +1,5 @@
+import { LAUNCH_DATE } from "./config.ts";
+
 // Dates are YYYY-MM-DD strings (R2).
 export const addDays = (date: string, n: number) =>
   new Date(Date.parse(`${date}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
@@ -14,3 +16,5 @@ export function zoneToday(timeZone?: string) {
     return utcToday();
   }
 }
+
+export const puzzleNumber = (date: string) => (Date.parse(date) - Date.parse(LAUNCH_DATE)) / 86_400_000 + 1;

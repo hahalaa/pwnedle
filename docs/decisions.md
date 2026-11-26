@@ -249,3 +249,10 @@ A `newyear` variant works like the `christmas` one, through `data-event="newyear
 
 ## D56. New tier bands (T80, supersedes R11's bands)
 The bands are now Uncrackable 85 to 100, Strong 70 to 84, Mid 40 to 69, Weak 15 to 39 and Pwned 0 to 14, for each password and for the daily average. Past games and past days take the new bands too. Stats, the share text, the daily tier and the crowd chart already work tiers out from scores. Saved games also store each result's tier name, so `loadGame` works it out again from the score; that replaces D40's Medium-to-Mid fix. Each band edge times 5 (75, 200, 350, 425) is still a multiple of 25, so each of the crowd chart's 25-point bars still sits in a single tier.
+
+## D57. Stats highlights (T81)
+The stats dialog adds highlights, worked out in the browser from saved daily games. Archive games never count (R18), and no request goes to the server.
+- Best days and worst days: up to 3 each, by daily total, with the puzzle number, date, total and daily tier. Ties go to the more recent day. The best list fills first and the worst list takes the 3 lowest of the days left over, so a day never appears in both. With 3 games the worst list is empty and hidden, and it fills as games are added. The whole section stays hidden until 3 daily games are finished.
+- Each day links to its puzzle: today's to the home page, earlier days to `/archive/<number>`. A finished game opens on its end screen there, and the dialog closes on the click.
+- Best guess and worst miss: the reveals closest to and furthest from the count, by the same ratio the reveal shows. They come from every saved daily reveal, including an unfinished game's, and ties go to the more recent reveal. Each shows the password, puzzle number and the reveal's wording ("4.2× too low", "Exact").
+- Saved games had no password text before T81. Each new result now saves its password, and an older result shows "password N" instead.

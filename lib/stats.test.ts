@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { type Game, loadGame, savedGames, saveGame, stats } from "./stats";
+import { type Game, highlights, loadGame, savedGames, saveGame, stats } from "./stats";
 
 const finished = (...scores: number[]): Game => ({ index: 4, done: true, results: scores.map((score) => ({ score })) });
 
@@ -39,6 +39,61 @@ test("streaks run over consecutive puzzle dates and the current one ends after a
 test("archive games are left out of stats and streaks (R18)", () => {
   const games = { "2026-10-24": finished(50), "2026-10-25": { ...finished(500), archive: true }, "2026-10-26": finished(50) };
   expect(stats(games, "2026-10-26")).toMatchObject({ played: 2, best: 50, current: 1, max: 1 });
+});
+
+// A finished game whose five scores add up to `total`.
+const day = (total: number): Game => finished(total, 0, 0, 0, 0);
+const dates = (h: ReturnType<typeof highlights>, k: "best" | "worst") => h![k].map((d) => d.date);
+
+test("highlights stay hidden until 3 daily games are finished, and leave out archive and unfinished games (D57)", () => {
+  const games: Record<string, Game> = {
+    "2026-10-24": day(300),
+    "2026-10-25": { ...day(500), archive: true },
+    "2026-10-26": { index: 1, done: false, results: [{ score: 90 }] },
+    "2026-10-27": day(200),
+  };
+  expect(highlights(games)).toBeNull();
+  games["2026-10-28"] = day(400);
+  expect(highlights(games)).toMatchObject({
+    best: [
+      { date: "2026-10-28", number: 9, total: 400, tier: "Strong" },
+      { date: "2026-10-24", number: 5, total: 300 },
+      { date: "2026-10-27", number: 8, total: 200 },
+    ],
+    // With 3 games every day is a best one, so no worst days yet.
+    worst: [],
+  });
+});
+
+test("with fewer than 6 games a day is never both best and worst; ties go to the more recent day (D57)", () => {
+  const games = { "2026-10-24": day(300), "2026-10-25": day(100), "2026-10-26": day(300), "2026-10-27": day(200), "2026-10-28": day(100) };
+  const h = highlights(games);
+  expect(dates(h, "best")).toEqual(["2026-10-26", "2026-10-24", "2026-10-27"]);
+  expect(dates(h, "worst")).toEqual(["2026-10-28", "2026-10-25"]);
+  // All tied: newest first in both lists, still no repeats.
+  const flat = Object.fromEntries(["24", "25", "26", "27", "28", "29", "30"].map((d) => [`2026-10-${d}`, day(250)]));
+  expect(dates(highlights(flat), "best")).toEqual(["2026-10-30", "2026-10-29", "2026-10-28"]);
+  expect(dates(highlights(flat), "worst")).toEqual(["2026-10-27", "2026-10-26", "2026-10-25"]);
+});
+
+test("best guess and worst miss come from every saved daily reveal, with the reveal's wording (D57)", () => {
+  const reveal = (guess: number, count: number, password?: string) => ({ score: 50, guess, count, password });
+  const games: Record<string, Game> = {
+    "2026-10-24": { index: 5, done: true, results: [reveal(99, 999), reveal(5, 5)] },
+    "2026-10-25": { index: 5, done: true, results: [reveal(5, 5, "hunter2"), reveal(0, 99_999_999, "qwerty")] },
+    // Unfinished daily games still count; archive ones never do.
+    "2026-10-26": { index: 1, done: false, results: [reveal(1, 0, "abc")] },
+    "2026-10-27": { index: 5, done: true, archive: true, results: [reveal(99_999_999, 0, "zzz")] },
+    "2026-10-28": { index: 5, done: true, results: [reveal(1000, 0)] },
+  };
+  const h = highlights(games)!;
+  // Two exact guesses tie; the more recent one wins.
+  expect(h.guess).toMatchObject({ password: "hunter2", number: 6, index: 0, text: "Exact" });
+  expect(h.miss).toMatchObject({ password: "qwerty", number: 6, text: "100m× too low" });
+  // A result saved before T81 has no password.
+  games["2026-10-25"].results[0].password = undefined;
+  games["2026-10-25"].results[0].guess = 4;
+  expect(highlights(games)!.guess).toMatchObject({ password: undefined, number: 5, index: 1, text: "Exact" });
 });
 
 afterEach(() => vi.unstubAllGlobals());

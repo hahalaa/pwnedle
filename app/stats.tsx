@@ -1,15 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { zoneToday } from "../lib/days";
-import { savedGames, stats } from "../lib/stats";
+import { highlights, savedGames, stats } from "../lib/stats";
 import { NavLabel } from "./nav-label";
 import { tierColor } from "./round";
 
 // R17: worked out from this browser's saved games each time the modal opens.
 export function Stats() {
   const ref = useRef<HTMLDialogElement>(null);
-  const [s, setS] = useState<ReturnType<typeof stats> | null>(null);
+  const [data, setData] = useState<{ s: ReturnType<typeof stats>; h: ReturnType<typeof highlights>; today: string } | null>(null);
 
   return (
     <>
@@ -17,7 +18,9 @@ export function Stats() {
         type="button"
         onClick={() => {
           // Local date, matching the puzzle dates the player was served (R2).
-          setS(stats(savedGames(), zoneToday()));
+          const games = savedGames();
+          const today = zoneToday();
+          setData({ s: stats(games, today), h: highlights(games), today });
           ref.current?.showModal();
         }}
         aria-label="stats"
@@ -34,7 +37,8 @@ export function Stats() {
         className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md flex-col border border-line bg-void p-4 text-bone backdrop:bg-void/80 open:flex sm:p-6"
       >
         {/* Only the stats scroll when the dialog is taller than the screen, so Close stays in view. */}
-        <div className="min-h-0 overflow-y-auto focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">{s && <StatsBody s={s} />}</div>
+        {/* The gutter and padding keep the counts and tier names clear of the scrollbar, including overlay ones. */}
+        <div className="min-h-0 overflow-y-auto pr-4 [scrollbar-gutter:stable] focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-bone">{data && <StatsBody {...data} onPick={() => ref.current?.close()} />}</div>
         <form method="dialog" className="mt-4 sm:mt-6">
           <button
             type="submit"
@@ -48,7 +52,7 @@ export function Stats() {
   );
 }
 
-export function StatsBody({ s }: { s: ReturnType<typeof stats> }) {
+export function StatsBody({ s, h, today, onPick }: { s: ReturnType<typeof stats>; h?: ReturnType<typeof highlights>; today?: string; onPick?: () => void }) {
   return (
     <div className="flex flex-col gap-6">
       <h2 id="stats-title" className="border-b border-line pb-3 text-lg">
@@ -74,6 +78,63 @@ export function StatsBody({ s }: { s: ReturnType<typeof stats> }) {
         <h3 className="text-xs text-ash">tiers</h3>
         <TierBars tiers={s.tiers} />
       </div>
+      {/* D57: each day links to its puzzle, which opens on the end screen. Today is only played from the home page. */}
+      {h &&
+        (
+          [
+            ["best days", h.best],
+            ["worst days", h.worst],
+          ] as const
+        ).map(
+          ([label, days]) =>
+            days.length > 0 && (
+              <div key={label} className="flex flex-col gap-2">
+                <h3 className="text-xs text-ash">{label}</h3>
+                <ol className="divide-y divide-line border-y border-line text-sm">
+                  {days.map((d) => (
+                    <li key={d.date}>
+                      <Link
+                        href={d.date === today ? "/" : `/archive/${d.number}`}
+                        onClick={onPick}
+                        className="group flex min-h-11 items-center justify-between gap-3 px-3 hover:bg-line focus-visible:outline-1 focus-visible:outline-bone"
+                      >
+                        <span>
+                          #{d.number} <span className="text-ash group-hover:text-bone">{d.date}</span>
+                        </span>
+                        <span className="flex items-center gap-3">
+                          {d.total}
+                          <span className="w-24 text-right" style={{ color: tierColor(d.tier) }}>
+                            {d.tier.toLowerCase()}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            ),
+        )}
+      {h && (
+        <dl className="flex flex-col gap-3 text-sm">
+          {(
+            [
+              ["best guess", h.guess],
+              ["worst miss", h.miss],
+            ] as const
+          ).map(([label, r]) => (
+            <div key={label} className="flex flex-col-reverse gap-1">
+              <dt className="text-xs text-ash">{label}</dt>
+              {/* Results saved before T81 have no password, so they show its place in the puzzle. */}
+              <dd className="break-all">
+                {r.password ?? `password ${r.index + 1}`}{" "}
+                <span className="text-ash">
+                  #{r.number} · {r.text}
+                </span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
       {/* R18: archive games are saved but left out of these numbers. */}
       <p className="text-xs text-ash">Archive games don&apos;t count towards stats.</p>
     </div>

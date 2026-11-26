@@ -1,9 +1,11 @@
-import { addDays } from "./days";
+import { addDays, puzzleNumber } from "./days";
+import { missRatio } from "./guess";
 import { tier } from "./scoring";
 
 // R16: one saved game per puzzle date, under `pwnedle:<date>` in localStorage.
 // `archive` marks a game last played from the archive (R18).
-export type Game = { index: number; done: boolean; results: { score: number }[]; archive?: boolean };
+// Results saved since T81 also keep their password, for the stats highlights.
+export type Game = { index: number; done: boolean; results: { score: number; guess?: number; count?: number; password?: string }[]; archive?: boolean };
 
 export const TIERS = ["Uncrackable", "Strong", "Mid", "Weak", "Pwned"];
 
@@ -28,6 +30,28 @@ export function stats(games: Record<string, Game>, today: string) {
     max,
     tiers: TIERS.map((t) => [t, totals.filter((s) => tier(s / 5) === t).length] as const),
   };
+}
+
+// D57: best and worst days and reveals from daily games only (R18), hidden until 3 daily games are finished. Ties go to
+// the more recent day, and a day is never in both lists.
+export function highlights(games: Record<string, Game>) {
+  const daily = Object.keys(games).filter((d) => !games[d].archive).sort().reverse();
+  const days = daily
+    .filter((d) => games[d].done)
+    .map((date) => {
+      const total = games[date].results.reduce((a, r) => a + r.score, 0);
+      return { date, number: puzzleNumber(date), total, tier: tier(total / 5) };
+    });
+  if (days.length < 3) return null;
+  // Sorting is stable, so on a tie the newer day stays first.
+  const best = [...days].sort((a, b) => b.total - a.total).slice(0, 3);
+  const worst = [...days].sort((a, b) => a.total - b.total).filter((d) => !best.includes(d)).slice(0, 3);
+  const reveals = daily.flatMap((date) =>
+    games[date].results
+      .map(({ guess = 0, count = 0, password }, i) => ({ number: puzzleNumber(date), index: i, password, text: missRatio(guess, count), off: (Math.max(guess, count) + 1) / (Math.min(guess, count) + 1) }))
+      .reverse(),
+  );
+  return { best, worst, guess: reveals.reduce((a, r) => (r.off < a.off ? r : a)), miss: reveals.reduce((a, r) => (r.off > a.off ? r : a)) };
 }
 
 // localStorage can throw (blocked storage, some private modes); the game still plays, it just won't resume.

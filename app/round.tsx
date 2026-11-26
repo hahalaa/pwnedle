@@ -57,7 +57,7 @@ const stretch = (view: View) => `translateX(${-view[0] * scale(view) * 100}%) sc
 const place = (view: View, at: number) => `translateX(${(at * (scale(view) - 1) - view[0] * scale(view)) * 100}%)`;
 
 // What /api/guess returns (R14), plus the guess that was sent.
-type Result = { guess: number; count: number; score: number; tier: string; note: string };
+type Result = { guess: number; count: number; score: number; tier: string; note: string; password?: string };
 type Saved = Omit<Game, "results"> & { results: Result[] };
 
 // True once hydrated: the server can't see localStorage, so the first render must match a fresh game.
@@ -135,7 +135,8 @@ export function Round({ date, number, passwords, archive, theme }: { date: strin
     if (!body) return setState("error");
     if (!results.length) track("puzzle-start", number, archive);
     play(index, body.tier);
-    update({ ...game, results: [...results, { guess, ...body }] });
+    // T81: the password is kept for the stats highlights, since saved games are all they read.
+    update({ ...game, results: [...results, { guess, password: passwords[index], ...body }] });
     setState("guessing");
   }
 

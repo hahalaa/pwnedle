@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { connection } from "next/server";
 import type { Puzzle } from "../scripts/puzzles.ts";
 import { LAUNCH_DATE } from "./config.ts";
-import { addDays, utcToday, zoneToday } from "./days.ts";
+import { addDays, puzzleNumber, utcToday, zoneToday } from "./days.ts";
 
 // The puzzle for `date`, draft or approved (R36), if it falls between launch and UTC today+1 (R2).
 // Returns null for anything else, including a missing file. Includes counts and notes, so never send it to the client whole (R13).
@@ -39,8 +39,6 @@ export async function playerToday() {
 }
 
 // Puzzle number is days since launch, starting at #1 (R1, D22).
-export const puzzleNumber = (date: string) => (Date.parse(date) - Date.parse(LAUNCH_DATE)) / 86_400_000 + 1;
-
 // R20: every puzzle file from launch up to yesterday, newest first, with its theme if it has one (D49). Today and later are never listed.
 export async function pastPuzzles(today: string, dir = join(process.cwd(), "data/puzzles")) {
   // No folder yet just means nothing is published. next.config.ts already traces the folder,
